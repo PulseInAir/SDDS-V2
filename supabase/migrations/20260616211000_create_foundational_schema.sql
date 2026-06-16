@@ -142,6 +142,14 @@ create trigger client_credentials_set_updated_at
 before update on public.client_credentials
 for each row execute function private.set_updated_at();
 
+revoke all on function private.set_updated_at() from public, anon, authenticated;
+
+comment on table public.workspaces is 'Tenant boundary for all SDDS operational data.';
+comment on table public.workspace_members is 'Authenticated-user membership and role within an SDDS workspace.';
+comment on table public.assessment_years is 'Workspace-scoped assessment-year configuration.';
+comment on table public.clients is 'Permanent client identity record, independent of annual filing cases.';
+comment on table public.client_credentials is 'Versioned encrypted credential envelopes only; plaintext credentials are forbidden.';
+
 create or replace function private.is_workspace_member(target_workspace_id uuid)
 returns boolean
 language sql
@@ -175,7 +183,6 @@ as $$
   );
 $$;
 
-revoke all on function private.set_updated_at() from public, anon, authenticated;
 revoke all on function private.is_workspace_member(uuid) from public, anon;
 revoke all on function private.is_workspace_owner(uuid) from public, anon;
 grant execute on function private.is_workspace_member(uuid) to authenticated;
@@ -311,9 +318,3 @@ grant select, insert, update, delete on table public.workspace_members to servic
 grant select, insert, update on table public.assessment_years to service_role;
 grant select, insert, update on table public.clients to service_role;
 grant select, insert, update on table public.client_credentials to service_role;
-
-comment on table public.workspaces is 'Tenant boundary for all SDDS operational data.';
-comment on table public.workspace_members is 'Authenticated-user membership and role within an SDDS workspace.';
-comment on table public.assessment_years is 'Workspace-scoped assessment-year configuration.';
-comment on table public.clients is 'Permanent client identity record, independent of annual filing cases.';
-comment on table public.client_credentials is 'Versioned encrypted credential envelopes only; plaintext credentials are forbidden.';
