@@ -11,7 +11,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G02 | DONE | Configure quality gates and CI | G01 | typecheck, lint, build, test command, GitHub workflow where appropriate | `12c4c3af71d61b9e580cf0e7123652c4f1953069` |
 | G03 | DONE | Configure environment contract and Supabase clients | G01 | `.env.example`, browser/server clients, no secret leakage | `ff1f323e2fd67d14af8e2ff554450a48b02ada75` |
 | G04 | DONE | Create workspace, membership, AY, client, and credential migrations | G03 | constraints, indexes, RLS draft, generated types | `76a4595bb0d556d3506c0caf5aa9d4a9dee918f5` |
-| G05 | READY | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | — |
+| G05 | IN_PROGRESS | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | — |
 | G06 | PENDING | Create document metadata and private Storage policies | G04 | private bucket contract, RLS/storage tests | — |
 | G07 | PENDING | Create invoice, item, sequence, and payment migrations | G04 | atomic numbering and financial constraints | — |
 | G08 | PENDING | Create refunds, tax events, follow-ups, communication, activity, and import-job migrations | G05,G07 | complete operational relations and RLS | — |
