@@ -8,20 +8,18 @@ This file is rewritten after every task. Keep it compact and factual.
 - Active task: none
 - Next READY task: G02 — Configure quality gates and CI
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g01-nextjs-foundation`
-- Base branch: `master`
-- Base HEAD: `fcafb09dbdf3bd22796eb48aec56ff81d403ad16`
-- G01 implementation commit: `ed2c53c4b464f6ffa851ff5ff7b15ccc30f36112`
+- Branch: `master`
+- G01 merge commit: `d0610265e32aea9b58c0342c2db260306f3d5b9b`
 - Vercel project: not linked yet
 - Supabase project: not linked yet
 
 ## Completed work
 
 - G00 completed: project-brain baseline installed and verified.
-- G01 completed: initialized a greenfield Next.js App Router application with TypeScript strict mode, Tailwind CSS, ESLint, and a minimal SDDS foundation page.
-- Removed default starter imagery, links, branding, dark-mode demo content, and external font loading.
-- Added private-product metadata and a restrained neutral foundation aligned with the locked SDDS direction.
-- Added a PostCSS override resolving the production dependency advisory found during local validation.
+- G01 completed and merged through PR #2.
+- Initialized Next.js App Router with TypeScript strict mode, Tailwind CSS, ESLint, and a minimal SDDS foundation page.
+- Removed default starter imagery, links, branding, demo content, and external font loading.
+- Added a PostCSS override resolving the production dependency advisory found during validation.
 
 ## Changed
 
@@ -34,8 +32,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - `src/app/globals.css`
 - `src/app/layout.tsx`
 - `src/app/page.tsx`
-- `AI Master Brain/17-TASK-LEDGER.md`
-- `AI Master Brain/18-SESSION-HANDOFF.md`
+- task ledger and session handoff
 
 ## Verification
 
@@ -46,15 +43,15 @@ Validated an equivalent clean local scaffold using Node.js `22.16.0`, npm `10.9.
 - `npm run build`: pass
 - Routes generated: `/` and `/_not-found`
 - `npm audit --omit=dev`: 0 known vulnerabilities after the PostCSS override
-- Branch comparison: only the nine intended application foundation files plus ledger/handoff documentation are changed
+- PR #2 changed only the intended foundation files and project-state documentation
 - Starter public assets: not added
 - Secrets or environment files: not added
 
 ## Risks / blockers
 
-- The repository does not yet contain a committed dependency lockfile. G02 must generate and commit the npm lockfile while configuring deterministic quality gates and CI.
+- The repository does not yet contain a committed dependency lockfile. G02 must generate and commit it while configuring deterministic quality gates and CI.
 - Backup destination and retention remain an owner decision for G31 and do not block G02.
 
 ## Exact next action
 
-Run G02: add deterministic dependency installation, typecheck/test scripts, the required CI workflow, and verify lint, typecheck, tests, and production build.
+Run G02: add deterministic dependency installation, typecheck and test scripts, the required CI workflow, and verify lint, typecheck, tests, and production build.
