@@ -1,0 +1,46 @@
+name: Bootstrap Supabase dependencies
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  install-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install current Supabase SSR dependencies
+        run: npm install --save-exact @supabase/ssr@latest @supabase/supabase-js@latest
+
+      - name: Run quality suite
+        run: npm run check
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Commit dependency manifests
+        run: |
+          if [ -z "$(git status --porcelain -- package.json package-lock.json)" ]; then
+            echo "Dependency manifests are already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: install Supabase SSR dependencies"
+          git push origin HEAD:${{ github.head_ref }}
