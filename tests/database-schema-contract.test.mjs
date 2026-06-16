@@ -38,9 +38,17 @@ test("every exposed G04 table enables row-level security", () => {
       ),
       `${table} must enable RLS`,
     );
+
+    assert.match(
+      migration,
+      new RegExp(
+        `revoke all on table public\\.${table} from public, anon, authenticated, service_role`,
+        "i",
+      ),
+      `${table} must reset inherited/default privileges before explicit grants`,
+    );
   }
 
-  assert.match(migration, /revoke all on table public\.clients from anon/i);
   assert.doesNotMatch(migration, /grant\s+.+\s+to\s+anon/i);
 });
 
@@ -57,6 +65,15 @@ test("workspace authorization helpers remain outside the exposed public schema",
   assert.doesNotMatch(
     migration,
     /create or replace function public\.is_workspace_(member|owner)/i,
+  );
+
+  const securityDefinerFunctions = migration.match(
+    /security definer\s+set search_path = ''/gi,
+  );
+  assert.equal(
+    securityDefinerFunctions?.length,
+    2,
+    "both security-definer authorization helpers must pin an empty search path",
   );
 });
 
@@ -79,6 +96,21 @@ test("credential storage accepts encrypted envelopes only", () => {
   assert.match(credentialTable, /jsonb_typeof\(encrypted_payload\) = 'object'/i);
   assert.doesNotMatch(credentialTable, /\bpassword\b/i);
   assert.doesNotMatch(credentialTable, /\bplaintext\b/i);
+});
+
+test("foreign-key lookup paths required by G04 are indexed", () => {
+  assert.match(migration, /workspace_members_user_active_idx/i);
+  assert.match(migration, /assessment_years_workspace_open_idx/i);
+  assert.match(migration, /clients_workspace_active_name_idx/i);
+  assert.match(migration, /client_credentials_workspace_client_idx/i);
+  assert.match(migration, /client_credentials_updated_by_idx/i);
+});
+
+test("membership policy prevents the current owner from deactivating itself", () => {
+  assert.match(
+    migration,
+    /and \(user_id <> \(select auth\.uid\(\)\) or active\)/i,
+  );
 });
 
 test("destructive business-row deletes are not granted", () => {
