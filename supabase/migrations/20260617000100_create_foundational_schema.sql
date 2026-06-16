@@ -107,6 +107,8 @@ create unique index clients_workspace_pan_active_unique_idx
   where archived_at is null;
 create index client_credentials_workspace_client_idx
   on public.client_credentials (workspace_id, client_id);
+create index client_credentials_updated_by_idx
+  on public.client_credentials (updated_by);
 create unique index client_credentials_one_active_per_client_idx
   on public.client_credentials (client_id)
   where archived_at is null;
@@ -114,10 +116,10 @@ create unique index client_credentials_one_active_per_client_idx
 create or replace function private.set_updated_at()
 returns trigger
 language plpgsql
-set search_path = pg_catalog
+set search_path = ''
 as $$
 begin
-  new.updated_at = now();
+  new.updated_at = pg_catalog.now();
   return new;
 end;
 $$;
@@ -147,7 +149,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = pg_catalog, public
+set search_path = ''
 as $$
   select exists (
     select 1
@@ -163,7 +165,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = pg_catalog, public
+set search_path = ''
 as $$
   select exists (
     select 1
@@ -217,7 +219,10 @@ on public.workspace_members
 for update
 to authenticated
 using ((select private.is_workspace_owner(workspace_id)))
-with check ((select private.is_workspace_owner(workspace_id)));
+with check (
+  (select private.is_workspace_owner(workspace_id))
+  and (user_id <> (select auth.uid()) or active)
+);
 
 create policy workspace_members_delete_owner
 on public.workspace_members
@@ -291,17 +296,23 @@ with check (
   and updated_by = (select auth.uid())
 );
 
-revoke all on table public.workspaces from anon;
-revoke all on table public.workspace_members from anon;
-revoke all on table public.assessment_years from anon;
-revoke all on table public.clients from anon;
-revoke all on table public.client_credentials from anon;
+revoke all on table public.workspaces from public, anon, authenticated, service_role;
+revoke all on table public.workspace_members from public, anon, authenticated, service_role;
+revoke all on table public.assessment_years from public, anon, authenticated, service_role;
+revoke all on table public.clients from public, anon, authenticated, service_role;
+revoke all on table public.client_credentials from public, anon, authenticated, service_role;
 
 grant select, update on table public.workspaces to authenticated;
 grant select, insert, update, delete on table public.workspace_members to authenticated;
 grant select, insert, update on table public.assessment_years to authenticated;
 grant select, insert, update on table public.clients to authenticated;
 grant select, insert, update on table public.client_credentials to authenticated;
+
+grant select, insert, update on table public.workspaces to service_role;
+grant select, insert, update, delete on table public.workspace_members to service_role;
+grant select, insert, update on table public.assessment_years to service_role;
+grant select, insert, update on table public.clients to service_role;
+grant select, insert, update on table public.client_credentials to service_role;
 
 comment on table public.workspaces is 'Tenant boundary for all SDDS operational data.';
 comment on table public.workspace_members is 'Authenticated-user membership and role within an SDDS workspace.';
