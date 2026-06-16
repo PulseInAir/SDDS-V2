@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
-const migration = await readFile(
-  new URL(
-    "../supabase/migrations/20260617000100_create_foundational_schema.sql",
-    import.meta.url,
-  ),
-  "utf8",
-);
+const migrationsDirectory = new URL("../supabase/migrations/", import.meta.url);
+const migrationFiles = (await readdir(migrationsDirectory))
+  .filter((filename) => filename.endsWith(".sql"))
+  .sort();
+const migration = (
+  await Promise.all(
+    migrationFiles.map((filename) =>
+      readFile(new URL(filename, migrationsDirectory), "utf8"),
+    ),
+  )
+).join("\n");
 
 const requiredTables = [
   "workspaces",
