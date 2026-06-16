@@ -11,6 +11,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - Branch: `codex/g04-foundational-schema`
 - Base branch: `master`
 - Base HEAD: `ac9df9bd4513167130251c93d0341db6b3bda450`
+- Draft pull request: `#5`
 - Vercel project: not linked yet
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Supabase URL: `https://vorcxrxggfybhucpimfx.supabase.co`
@@ -38,6 +39,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - Membership authorization helpers are contained in the non-exposed `private` schema.
 - Anonymous table privileges are revoked.
 - Destructive deletes are not granted for workspaces, assessment years, clients, or credentials.
+- GitHub Actions run `27644053964`: locked install, lint, typecheck, repository tests, production build, and production dependency audit all passed.
 
 ## Remaining verification / blocker
 
