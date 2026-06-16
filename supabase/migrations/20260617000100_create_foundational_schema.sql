@@ -1,5 +1,3 @@
-begin;
-
 create extension if not exists pgcrypto with schema extensions;
 
 create schema if not exists private;
@@ -319,5 +317,3 @@ comment on table public.workspace_members is 'Authenticated-user membership and 
 comment on table public.assessment_years is 'Workspace-scoped assessment-year configuration.';
 comment on table public.clients is 'Permanent client identity record, independent of annual filing cases.';
 comment on table public.client_credentials is 'Versioned encrypted credential envelopes only; plaintext credentials are forbidden.';
-
-commit;
