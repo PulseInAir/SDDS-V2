@@ -7,8 +7,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | ID | Status | Task | Depends on | Required output / acceptance | Commit |
 |---|---|---|---|---|---|
 | G00 | DONE | Install and validate project-brain control system in repository | — | Files copied, legacy conflicts quarantined, Git baseline recorded | `ac161dc7dfd3cec26b5ff0e7b26abeeb8b1a6a0e` |
-| G01 | READY | Inspect or initialise greenfield Next.js repository | G00 | Next.js App Router + TS + Tailwind, clean build, no starter clutter | — |
-| G02 | PENDING | Configure quality gates and CI | G01 | typecheck, lint, build, test command, GitHub workflow where appropriate | — |
+| G01 | DONE | Inspect or initialise greenfield Next.js repository | G00 | Next.js App Router + TS + Tailwind, clean build, no starter clutter | `ed2c53c4b464f6ffa851ff5ff7b15ccc30f36112` |
+| G02 | READY | Configure quality gates and CI | G01 | typecheck, lint, build, test command, GitHub workflow where appropriate | — |
 | G03 | PENDING | Configure environment contract and Supabase clients | G01 | `.env.example`, browser/server clients, no secret leakage | — |
 | G04 | PENDING | Create workspace, membership, AY, client, and credential migrations | G03 | constraints, indexes, RLS draft, generated types | — |
 | G05 | PENDING | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | — |

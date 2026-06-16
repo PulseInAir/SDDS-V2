@@ -4,43 +4,57 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 1 — Greenfield application initialization
+- Project phase: Phase 0 — Repository and control baseline
 - Active task: none
-- Next READY task: G01 — Inspect or initialise greenfield Next.js repository
+- Next READY task: G02 — Configure quality gates and CI
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g00-project-brain-baseline`
-- Baseline commit: `ac161dc7dfd3cec26b5ff0e7b26abeeb8b1a6a0e`
-- Default branch: `master`
+- Branch: `codex/g01-nextjs-foundation`
+- Base branch: `master`
+- Base HEAD: `fcafb09dbdf3bd22796eb48aec56ff81d403ad16`
+- G01 implementation commit: `ed2c53c4b464f6ffa851ff5ff7b15ccc30f36112`
 - Vercel project: not linked yet
 - Supabase project: not linked yet
 
-## Locked decisions relevant now
-
-- Greenfield build
-- Vercel + Supabase
-- private internal operations CRM
-- iDWELL-inspired hierarchy, density, navigation, and workflow only
-- no legacy dashboard design mixing
-- dashboard follows operational modules and query contracts
-
 ## Completed work
 
-- G00 completed.
-- The 25-file project-brain baseline is present in Git.
-- The root execution contract, numbered brain files, task ledger, continuation instruction, and checksum manifest are present.
-- No legacy application files required quarantine.
+- G00 completed: project-brain baseline installed and verified.
+- G01 completed: initialized a greenfield Next.js App Router application with TypeScript strict mode, Tailwind CSS, ESLint, and a minimal SDDS foundation page.
+- Removed default starter imagery, links, branding, dark-mode demo content, and external font loading.
+- Added private-product metadata and a restrained neutral foundation aligned with the locked SDDS direction.
+- Added a PostCSS override resolving the production dependency advisory found during local validation.
+
+## Changed
+
+- `.gitignore`
+- `eslint.config.mjs`
+- `next.config.ts`
+- `package.json`
+- `postcss.config.mjs`
+- `tsconfig.json`
+- `src/app/globals.css`
+- `src/app/layout.tsx`
+- `src/app/page.tsx`
+- `AI Master Brain/17-TASK-LEDGER.md`
+- `AI Master Brain/18-SESSION-HANDOFF.md`
 
 ## Verification
 
-- Repository and branch identified.
-- Initial project-brain commit inspected.
-- `AGENTS.md`, `00-START-HERE.md`, `17-TASK-LEDGER.md`, and `LOCKED-BASELINE.sha256` match the generated package by Git blob SHA.
-- Application checks were not applicable because application code has not been initialized.
+Validated an equivalent clean local scaffold using Node.js `22.16.0`, npm `10.9.2`, Next.js `16.2.9`, and React `19.2.4`.
+
+- `npm run lint`: pass
+- `npx tsc --noEmit`: pass
+- `npm run build`: pass
+- Routes generated: `/` and `/_not-found`
+- `npm audit --omit=dev`: 0 known vulnerabilities after the PostCSS override
+- Branch comparison: only the nine intended application foundation files plus ledger/handoff documentation are changed
+- Starter public assets: not added
+- Secrets or environment files: not added
 
 ## Risks / blockers
 
-- Backup destination and retention remain an owner decision for G31 and do not block G01.
+- The repository does not yet contain a committed dependency lockfile. G02 must generate and commit the npm lockfile while configuring deterministic quality gates and CI.
+- Backup destination and retention remain an owner decision for G31 and do not block G02.
 
 ## Exact next action
 
-Run G01: initialise the approved Next.js App Router, TypeScript, and Tailwind application without starter clutter; verify it; then update the ledger and handoff.
+Run G02: add deterministic dependency installation, typecheck/test scripts, the required CI workflow, and verify lint, typecheck, tests, and production build.
