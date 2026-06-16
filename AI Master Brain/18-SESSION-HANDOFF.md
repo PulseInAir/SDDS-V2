@@ -5,61 +5,47 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 1 — Domain and database foundation
-- Active task: none
-- Next READY task: G04 — Create workspace, membership, AY, client, and credential migrations
+- Active task: G04 — Create workspace, membership, AY, client, and credential migrations
+- Next READY task: none until G04 is verified and completed
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `master`
-- G03 merge commit: `ff1f323e2fd67d14af8e2ff554450a48b02ada75`
+- Branch: `codex/g04-foundational-schema`
+- Base branch: `master`
+- Base HEAD: `ac9df9bd4513167130251c93d0341db6b3bda450`
 - Vercel project: not linked yet
-- Supabase project: not linked yet
+- Supabase project: `vorcxrxggfybhucpimfx`
+- Supabase URL: `https://vorcxrxggfybhucpimfx.supabase.co`
 
 ## Completed work
 
-- G00 completed: project-brain baseline installed and verified.
-- G01 completed: greenfield Next.js foundation merged.
-- G02 completed: deterministic dependencies, tests, and CI merged.
-- G03 completed and merged through PR #4.
-- Added a placeholder-only `.env.example` containing the public Supabase URL and publishable key contract.
-- Installed and locked `@supabase/ssr` `0.12.0` and `@supabase/supabase-js` `2.108.2`.
-- Added lazy environment validation without module-scope startup failure.
-- Added a client-only lazy browser Supabase singleton.
-- Added a request-scoped server Supabase client using Next.js cookies.
-- Kept service-role and secret keys out of browser code and the committed environment example.
-- Added automated source-contract tests for public variables and browser/server boundaries.
+- G00 through G03 are complete and merged.
+- G04 has started.
+- Added the version-controlled foundational migration for workspaces, workspace membership, assessment years, clients, and encrypted credential envelopes.
+- Added constraints for canonical PAN values, assessment-year labels/dates, one current assessment year per workspace, one active PAN per workspace, and one active credential envelope per client.
+- Added supporting indexes, updated-at triggers, private membership/owner authorization helpers, RLS policies, and authenticated/anonymous grants.
+- Added automated repository tests that lock the G04 table, RLS, authorization-helper, identity, credential, and soft-delete contracts.
 
 ## Changed
 
-- `.env.example`
-- `package.json`
-- `package-lock.json`
-- `src/lib/env/supabase.ts`
-- `src/lib/supabase/browser.ts`
-- `src/lib/supabase/server.ts`
-- `tests/supabase-contract.test.mjs`
+- `supabase/migrations/20260617000100_create_foundational_schema.sql`
+- `tests/database-schema-contract.test.mjs`
 - task ledger and session handoff
 
-## Verification
+## Verification completed
 
-Final pull-request CI run `27641712027` completed successfully on Node.js 22.
+- Migration source reviewed against the locked domain and security contracts.
+- Credential schema contains a versioned JSON encrypted envelope only; no plaintext credential column exists.
+- All five exposed public tables explicitly enable RLS.
+- Membership authorization helpers are contained in the non-exposed `private` schema.
+- Anonymous table privileges are revoked.
+- Destructive deletes are not granted for workspaces, assessment years, clients, or credentials.
 
-- locked install with `npm ci`: pass
-- `npm run lint`: pass
-- `npm run typecheck`: pass
-- `npm test`: pass
-- `npm run build`: pass without Supabase environment values, proving lazy build-safe initialization
-- `npm audit --omit=dev --audit-level=high`: pass
-- environment contract contains placeholders only
-- no service-role, secret-key, or real credential value added
-- browser client does not import server headers
-- server client is marked server-only and uses request cookies
+## Remaining verification / blocker
 
-## Risks / blockers
-
-- No Supabase project identifier is recorded in the repository yet. G04 must identify the intended project before applying or verifying migrations.
-- Authentication cookie refresh/proxy logic is intentionally deferred to G09.
-- Generated database types are intentionally deferred until G04 creates and verifies the first schema.
-- Backup destination and retention remain an owner decision for G31 and do not block G04.
+- The Supabase connector action interface is discoverable but is not executing project, SQL, migration, type-generation, or advisor calls in this session.
+- Therefore the migration has not been applied to `vorcxrxggfybhucpimfx`.
+- Live schema inspection, generated TypeScript types, security/performance advisors, and positive/negative RLS tests remain incomplete.
+- G04 must remain `IN_PROGRESS`; no completion or database-change claim is permitted.
 
 ## Exact next action
 
-Run G04: identify the intended Supabase project, create version-controlled migrations for workspace, membership, assessment year, client, and encrypted credential records, add constraints/indexes/RLS, generate database types, and verify authorised and unauthorised paths.
+Restore executable Supabase connector access, then inspect the project schema and migration history, apply the committed G04 migration, generate and commit database types, run authorised/unauthorised/cross-workspace RLS tests and advisors, run repository CI, mark G04 DONE, promote G05, merge, and stop.
