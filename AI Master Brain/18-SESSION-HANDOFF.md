@@ -45,7 +45,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - Test rows rolled back.
 - Supabase security advisor: no findings.
 - Supabase performance advisor: informational unused-index notices only, expected on an empty schema.
-- GitHub Actions run `27650751050`: install, lint, typecheck, tests, build, and production dependency audit passed.
+- GitHub Actions run `27650837709`: install, lint, typecheck, tests, build, and production dependency audit passed.
 
 ## Exact next action
 
