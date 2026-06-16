@@ -8,9 +8,8 @@ This file is rewritten after every task. Keep it compact and factual.
 - Active task: none
 - Next READY task: G04 — Create workspace, membership, AY, client, and credential migrations
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g03-supabase-clients`
-- Base branch: `master`
-- G03 implementation head before documentation updates: `dbe20530ecc752315eefcf245085bf8bbbaa661e`
+- Branch: `master`
+- G03 merge commit: `ff1f323e2fd67d14af8e2ff554450a48b02ada75`
 - Vercel project: not linked yet
 - Supabase project: not linked yet
 
@@ -19,7 +18,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - G00 completed: project-brain baseline installed and verified.
 - G01 completed: greenfield Next.js foundation merged.
 - G02 completed: deterministic dependencies, tests, and CI merged.
-- G03 completed on PR #4.
+- G03 completed and merged through PR #4.
 - Added a placeholder-only `.env.example` containing the public Supabase URL and publishable key contract.
 - Installed and locked `@supabase/ssr` `0.12.0` and `@supabase/supabase-js` `2.108.2`.
 - Added lazy environment validation without module-scope startup failure.
@@ -41,7 +40,7 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Verification
 
-Final pull-request CI run `27641607549` completed successfully on Node.js 22.
+Final pull-request CI run `27641712027` completed successfully on Node.js 22.
 
 - locked install with `npm ci`: pass
 - `npm run lint`: pass
