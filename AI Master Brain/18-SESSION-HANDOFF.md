@@ -5,49 +5,49 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 1 — Domain and database foundation
-- Active task: G04 — Create workspace, membership, AY, client, and credential migrations
-- Next READY task: none until G04 is verified and completed
+- Active task: none
+- Next READY task: G05 — Create filing case, filing records, and status-history migrations
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `codex/g04-foundational-schema`
 - Base branch: `master`
-- Base HEAD: `ac9df9bd4513167130251c93d0341db6b3bda450`
-- Draft pull request: `#5`
+- Pull request: `#5`
 - Vercel project: not linked yet
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Supabase URL: `https://vorcxrxggfybhucpimfx.supabase.co`
 
 ## Completed work
 
-- G00 through G03 are complete and merged.
-- G04 has started.
-- Added the version-controlled foundational migration for workspaces, workspace membership, assessment years, clients, and encrypted credential envelopes.
-- Added constraints for canonical PAN values, assessment-year labels/dates, one current assessment year per workspace, one active PAN per workspace, and one active credential envelope per client.
-- Added supporting indexes, updated-at triggers, private membership/owner authorization helpers, RLS policies, and authenticated/anonymous grants.
-- Added automated repository tests that lock the G04 table, RLS, authorization-helper, identity, credential, and soft-delete contracts.
+- G00 through G04 are complete.
+- Applied live migrations `20260616211000_create_foundational_schema` and `20260616211525_secure_foundational_schema`.
+- Created workspaces, owner membership, assessment years, permanent clients, and encrypted credential-envelope tables.
+- Added canonical PAN, AY, active-record, archive, credential, foreign-key, and uniqueness constraints.
+- Added supporting indexes and updated-at triggers.
+- Added private membership/owner authorization helpers with fixed empty search paths.
+- Enabled RLS on all five public tables and applied explicit least-privilege grants.
+- Added generated Supabase TypeScript database types.
+- Added repository schema-contract tests.
 
 ## Changed
 
-- `supabase/migrations/20260617000100_create_foundational_schema.sql`
+- `supabase/migrations/20260616211000_create_foundational_schema.sql`
+- `supabase/migrations/20260616211525_secure_foundational_schema.sql`
+- `src/types/database.types.ts`
 - `tests/database-schema-contract.test.mjs`
 - task ledger and session handoff
 
-## Verification completed
+## Verification
 
-- Migration source reviewed against the locked domain and security contracts.
-- Credential schema contains a versioned JSON encrypted envelope only; no plaintext credential column exists.
-- All five exposed public tables explicitly enable RLS.
-- Membership authorization helpers are contained in the non-exposed `private` schema.
-- Anonymous table privileges are revoked.
-- Destructive deletes are not granted for workspaces, assessment years, clients, or credentials.
-- GitHub Actions run `27644053964`: locked install, lint, typecheck, repository tests, production build, and production dependency audit all passed.
-
-## Remaining verification / blocker
-
-- The Supabase connector action interface is discoverable but is not executing project, SQL, migration, type-generation, or advisor calls in this session.
-- Therefore the migration has not been applied to `vorcxrxggfybhucpimfx`.
-- Live schema inspection, generated TypeScript types, security/performance advisors, and positive/negative RLS tests remain incomplete.
-- G04 must remain `IN_PROGRESS`; no completion or database-change claim is permitted.
+- Supabase project status: active and healthy.
+- Migration history exactly matches both repository migration filenames.
+- RLS enabled on all five business tables.
+- All 15 intended authenticated policies exist.
+- Anonymous table privileges are absent; authenticated and service-role privileges match the explicit contract.
+- Security-definer helpers are in `private` and pin `search_path` to empty.
+- Transactional live database tests passed for authorised owner reads/writes, credential access, unauthenticated denial, nonmember denial, cross-workspace isolation, owner self-deactivation prevention, canonical PAN, one current AY, unique active PAN, and one active credential per client. Test rows rolled back.
+- Supabase security advisor: no findings.
+- Supabase performance advisor: informational unused-index notices only, expected on an empty new schema; no corrective migration required.
+- GitHub Actions run `27649128945`: install, lint, typecheck, tests, build, and production dependency audit passed.
 
 ## Exact next action
 
-Restore executable Supabase connector access, then inspect the project schema and migration history, apply the committed G04 migration, generate and commit database types, run authorised/unauthorised/cross-workspace RLS tests and advisors, run repository CI, mark G04 DONE, promote G05, merge, and stop.
+Run G05 only: create filing-case, filing-record, and append-only status-history migrations with typed constraints, indexes, RLS, generated types, live positive/negative tests, advisors, CI, ledger update, and handoff update.
