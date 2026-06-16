@@ -9,7 +9,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G00 | DONE | Install and validate project-brain control system in repository | — | Files copied, legacy conflicts quarantined, Git baseline recorded | `ac161dc7dfd3cec26b5ff0e7b26abeeb8b1a6a0e` |
 | G01 | DONE | Inspect or initialise greenfield Next.js repository | G00 | Next.js App Router + TS + Tailwind, clean build, no starter clutter | `d0610265e32aea9b58c0342c2db260306f3d5b9b` |
 | G02 | DONE | Configure quality gates and CI | G01 | typecheck, lint, build, test command, GitHub workflow where appropriate | `12c4c3af71d61b9e580cf0e7123652c4f1953069` |
-| G03 | DONE | Configure environment contract and Supabase clients | G01 | `.env.example`, browser/server clients, no secret leakage | `dbe20530ecc752315eefcf245085bf8bbbaa661e` |
+| G03 | DONE | Configure environment contract and Supabase clients | G01 | `.env.example`, browser/server clients, no secret leakage | `ff1f323e2fd67d14af8e2ff554450a48b02ada75` |
 | G04 | READY | Create workspace, membership, AY, client, and credential migrations | G03 | constraints, indexes, RLS draft, generated types | — |
 | G05 | PENDING | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | — |
 | G06 | PENDING | Create document metadata and private Storage policies | G04 | private bucket contract, RLS/storage tests | — |
