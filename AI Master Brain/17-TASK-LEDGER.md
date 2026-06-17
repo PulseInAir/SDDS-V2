@@ -29,8 +29,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G20 | DONE | Implement Invoices & Revenue module | G07,G15 | create/issue/print, partial payments, reconciliation | `6165680ebd77ee0a02b1571a44f7b85a92a3f7cc` |
 | G21 | DONE | Implement Refunds module | G08,G15 | statuses, amounts, dates, next action, filters | `230d47a` |
 | G22 | DONE | Implement Intimations / Notices module | G08,G15 | due dates, documents, responses, closure | `be4c64a` |
-| G23 | READY | Implement Follow-up module | G08,G15 | annual creation, exclusion/reactivation, contact log | — |
-| G24 | PENDING | Implement Settings and AY/invoice/privacy configuration | G13,G20 | controlled settings without speculative features | — |
+| G23 | DONE | Implement Follow-up module | G08,G15 | annual creation, exclusion/reactivation, contact log | `6bb2fb7` |
+| G24 | READY | Implement Settings and AY/invoice/privacy configuration | G13,G20 | controlled settings without speculative features | — |
 | G25 | PENDING | Implement global search | G14,G20,G16 | supported fields, typed results, privacy-safe | — |
 | G26 | PENDING | Lock and test dashboard query contracts | G17,G19,G20,G21,G22,G23 | every metric reconciles and has destination | — |
 | G27 | PENDING | Build operational dashboard | G26,G13 | attention, workflow, queues, financial exceptions, activity | — |

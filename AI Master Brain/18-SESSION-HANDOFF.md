@@ -6,35 +6,38 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G23 — Implement Follow-up module
+- Next READY task: G24 — Implement Settings and AY/invoice/privacy configuration
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `be4c64a`
+- HEAD: `6bb2fb7`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean after task commit, pending ledger/handoff update
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Changed
 
-- Added the dedicated `/notices` workspace route with search, AY/status/type/unresolved/attention filters, privacy-safe summary metrics, and a due-first tax-event register.
-- Replaced the client-profile Intimations / Notices placeholder with the real client-scoped module and shared create/update flow.
-- Added server-side tax-event queries, validation, and actions for record creation, status updates, filing-link validation, activity logging, document-context counts, and route revalidation.
-- Added notice utilities and focused G22 structural tests covering route wiring and editable notice fields for due dates, response submission, documents context, and closure.
+- Added the dedicated `/follow-up` workspace route with contact logging, AY/client/status filters, due-first follow-up ordering, exclusion/reactivation controls, WhatsApp launch links, and privacy-safe queue summaries.
+- Replaced the client-profile Communication & Activity placeholder with a real client-scoped follow-up register plus recent communication and activity timelines.
+- Added follow-up server actions, validations, and utilities for queue reads, communication logging, status updates, reactivation, route revalidation, and due/exclusion attention derivation.
+- Updated filing-case completion so moving a case to `Completed` creates or re-enables the next configured assessment-year follow-up before the transition succeeds.
+- Added focused G23 structural tests covering route wiring, client-tab replacement, completion-hook enforcement, and visible follow-up/contact controls.
 
 ## Deferred work
 
-- Final notice/intimation taxonomy beyond the minimum approved contract remains deferred under open decision `O-006`; this task stayed inside the committed schema values and did not add new statuses or event types.
+- Assessment-year rollover automation remains constrained by open decision `O-003`; this task will use configured assessment-year records only.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `e012e59`, remote `origin`.
-- Required project-brain files reviewed for G22 scope: 00, 01, 02, 03, 04, 05, 06, 07, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `d3d02f5`, remote `origin`.
+- Required project-brain files reviewed for G23 scope: 00, 01, 02, 03, 04, 05, 06, 07, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
 - `npm run typecheck`: passed.
-- `npm test`: passed, including new `tests/notice-module-contract.test.mjs`.
+- `node --test tests/follow-up-module-contract.test.mjs`: passed.
+- `npm test`: passed.
 - `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
-- `npm run build`: passed and generated `/notices` and `/clients/[clientId]/notices`.
+- `npm run build`: passed and generated `/follow-up` and `/clients/[clientId]/communications`.
+- Browser-level dev check: `http://127.0.0.1:3000/follow-up` responded, but local runtime rendering stopped in the expected config error path because `NEXT_PUBLIC_SUPABASE_URL` is not configured in the current dev environment.
 - `git diff --check`: passed with line-ending warnings only.
 
 ## Exact next action
 
-Run G23 — Implement Follow-up module.
+Run G24 — Implement Settings and AY/invoice/privacy configuration.
