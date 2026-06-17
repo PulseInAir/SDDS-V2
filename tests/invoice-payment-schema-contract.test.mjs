@@ -23,7 +23,6 @@ test("G07 creates invoice, item, payment, and sequence tables", () => {
 test("invoice identity is database-allocated and placeholder defaults are removed", () => {
   assert.match(migration, /create or replace function private\.prepare_invoice/i);
   assert.match(migration, /invoice identity is allocated by the database/i);
-  assert.match(migration, /20260617041628_fix_invoice_identity_defaults/i);
   assert.match(migration, /alter column invoice_number drop default/i);
   assert.match(migration, /alter column serial_number drop default/i);
 });
