@@ -6,32 +6,42 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 1 — Domain and database foundation
 - Active task: none
-- Next READY task: G08 — Create refunds, tax events, follow-ups, communication, activity, and import-job migrations
+- Next READY task: none while G08 is blocked
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - G07 pull request: `#8` merged
 - G07 merge commit: `d1c827c27ca1abcded62a00fc8539e73a692a34c`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
-## Completed work
+## Completed work this session
 
-- G00 through G07 are complete.
-- Restored version-controlled invoice sequence, invoice, line-item, and payment migrations.
-- Added atomic invoice numbering by workspace and assessment year.
-- Added draft-only line-item edits, derived totals, 30-day due-date defaulting, partial/full payment reconciliation, payment reversal history, and overpayment prevention.
-- Fixed the live invoice creation defect caused by placeholder defaults on database-generated invoice identity fields.
-- Added least-privilege RLS/grants, refreshed database types, and added G07 contract tests.
+- Added G08 base migration for:
+  - `refunds`
+  - `tax_events`
+  - `follow_ups`
+  - `communications`
+  - `activity_events`
+  - `import_jobs`
+- Added constraints, foreign keys, indexes, updated-at triggers, comments, and RLS/grants for the six G08 tables.
+- Added repository contract tests for G08 migration presence, case/workspace links, controlled statuses, indexes, and RLS/anon-denial checks.
+
+## Commits created
+
+- `2b635af6c2b8d4b8efc33ba8911f92fa6124e948` — `feat: add G08 operational extension schema`
+- `089627befc12b45b05a6712932eda940f7df595d` — `feat: secure G08 operational extension schema`
+- `094bf4ace7d357553ccdbf62475d0d3ee9c48f05` — `test: add G08 operational schema contracts`
+- `4416f37ec3ca466f4a87441e1a8cce1ececc9544` — `docs: record G08 partial blocker`
 
 ## Verification
 
-- Live migration history includes G07 versions `20260617040000` through `20260617040400` and fix `20260617041628`.
-- Rollback-only live tests passed for invoice allocation, AY serial numbering, derived line totals, issue/due dates, partial payment, full payment, overpayment denial, anonymous denial, and cross-workspace isolation.
-- Test rows rolled back; invoice, item, payment, and sequence tables remain empty.
-- Supabase security advisor: one informational notice for internal `invoice_sequences` having RLS with no authenticated policy; no exposed access grant exists.
-- Supabase performance advisor: informational unused-index notices only on the empty schema.
-- GitHub Actions run `27666596406` passed install, lint, typecheck, tests, build, and production dependency audit.
-- PR `#8` was marked ready and squash-merged into `master`.
+- Repository files were patched through the GitHub connector.
+- Local clone failed in this environment because `github.com` DNS resolution is unavailable in the container.
+- Local `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `git diff --check`, generated Supabase types refresh, live Supabase migration tests, Supabase advisors, and CI verification were not run from this environment.
+
+## Blocker
+
+G08 cannot be marked DONE from this environment because required generated types, local checks, live Supabase rollback tests, advisors, and CI evidence are still missing.
 
 ## Exact next action
 
-Run G08 only: create refunds, tax events, follow-ups, communication, activity, and import-job migrations with constraints, indexes, RLS, generated types, live tests, advisors, CI, merge, ledger update, and stop.
+Resume G08 in an environment with repo checkout and Supabase access: refresh `src/types/database.types.ts`, run local checks, apply/test migrations against Supabase in rollback-only mode, check advisors/CI, then mark G08 DONE only if all checks pass.
