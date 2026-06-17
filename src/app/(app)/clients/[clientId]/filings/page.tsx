@@ -1,10 +1,62 @@
-export default function FilingsPage() {
+import { getClientFilingCases } from '@/lib/actions/cases';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import Link from 'next/link';
+
+export default async function FilingsPage({ params }: { params: { clientId: string } }) {
+  const cases = await getClientFilingCases(params.clientId);
+
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <h3 className="text-lg font-medium text-gray-900">Filings</h3>
-      <p className="mt-2 text-sm text-gray-500 max-w-sm">
-        This module will track filing records, revisions, acknowledgements, and verification status.
-      </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filing Cases</h2>
+      </div>
+
+      {cases.length === 0 ? (
+        <div className="text-center py-12 border rounded-lg bg-gray-50 dark:bg-gray-800/50">
+          <p className="text-sm text-gray-500">No filing cases found for this client.</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-6">Assessment Year</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">Status</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">Category</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">Next Action</th>
+                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <span className="sr-only">View</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {cases.map((fc: any) => (
+                <tr key={fc.id}>
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
+                    {fc.assessment_years?.label}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <StatusBadge>{fc.case_status}</StatusBadge>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {fc.return_category || '-'}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {fc.next_action || '-'}
+                  </td>
+                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <Link href={`/filing-queue/${fc.id}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      View details<span className="sr-only">, {fc.assessment_years?.label}</span>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
-  )
+  );
 }
+
