@@ -4,44 +4,30 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 1 — Domain and database foundation
+- Project phase: Phase 1 — Domain and database foundation / auth boundary next
 - Active task: none
-- Next READY task: none while G08 is blocked
+- Next READY task: G09 — Implement authenticated app boundary and owner workspace membership
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- G07 pull request: `#8` merged
-- G07 merge commit: `d1c827c27ca1abcded62a00fc8539e73a692a34c`
 - Supabase project: `vorcxrxggfybhucpimfx`
+
+## Deferred work
+
+- G08 remains `BLOCKED`, not `DONE`.
+- Owner explicitly chose to defer G08 completion and move on.
+- G08 schema/test commits exist, but generated types, local checks, live Supabase rollback tests, advisors, and CI evidence remain incomplete.
+- Downstream G08-dependent modules remain blocked until G08 is fully verified.
 
 ## Completed work this session
 
-- Added G08 base migration for:
-  - `refunds`
-  - `tax_events`
-  - `follow_ups`
-  - `communications`
-  - `activity_events`
-  - `import_jobs`
-- Added constraints, foreign keys, indexes, updated-at triggers, comments, and RLS/grants for the six G08 tables.
-- Added repository contract tests for G08 migration presence, case/workspace links, controlled statuses, indexes, and RLS/anon-denial checks.
-
-## Commits created
-
-- `2b635af6c2b8d4b8efc33ba8911f92fa6124e948` — `feat: add G08 operational extension schema`
-- `089627befc12b45b05a6712932eda940f7df595d` — `feat: secure G08 operational extension schema`
-- `094bf4ace7d357553ccdbf62475d0d3ee9c48f05` — `test: add G08 operational schema contracts`
-- `4416f37ec3ca466f4a87441e1a8cce1ececc9544` — `docs: record G08 partial blocker`
+- Recorded G08 as deferred/incomplete.
+- Marked G09 as the next READY task under owner override.
 
 ## Verification
 
-- Repository files were patched through the GitHub connector.
-- Local clone failed in this environment because `github.com` DNS resolution is unavailable in the container.
-- Local `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `git diff --check`, generated Supabase types refresh, live Supabase migration tests, Supabase advisors, and CI verification were not run from this environment.
-
-## Blocker
-
-G08 cannot be marked DONE from this environment because required generated types, local checks, live Supabase rollback tests, advisors, and CI evidence are still missing.
+- Repository docs updated through GitHub connector.
+- Local `npm`, `git diff --check`, generated types, live Supabase checks, advisors, and CI were not run from this environment.
 
 ## Exact next action
 
-Resume G08 in an environment with repo checkout and Supabase access: refresh `src/types/database.types.ts`, run local checks, apply/test migrations against Supabase in rollback-only mode, check advisors/CI, then mark G08 DONE only if all checks pass.
+Run G09 only: implement authenticated app boundary and owner workspace membership, protecting routes and preserving existing Supabase/RLS boundaries. Do not start G10 or any G08-dependent module.
