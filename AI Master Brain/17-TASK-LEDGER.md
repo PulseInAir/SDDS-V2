@@ -1,6 +1,6 @@
 # SDDS Task Ledger
 
-**Ledger rule:** Exactly one task may be `IN_PROGRESS`. Select the first `READY` task whose dependencies are DONE. Do not skip dependencies. Record commit and evidence before marking DONE.
+**Ledger rule:** Exactly one task may be `IN_PROGRESS`. Select the first `READY` task whose dependencies are DONE. Do not skip dependencies unless the owner explicitly overrides and the risk is recorded. Record commit and evidence before marking DONE.
 
 Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 
@@ -14,8 +14,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G05 | DONE | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | `7c642eb263fb20313a317909c7470c33fb709e25` |
 | G06 | DONE | Create document metadata and private Storage policies | G04 | private bucket contract, RLS/storage tests | `4adef88eaddb842900e4e9f5feba3ae4f5e9de6b` |
 | G07 | DONE | Create invoice, item, sequence, and payment migrations | G04 | atomic numbering and financial constraints | `d1c827c27ca1abcded62a00fc8539e73a692a34c` |
-| G08 | BLOCKED | Create refunds, tax events, follow-ups, communication, activity, and import-job migrations | G05,G07 | Schema and contract test committed; generated types, local checks, live Supabase tests, advisors, CI, and final merge evidence still required | `2b635af6c2b8d4b8efc33ba8911f92fa6124e948`, `089627befc12b45b05a6712932eda940f7df595d`, `094bf4ace7d357553ccdbf62475d0d3ee9c48f05` |
-| G09 | PENDING | Implement authenticated app boundary and owner workspace membership | G04 | protected routes, correct redirects, RLS verified | — |
+| G08 | BLOCKED | Create refunds, tax events, follow-ups, communication, activity, and import-job migrations | G05,G07 | Deferred by owner. Schema/test commits exist, but generated types, local checks, live Supabase tests, advisors, and CI evidence remain incomplete. Downstream G08-dependent modules stay blocked. | `2b635af6c2b8d4b8efc33ba8911f92fa6124e948`, `089627befc12b45b05a6712932eda940f7df595d`, `094bf4ace7d357553ccdbf62475d0d3ee9c48f05` |
+| G09 | READY | Implement authenticated app boundary and owner workspace membership | G04 | protected routes, correct redirects, RLS verified | — |
 | G10 | PENDING | Implement credential encryption, update, and reveal flow | G09 | AES-GCM envelope, record-specific reveal, audit metadata | — |
 | G11 | PENDING | Implement document upload/download/version foundation | G06,G09 | validated private upload, signed download, history | — |
 | G12 | PENDING | Build design tokens and shared UI primitives | G01 | locked SDDS tokens/components/states, Storybook not required | — |
@@ -36,7 +36,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G27 | PENDING | Build operational dashboard | G26,G13 | attention, workflow, queues, financial exceptions, activity | — |
 | G28 | PENDING | Run dashboard visual/interaction correction loop | G27 | desktop-first design compliance, responsive/accessibility evidence | — |
 | G29 | PENDING | Implement CSV import dry-run and commit | G14,G20,G16 | idempotent mapping, errors, audit, safe commit | — |
-| G30 | PENDING | Implement business exports | G19,G20,G21,G22,G23 | authorised practical exports, safe handling | — |
+| G30 | PENDING | Implement business exports | G19,G20,G21,G23 | authorised practical exports, safe handling | — |
 | G31 | BLOCKED | Implement production backup destination and retention | OWNER DECISION | approved destination/retention/encryption + restore procedure | — |
 | G32 | PENDING | Performance and accessibility hardening | G28,G29,G30 | budgets, query review, keyboard/contrast/responsive | — |
 | G33 | PENDING | Full end-to-end regression | G32,G31 | all critical flows pass, restore tested | — |
