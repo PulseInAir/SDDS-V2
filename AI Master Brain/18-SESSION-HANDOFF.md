@@ -5,33 +5,32 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 1 — Domain and database foundation
-- Active task: none
-- Next READY task: G08 — Create refunds, tax events, follow-ups, communication, activity, and import-job migrations
+- Active task: G08 — BLOCKED during database verification
+- Next READY task: none; G08 must be completed first
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `master`
-- G07 pull request: `#8` merged
-- G07 merge commit: `d1c827c27ca1abcded62a00fc8539e73a692a34c`
+- Branch: `codex/g08-operational-schema`
+- Base branch: `master`
+- Starting Git state: `9dacfc9b4894460bbc6f726fed0fed0d17f1ed66`
+- Draft pull request: `#9`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
-## Completed work
+## Implemented
 
-- G00 through G07 are complete.
-- Restored version-controlled invoice sequence, invoice, line-item, and payment migrations.
-- Added atomic invoice numbering by workspace and assessment year.
-- Added draft-only line-item edits, derived totals, 30-day due-date defaulting, partial/full payment reconciliation, payment reversal history, and overpayment prevention.
-- Fixed the live invoice creation defect caused by placeholder defaults on database-generated invoice identity fields.
-- Added least-privilege RLS/grants, refreshed database types, and added G07 contract tests.
+- Added refunds and unified tax-event schema with case and optional filing-record ownership.
+- Added follow-ups, append-only communications, activity events, audit events, import jobs, and import rows.
+- Added tax-event document linkage, context-validation triggers, indexes, controlled minimum states, soft-archive fields, append-only protections, and least-privilege RLS/grants.
+- Added G08 operational schema contract tests.
 
 ## Verification
 
-- Live migration history includes G07 versions `20260617040000` through `20260617040400` and fix `20260617041628`.
-- Rollback-only live tests passed for invoice allocation, AY serial numbering, derived line totals, issue/due dates, partial payment, full payment, overpayment denial, anonymous denial, and cross-workspace isolation.
-- Test rows rolled back; invoice, item, payment, and sequence tables remain empty.
-- Supabase security advisor: one informational notice for internal `invoice_sequences` having RLS with no authenticated policy; no exposed access grant exists.
-- Supabase performance advisor: informational unused-index notices only on the empty schema.
-- GitHub Actions run `27666596406` passed install, lint, typecheck, tests, build, and production dependency audit.
-- PR `#8` was marked ready and squash-merged into `master`.
+- GitHub Actions run `27668629280` passed install, lint, typecheck, tests, production build, and production dependency audit.
+- Live Supabase migration execution, rollback-only constraint/RLS tests, advisors, and generated TypeScript types were not completed.
+- The draft PR was not marked ready or merged because applying unverified database DDL would create a material data-safety risk.
+
+## Blocker
+
+- The connected Supabase execution functions could not be invoked successfully in this session. G08 cannot be declared complete until the migrations compile and pass live rollback-only isolation tests, advisors are reviewed, and `src/types/database.types.ts` is regenerated.
 
 ## Exact next action
 
-Run G08 only: create refunds, tax events, follow-ups, communication, activity, and import-job migrations with constraints, indexes, RLS, generated types, live tests, advisors, CI, merge, ledger update, and stop.
+Resume G08 on branch `codex/g08-operational-schema`: run the four pending migrations against Supabase project `vorcxrxggfybhucpimfx`, correct any database error, run rollback-only lifecycle and cross-workspace RLS tests, review security/performance advisors, regenerate database types, rerun CI, then merge PR `#9`, mark G08 DONE, promote G09, and stop.
