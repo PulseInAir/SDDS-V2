@@ -463,6 +463,227 @@ export type Database = {
           },
         ]
       }
+      invoice_items: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          invoice_id: string
+          line_amount: number | null
+          quantity: number
+          unit_amount: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number
+          id?: string
+          invoice_id: string
+          line_amount?: number | null
+          quantity?: number
+          unit_amount: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          invoice_id?: string
+          line_amount?: number | null
+          quantity?: number
+          unit_amount?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_workspace_fk"
+            columns: ["workspace_id", "invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["workspace_id", "id"]
+          },
+        ]
+      }
+      invoice_sequences: {
+        Row: {
+          assessment_year_id: string
+          next_serial: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assessment_year_id: string
+          next_serial?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assessment_year_id?: string
+          next_serial?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_sequences_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: true
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "invoice_sequences_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          archived_at: string | null
+          assessment_year_id: string
+          cancelled_at: string | null
+          case_id: string | null
+          client_id: string
+          created_at: string
+          discount_amount: number
+          due_date: string | null
+          id: string
+          invoice_number: string | null
+          issue_date: string | null
+          issued_at: string | null
+          notes: string | null
+          serial_number: number | null
+          status: string
+          subtotal: number
+          total_amount: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          assessment_year_id: string
+          cancelled_at?: string | null
+          case_id?: string | null
+          client_id: string
+          created_at?: string
+          discount_amount?: number
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          issue_date?: string | null
+          issued_at?: string | null
+          notes?: string | null
+          serial_number?: number | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          assessment_year_id?: string
+          cancelled_at?: string | null
+          case_id?: string | null
+          client_id?: string
+          created_at?: string
+          discount_amount?: number
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          issue_date?: string | null
+          issued_at?: string | null
+          notes?: string | null
+          serial_number?: number | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "invoices_case_context_fk"
+            columns: ["workspace_id", "case_id", "client_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id", "client_id", "assessment_year_id"]
+          },
+          {
+            foreignKeyName: "invoices_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          invoice_id: string
+          mode: string
+          note: string | null
+          payment_date: string
+          recorded_by: string
+          reference: string | null
+          reversed_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          invoice_id: string
+          mode: string
+          note?: string | null
+          payment_date: string
+          recorded_by: string
+          reference?: string | null
+          reversed_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          mode?: string
+          note?: string | null
+          payment_date?: string
+          recorded_by?: string
+          reference?: string | null
+          reversed_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_workspace_fk"
+            columns: ["workspace_id", "invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["workspace_id", "id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           active: boolean
