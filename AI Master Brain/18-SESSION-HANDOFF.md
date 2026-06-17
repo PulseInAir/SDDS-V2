@@ -13,20 +13,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Deferred work
 
-- G08 remains `BLOCKED`, not `DONE`.
-- Owner explicitly chose to defer G08 completion and move on.
-- G08 schema/test commits exist, but generated types, local checks, live Supabase rollback tests, advisors, and CI evidence remain incomplete.
-- Downstream G08-dependent modules remain blocked until G08 is fully verified.
+- None. G08 has been completed.
 
 ## Completed work this session
 
-- Recorded G08 as deferred/incomplete.
-- Marked G09 as the next READY task under owner override.
+- Linked remote Supabase project `vorcxrxggfybhucpimfx`.
+- Regenerated `src/types/database.types.ts` from the linked project using utf8 encoding.
+- Pushed pending G08 migrations (`20260617050000` and `20260617050100`) to the remote Supabase database.
+- Ran live Supabase RLS checks verifying anonymous denial and destructive delete protection.
+- Ran `supabase db lint` confirming no schema errors from advisors.
+- Marked G08 as DONE and appended commit hash `78a5bd2` to the ledger.
 
 ## Verification
 
-- Repository docs updated through GitHub connector.
-- Local `npm`, `git diff --check`, generated types, live Supabase checks, advisors, and CI were not run from this environment.
+- `npm run check` (lint, typecheck, tests, build) passed locally.
+- `git diff --check` passed.
+- Remote Supabase types regenerated and pushed successfully.
+- Rollback-only live checks on G08 tables successfully validated RLS behavior.
 
 ## Exact next action
 
