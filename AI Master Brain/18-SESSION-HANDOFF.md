@@ -6,7 +6,7 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 1 — Domain and database foundation / auth boundary next
 - Active task: none
-- Next READY task: G10 — Implement credential encryption, update, and reveal flow
+- Next READY task: G11 — Implement document upload/download/version foundation
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
@@ -17,17 +17,17 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Completed work this session
 
-- Created Next.js route groups `(auth)` and `(app)` to enforce app boundaries.
-- Moved `/login` to `(auth)/login` and `/` to `(app)/page.tsx`.
-- Implemented `(app)/layout.tsx` to automatically verify owner workspace membership via `getAuthenticatedWorkspaceSession()` on all protected routes.
-- Updated the foundation test to assert against the new `(app)/page.tsx` location.
-- Marked G09 as DONE and appended commit hash `e983b0c` to the ledger.
+- Implemented `CREDENTIAL_ENCRYPTION_KEY` validation in `src/lib/env/server.ts`.
+- Implemented AES-256-GCM encryption envelope in `src/lib/encryption/crypto.ts`.
+- Implemented server actions `updateCredential` and `revealCredential` with audit logging in `src/lib/actions/credentials.ts`.
+- Stubbed shared components `CredentialStatus`, `CredentialRevealDialog`, and `CredentialUpdateForm` in `src/components/credentials`.
+- Marked G10 as DONE in the ledger.
 
 ## Verification
 
-- `npm run check` (lint, typecheck, tests, build) passed locally.
-- Next.js build compiled correctly with route groups.
+- `npm run check` completed successfully with linting, typechecking, tests, and build passing.
+- Validated AES-GCM envelope logic and `activity_events` audit schema requirements.
 
 ## Exact next action
 
-Run G10 only: Implement credential encryption, update, and reveal flow. This involves implementing AES-GCM envelope and tracking reveal metadata without logging plain text. Do not start G11 or skip dependencies.
+Run G11 only: Implement document upload/download/version foundation. Ensure to respect `private` storage bucket policy. Do not skip dependencies.
