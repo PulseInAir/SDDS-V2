@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   AlertTriangle,
@@ -12,11 +12,8 @@ import {
   MoveRight,
 } from 'lucide-react';
 import { transitionFilingCase } from '@/lib/actions/cases';
-import {
-  CASE_STATUSES,
-  CaseStatus,
-  VALID_TRANSITIONS,
-} from '@/lib/constants/workflows';
+import { CASE_STATUSES, VALID_TRANSITIONS } from '@/lib/constants/workflows';
+import type { CaseStatus } from '@/lib/constants/workflows';
 import { useAppContext } from '@/contexts/AppContext';
 import { MaskedValue } from '@/components/ui/MaskedValue';
 import { Button } from '@/components/ui/Button';
@@ -72,25 +69,32 @@ function CaseMoveControl({ filingCase }: { filingCase: FilingQueueCaseRow }) {
     setIsSubmitting(true);
     setError(null);
 
-    const result = await transitionFilingCase(filingCase.id, {
-      toStatus: selectedStatus,
-      reason: reason.trim() || undefined,
-    });
+    try {
+      const result = await transitionFilingCase(filingCase.id, {
+        toStatus: selectedStatus,
+        reason: reason.trim() || undefined,
+      });
 
-    setIsSubmitting(false);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
 
-    if (result?.error) {
-      setError(result.error);
-      return;
+      setSelectedStatus('');
+      setReason('');
+      router.refresh();
+    } catch {
+      setError('Unable to update the case status.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSelectedStatus('');
-    setReason('');
-    router.refresh();
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 space-y-2 border-t border-border-subtle pt-3">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-4 space-y-2 border-t border-border-subtle pt-3"
+    >
       <label htmlFor={`move-${filingCase.id}`} className="sr-only">
         Move {filingCase.clients.full_name} to another status
       </label>
@@ -115,7 +119,11 @@ function CaseMoveControl({ filingCase }: { filingCase: FilingQueueCaseRow }) {
         <Button
           type="submit"
           size="sm"
-          disabled={!selectedStatus || isSubmitting || (needsReason && !reason.trim())}
+          disabled={
+            !selectedStatus ||
+            isSubmitting ||
+            (needsReason && !reason.trim())
+          }
           aria-label={`Move ${filingCase.clients.full_name}`}
         >
           <MoveRight className="h-4 w-4" aria-hidden="true" />
@@ -136,7 +144,7 @@ function CaseMoveControl({ filingCase }: { filingCase: FilingQueueCaseRow }) {
       )}
 
       {error && (
-        <p role="alert" className="text-xs text-brand-error">
+        <p role="alert" className="text-xs text-red-600">
           {error}
         </p>
       )}
@@ -181,25 +189,25 @@ export function CaseBoard({
 
   return (
     <div className="flex min-h-0 flex-col gap-4">
-      <div
-        className="overflow-x-auto pb-3"
-        aria-label="Filing Queue board"
-      >
+      <div className="overflow-x-auto pb-3" aria-label="Filing Queue board">
         <div className="flex min-w-max items-start gap-4">
           {visibleStatuses.map((status) => {
             const statusCases = cases.filter(
               (filingCase) => filingCase.case_status === status,
             );
+            const columnId = `column-${status
+              .replaceAll(' ', '-')
+              .toLowerCase()}`;
 
             return (
               <section
                 key={status}
-                aria-labelledby={`column-${status.replaceAll(' ', '-').toLowerCase()}`}
+                aria-labelledby={columnId}
                 className="w-72 shrink-0 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-hover/70 p-3"
               >
                 <div className="mb-3 flex items-center justify-between gap-2 px-1">
                   <h2
-                    id={`column-${status.replaceAll(' ', '-').toLowerCase()}`}
+                    id={columnId}
                     className="text-sm font-semibold text-text-primary"
                   >
                     {status}
@@ -211,14 +219,14 @@ export function CaseBoard({
 
                 <div className="space-y-3">
                   {statusCases.length === 0 ? (
-                    <div className="rounded-[var(--radius-card)] border border-dashed border-border-subtle bg-surface-panel/60 px-3 py-8 text-center text-xs text-text-muted">
+                    <div className="rounded-[var(--radius-panel)] border border-dashed border-border-subtle bg-surface-panel/60 px-3 py-8 text-center text-xs text-text-muted">
                       No cases on this page
                     </div>
                   ) : (
                     statusCases.map((filingCase) => (
                       <article
                         key={filingCase.id}
-                        className="rounded-[var(--radius-card)] border border-border-subtle bg-surface-panel p-4 shadow-sm"
+                        className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 shadow-sm"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
@@ -239,18 +247,29 @@ export function CaseBoard({
 
                         <div className="mt-4 space-y-2 text-xs text-text-secondary">
                           <div className="flex items-center gap-2">
-                            <CalendarDays className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
+                            <CalendarDays
+                              className="h-4 w-4 shrink-0 text-text-muted"
+                              aria-hidden="true"
+                            />
                             <span>{formatDate(filingCase.due_date)}</span>
                           </div>
 
-                          <p className="line-clamp-2 min-h-8" title={filingCase.next_action || ''}>
+                          <p
+                            className="line-clamp-2 min-h-8"
+                            title={filingCase.next_action || ''}
+                          >
                             {filingCase.next_action || 'No next action recorded'}
                           </p>
 
                           {filingCase.blocker && (
-                            <div className="flex items-start gap-2 rounded-[var(--radius-input)] bg-red-50 px-2.5 py-2 text-brand-error">
-                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                              <span className="line-clamp-2">{filingCase.blocker}</span>
+                            <div className="flex items-start gap-2 rounded-[var(--radius-input)] bg-red-50 px-2.5 py-2 text-red-700">
+                              <AlertTriangle
+                                className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                                aria-hidden="true"
+                              />
+                              <span className="line-clamp-2">
+                                {filingCase.blocker}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -260,7 +279,10 @@ export function CaseBoard({
                           className="mt-4 inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800"
                         >
                           Open case
-                          <ArrowRight className="ml-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                          <ArrowRight
+                            className="ml-1.5 h-3.5 w-3.5"
+                            aria-hidden="true"
+                          />
                         </Link>
 
                         <CaseMoveControl filingCase={filingCase} />
@@ -277,10 +299,14 @@ export function CaseBoard({
       {totalPages > 1 && (
         <div className="flex items-center justify-between rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel px-4 py-3">
           <p className="text-sm text-text-secondary">
-            Page <span className="font-medium text-text-primary">{page}</span> of{' '}
+            Page <span className="font-medium text-text-primary">{page}</span>{' '}
+            of{' '}
             <span className="font-medium text-text-primary">{totalPages}</span>
           </p>
-          <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Board pagination">
+          <nav
+            className="inline-flex -space-x-px rounded-md shadow-sm"
+            aria-label="Board pagination"
+          >
             <Button
               variant="secondary"
               size="sm"
