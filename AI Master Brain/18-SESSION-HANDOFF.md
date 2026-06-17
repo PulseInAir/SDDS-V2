@@ -5,27 +5,37 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: G18 — Implement Filing Queue board view
-- Next READY task: none
+- Active task: none
+- Next READY task: G19 — Implement Documents module and checklist/history
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g18-filing-queue-board`
-- Starting Git state: clean branch from `master` at `68450cffe83a6bb01517b095619695b6c741ff81`
+- Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
-
-## Scope
-
-- Add a board view to `/filing-queue` using the existing G17 query, URL filters, privacy behavior, pagination, and filing-case detail links.
-- Status moves must call the existing validated transition action and use only `CASE_STATUSES` / `VALID_TRANSITIONS`.
-- Preserve the table view and avoid schema, RLS, auth, storage, or unrelated-module changes.
 
 ## Deferred work
 
-- Business rule validations (e.g., verifying a document exists before allowing a transition to Verification Pending) are currently structural (graph-based) and stubbed for complex queries, to be fully strict once the Documents module (G19) is complete.
+- Business rule validations that require document existence remain structural until the Documents module (G19) supplies the required data checks.
 
-## Verification pending
+## Completed work this session
 
-- Typecheck, lint, tests, production build, board/table reconciliation, transition validation, responsive overflow, and browser-console inspection.
+- Added a URL-controlled Table/Board switch to `/filing-queue`.
+- Added `CaseBoard` using the existing G17 query result, URL filters, pagination, Privacy Mode masking, and case-detail routes.
+- Built columns exclusively from `CASE_STATUSES` and status-move choices from `VALID_TRANSITIONS`.
+- Routed moves through the existing `transitionFilingCase` server action, preserving server-side transition validation and status history.
+- Marked G18 DONE and G19 READY.
+- Pull request: #10.
+
+## Verification
+
+- GitHub Actions CI run `27687666469`: passed.
+- `npm run lint`: passed.
+- `npm run typecheck`: passed.
+- `npm test`: passed.
+- `npm run build`: passed.
+- `npm audit --omit=dev --audit-level=high`: passed.
+- Board/table reconciliation is structural: both views receive the same `cases`, `page`, and `totalPages` from one `getFilingQueueCases` call, with the same URL filters.
+- Transition validation is preserved by limiting choices through `VALID_TRANSITIONS` and revalidating in `transitionFilingCase`.
+- Browser interaction and console inspection were not run because the connected Vercel account has no SDDS-V2 project or preview deployment.
 
 ## Exact next action
 
-Complete and verify G18 only.
+Run G19 only after the explicit user command `Continue SDDS`.
