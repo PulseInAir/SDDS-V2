@@ -10,6 +10,63 @@ import {
 } from '@/lib/validations/cases';
 import { VALID_TRANSITIONS, CaseStatus } from '@/lib/constants/workflows';
 
+export async function getFilingQueueCases(params: {
+  search?: string;
+  ay_label?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const supabase = await createSupabaseServerClient();
+  const { search, ay_label, status, page = 1, pageSize = 20 } = params;
+
+  let query = supabase
+    .from('filing_cases')
+    .select(`
+      *,
+      clients!inner (id, full_name, pan_uppercase, mobile),
+      assessment_years!inner (id, label)
+    `, { count: 'exact' })
+    .is('archived_at', null)
+    .order('updated_at', { ascending: false });
+
+  if (search) {
+    const searchUpper = search.toUpperCase();
+    query = query.or(
+      `full_name.ilike.%${search}%,pan_uppercase.ilike.%${searchUpper}%`,
+      { foreignTable: 'clients' }
+    );
+  }
+
+  if (ay_label) {
+    query = query.eq('assessment_years.label', ay_label);
+  }
+
+  if (status) {
+    query = query.eq('case_status', status);
+  }
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('Error fetching filing queue cases:', error);
+    throw new Error('Failed to fetch filing cases');
+  }
+
+  return {
+    cases: data,
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: Math.ceil((count || 0) / pageSize),
+  };
+}
+
 export async function getFilingCase(caseId: string) {
   const supabase = await createSupabaseServerClient();
 

@@ -5,8 +5,8 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: none
-- Next READY task: G17 — Implement Filing Queue table view
+- Active task: G17 — Implement Filing Queue table view
+- Next READY task: none
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`

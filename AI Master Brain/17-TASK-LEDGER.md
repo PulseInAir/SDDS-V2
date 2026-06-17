@@ -23,7 +23,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G14 | DONE | Implement client repository, list, search, create, and edit | G04,G13 | real data, validation, privacy, pagination | `13d0e8e` |
 | G15 | DONE | Implement client profile source of truth | G14,G05,G06,G07,G08 | all approved contexts without duplicate identity ownership | `2c75b71` |
 | G16 | DONE | Implement filing-case detail and transition engine | G05,G13 | valid transitions, requirements, history, errors | `96601dd` |
-| G17 | READY | Implement Filing Queue table view | G14,G16 | canonical query, filters, pagination, privacy | — |
+| G17 | IN_PROGRESS | Implement Filing Queue table view | G14,G16 | canonical query, filters, pagination, privacy | — |
 | G18 | PENDING | Implement Filing Queue board view | G17 | same dataset/filters, transition validation, reconciliation | — |
 | G19 | PENDING | Implement Documents module and checklist/history | G11,G15 | exceptions-first page, signed actions, version history | — |
 | G20 | PENDING | Implement Invoices & Revenue module | G07,G15 | create/issue/print, partial payments, reconciliation | — |
