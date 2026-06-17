@@ -13,7 +13,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G04 | DONE | Create workspace, membership, AY, client, and credential migrations | G03 | constraints, indexes, RLS draft, generated types | `76a4595bb0d556d3506c0caf5aa9d4a9dee918f5` |
 | G05 | DONE | Create filing case, filing records, and status-history migrations | G04 | separate records/status dimensions, valid constraints | `7c642eb263fb20313a317909c7470c33fb709e25` |
 | G06 | DONE | Create document metadata and private Storage policies | G04 | private bucket contract, RLS/storage tests | `4adef88eaddb842900e4e9f5feba3ae4f5e9de6b` |
-| G07 | READY | Create invoice, item, sequence, and payment migrations | G04 | atomic numbering and financial constraints | — |
+| G07 | IN_PROGRESS | Create invoice, item, sequence, and payment migrations | G04 | atomic numbering and financial constraints | — |
 | G08 | PENDING | Create refunds, tax events, follow-ups, communication, activity, and import-job migrations | G05,G07 | complete operational relations and RLS | — |
 | G09 | PENDING | Implement authenticated app boundary and owner workspace membership | G04 | protected routes, correct redirects, RLS verified | — |
 | G10 | PENDING | Implement credential encryption, update, and reveal flow | G09 | AES-GCM envelope, record-specific reveal, audit metadata | — |
