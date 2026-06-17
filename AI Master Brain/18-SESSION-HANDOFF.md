@@ -33,7 +33,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - Supabase security advisor: no findings.
 - Performance advisor: expected unused-index information only on the empty schema.
 - Initial CI exposed a brittle G04 test that counted all security-definer functions; the assertion was corrected to validate the two named G04 helpers.
-- Final CI passed install, lint, typecheck, tests, build, and production dependency audit.
+- GitHub Actions run `27661802872`: install, lint, typecheck, tests, build, and production dependency audit passed.
 
 ## Exact next action
 
