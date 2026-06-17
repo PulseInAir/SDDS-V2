@@ -6,38 +6,38 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G24 — Implement Settings and AY/invoice/privacy configuration
+- Next READY task: G25 — Implement global search
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `6bb2fb7`
+- HEAD before this handoff update: `e6cf394`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean after task commit, pending ledger/handoff update
+- Working tree: feature complete, documentation update pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Changed
 
-- Added the dedicated `/follow-up` workspace route with contact logging, AY/client/status filters, due-first follow-up ordering, exclusion/reactivation controls, WhatsApp launch links, and privacy-safe queue summaries.
-- Replaced the client-profile Communication & Activity placeholder with a real client-scoped follow-up register plus recent communication and activity timelines.
-- Added follow-up server actions, validations, and utilities for queue reads, communication logging, status updates, reactivation, route revalidation, and due/exclusion attention derivation.
-- Updated filing-case completion so moving a case to `Completed` creates or re-enables the next configured assessment-year follow-up before the transition succeeds.
-- Added focused G23 structural tests covering route wiring, client-tab replacement, completion-hook enforcement, and visible follow-up/contact controls.
+- Added the authenticated `/settings` route with focused assessment-year management, invoice sequencing visibility, privacy preference controls, and explicit handling of open decisions `O-002` and `O-003`.
+- Replaced hardcoded shell Assessment Year and Privacy Mode state with workspace-aware assessment-year options plus persisted cookie-backed selections that refresh the app shell consistently.
+- Added settings queries, server actions, and validation for loading shell context, creating assessment years, switching the current year, reopening/closing non-current years, and saving Privacy Mode browser defaults.
+- Added focused G24 structural tests covering route wiring, shell hydration, and controlled settings scope.
 
 ## Deferred work
 
-- Assessment-year rollover automation remains constrained by open decision `O-003`; this task will use configured assessment-year records only.
+- Assessment-year rollover automation remains constrained by open decision `O-003`; the app uses configured assessment-year records only.
+- Invoice legal identity, GST treatment, logo, and signature assets remain constrained by open decision `O-002`; settings intentionally expose sequencing visibility without speculative invoice identity fields.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `d3d02f5`, remote `origin`.
-- Required project-brain files reviewed for G23 scope: 00, 01, 02, 03, 04, 05, 06, 07, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `07b32e0`, remote `origin`.
+- Required project-brain files reviewed for G24 scope: 00, 01, 02, 03, 04, 05, 06, 07, 08 settings section, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
 - `npm run typecheck`: passed.
-- `node --test tests/follow-up-module-contract.test.mjs`: passed.
+- `node --test tests/settings-module-contract.test.mjs`: passed.
 - `npm test`: passed.
 - `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
-- `npm run build`: passed and generated `/follow-up` and `/clients/[clientId]/communications`.
-- Browser-level dev check: `http://127.0.0.1:3000/follow-up` responded, but local runtime rendering stopped in the expected config error path because `NEXT_PUBLIC_SUPABASE_URL` is not configured in the current dev environment.
+- `npm run build`: passed and generated `/settings`.
+- Runtime smoke check: built app started on `http://127.0.0.1:3100`, but requesting `/settings` hit the expected environment blocker `NEXT_PUBLIC_SUPABASE_URL is not configured` before auth or route rendering.
 - `git diff --check`: passed with line-ending warnings only.
 
 ## Exact next action
 
-Run G24 — Implement Settings and AY/invoice/privacy configuration.
+Run G25 — Implement global search.
