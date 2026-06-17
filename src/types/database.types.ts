@@ -205,6 +205,117 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          archived_at: string | null
+          assessment_year_id: string | null
+          case_id: string | null
+          checklist_status: string
+          checksum_sha256: string | null
+          client_id: string
+          document_type: string
+          filing_record_id: string | null
+          id: string
+          mime_type: string
+          original_filename: string
+          replaces_document_id: string | null
+          safe_filename: string
+          size_bytes: number
+          storage_bucket: string
+          storage_path: string
+          uploaded_at: string
+          uploaded_by: string
+          verified_at: string | null
+          verified_by: string | null
+          version: number
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          assessment_year_id?: string | null
+          case_id?: string | null
+          checklist_status?: string
+          checksum_sha256?: string | null
+          client_id: string
+          document_type: string
+          filing_record_id?: string | null
+          id?: string
+          mime_type: string
+          original_filename: string
+          replaces_document_id?: string | null
+          safe_filename: string
+          size_bytes: number
+          storage_bucket?: string
+          storage_path: string
+          uploaded_at?: string
+          uploaded_by: string
+          verified_at?: string | null
+          verified_by?: string | null
+          version?: number
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          assessment_year_id?: string | null
+          case_id?: string | null
+          checklist_status?: string
+          checksum_sha256?: string | null
+          client_id?: string
+          document_type?: string
+          filing_record_id?: string | null
+          id?: string
+          mime_type?: string
+          original_filename?: string
+          replaces_document_id?: string | null
+          safe_filename?: string
+          size_bytes?: number
+          storage_bucket?: string
+          storage_path?: string
+          uploaded_at?: string
+          uploaded_by?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          version?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "documents_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "documents_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "documents_filing_record_workspace_fk"
+            columns: ["workspace_id", "case_id", "filing_record_id"]
+            isOneToOne: false
+            referencedRelation: "filing_records"
+            referencedColumns: ["workspace_id", "case_id", "id"]
+          },
+          {
+            foreignKeyName: "documents_replacement_same_client_fk"
+            columns: ["workspace_id", "client_id", "replaces_document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["workspace_id", "client_id", "id"]
+          },
+        ]
+      }
       filing_cases: {
         Row: {
           archived_at: string | null
