@@ -111,3 +111,23 @@ export async function revealCredential(clientId: string) {
 
   return decryptedPayload;
 }
+
+export async function hasCredential(clientId: string) {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("client_credentials")
+    .select("id")
+    .eq("workspace_id", session.workspace.id)
+    .eq("client_id", clientId)
+    .is("archived_at", null)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to check credential existence:", error);
+    return false;
+  }
+
+  return !!data;
+}

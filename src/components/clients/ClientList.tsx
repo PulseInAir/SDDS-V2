@@ -3,6 +3,7 @@
 import { useAppContext } from '@/contexts/AppContext'
 import Link from 'next/link'
 import { StatusBadge } from '../ui/StatusBadge'
+import { MaskedValue } from '@/components/ui/MaskedValue'
 import { Edit, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -15,26 +16,6 @@ type ClientRow = {
   mobile: string | null
   active: boolean
   // Add more as needed
-}
-
-export function MaskedValue({ value, isPrivacyMode, maskChar = '•', visibleCount = 4 }: { value: string | null; isPrivacyMode: boolean; maskChar?: string; visibleCount?: number }) {
-  if (!value) return <span className="text-gray-400 italic">Not set</span>
-  
-  if (!isPrivacyMode) {
-    return <span>{value}</span>
-  }
-
-  const length = value.length
-  if (length <= visibleCount) return <span>{value}</span>
-
-  const maskedPart = value.slice(0, length - visibleCount).replace(/./g, maskChar)
-  const visiblePart = value.slice(-visibleCount)
-
-  return (
-    <span className="font-mono tracking-wider">
-      {maskedPart}{visiblePart}
-    </span>
-  )
 }
 
 export function ClientList({ clients, page, totalPages }: { clients: ClientRow[], page: number, totalPages: number }) {
