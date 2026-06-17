@@ -17,8 +17,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G08 | DONE | Create refunds, tax events, follow-ups, communication, activity, and import-job migrations | G05,G07 | Migrations applied, generated types, local checks, live Supabase tests, and advisors complete. | `2b635af6c2b8d4b8efc33ba8911f92fa6124e948`, `089627befc12b45b05a6712932eda940f7df595d`, `094bf4ace7d357553ccdbf62475d0d3ee9c48f05`, `78a5bd2974de22c9def4987ca86cad1e3a025d7f` |
 | G09 | DONE | Implement authenticated app boundary and owner workspace membership | G04 | protected routes, correct redirects, RLS verified | `e983b0c` |
 | G10 | DONE | Implement credential encryption, update, and reveal flow | G09 | AES-GCM envelope, record-specific reveal, audit metadata | `a4fb8ac` |
-| G11 | READY | Implement document upload/download/version foundation | G06,G09 | validated private upload, signed download, history | — |
-| G12 | PENDING | Build design tokens and shared UI primitives | G01 | locked SDDS tokens/components/states, Storybook not required | — |
+| G11 | DONE | Implement document upload/download/version foundation | G06,G09 | validated private upload, signed download, history | `69d6c1e` |
+| G12 | READY | Build design tokens and shared UI primitives | G01 | locked SDDS tokens/components/states, Storybook not required | — |
 | G13 | PENDING | Build authenticated application shell | G09,G12 | sidebar, top utility, AY context, Privacy Mode, responsive shell | — |
 | G14 | PENDING | Implement client repository, list, search, create, and edit | G04,G13 | real data, validation, privacy, pagination | — |
 | G15 | PENDING | Implement client profile source of truth | G14,G05,G06,G07,G08 | all approved contexts without duplicate identity ownership | — |
