@@ -60,24 +60,15 @@ test("workspace authorization helpers remain outside the exposed public schema",
   assert.match(migration, /create schema if not exists private/i);
   assert.match(
     migration,
-    /create or replace function private\.is_workspace_member/i,
+    /create or replace function private\.is_workspace_member[\s\S]*?security definer\s+set search_path = ''/i,
   );
   assert.match(
     migration,
-    /create or replace function private\.is_workspace_owner/i,
+    /create or replace function private\.is_workspace_owner[\s\S]*?security definer\s+set search_path = ''/i,
   );
   assert.doesNotMatch(
     migration,
     /create or replace function public\.is_workspace_(member|owner)/i,
-  );
-
-  const securityDefinerFunctions = migration.match(
-    /security definer\s+set search_path = ''/gi,
-  );
-  assert.equal(
-    securityDefinerFunctions?.length,
-    2,
-    "both security-definer authorization helpers must pin an empty search path",
   );
 });
 
