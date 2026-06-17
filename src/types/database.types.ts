@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -53,6 +55,47 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_status_history: {
+        Row: {
+          case_id: string
+          changed_at: string
+          changed_by: string
+          from_status: string | null
+          id: string
+          reason: string | null
+          to_status: string
+          workspace_id: string
+        }
+        Insert: {
+          case_id: string
+          changed_at?: string
+          changed_by: string
+          from_status?: string | null
+          id?: string
+          reason?: string | null
+          to_status: string
+          workspace_id: string
+        }
+        Update: {
+          case_id?: string
+          changed_at?: string
+          changed_by?: string
+          from_status?: string | null
+          id?: string
+          reason?: string | null
+          to_status?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_status_history_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
           },
         ]
       }
@@ -162,6 +205,153 @@ export type Database = {
           },
         ]
       }
+      filing_cases: {
+        Row: {
+          archived_at: string | null
+          assessment_year_id: string
+          blocker_code: string | null
+          blocker_note: string | null
+          cancelled_at: string | null
+          case_status: string
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          due_date: string | null
+          expected_completion_date: string | null
+          follow_up_excluded: boolean
+          hold_reason: string | null
+          id: string
+          next_action: string | null
+          next_review_date: string | null
+          return_category: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          assessment_year_id: string
+          blocker_code?: string | null
+          blocker_note?: string | null
+          cancelled_at?: string | null
+          case_status?: string
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          expected_completion_date?: string | null
+          follow_up_excluded?: boolean
+          hold_reason?: string | null
+          id?: string
+          next_action?: string | null
+          next_review_date?: string | null
+          return_category?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          assessment_year_id?: string
+          blocker_code?: string | null
+          blocker_note?: string | null
+          cancelled_at?: string | null
+          case_status?: string
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          expected_completion_date?: string | null
+          follow_up_excluded?: boolean
+          hold_reason?: string | null
+          id?: string
+          next_action?: string | null
+          next_review_date?: string | null
+          return_category?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "filing_cases_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "filing_cases_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+        ]
+      }
+      filing_records: {
+        Row: {
+          acknowledgement_number: string | null
+          archived_at: string | null
+          case_id: string
+          created_at: string
+          filing_date: string
+          filing_kind: string
+          id: string
+          notes: string | null
+          parent_filing_record_id: string | null
+          processing_status: string
+          updated_at: string
+          verification_date: string | null
+          verification_status: string
+          workspace_id: string
+        }
+        Insert: {
+          acknowledgement_number?: string | null
+          archived_at?: string | null
+          case_id: string
+          created_at?: string
+          filing_date: string
+          filing_kind: string
+          id?: string
+          notes?: string | null
+          parent_filing_record_id?: string | null
+          processing_status?: string
+          updated_at?: string
+          verification_date?: string | null
+          verification_status?: string
+          workspace_id: string
+        }
+        Update: {
+          acknowledgement_number?: string | null
+          archived_at?: string | null
+          case_id?: string
+          created_at?: string
+          filing_date?: string
+          filing_kind?: string
+          id?: string
+          notes?: string | null
+          parent_filing_record_id?: string | null
+          processing_status?: string
+          updated_at?: string
+          verification_date?: string | null
+          verification_status?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "filing_records_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "filing_records_parent_same_case_fk"
+            columns: ["workspace_id", "case_id", "parent_filing_record_id"]
+            isOneToOne: false
+            referencedRelation: "filing_records"
+            referencedColumns: ["workspace_id", "case_id", "id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           active: boolean
@@ -238,6 +428,7 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
