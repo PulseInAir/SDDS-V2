@@ -16,8 +16,8 @@ create table public.invoices (
   client_id uuid not null,
   case_id uuid,
   assessment_year_id uuid not null,
-  invoice_number text,
-  serial_number bigint,
+  invoice_number text not null,
+  serial_number bigint not null,
   status text not null default 'draft',
   issue_date date,
   due_date date,
@@ -42,7 +42,7 @@ create table public.invoices (
     references public.filing_cases(workspace_id, id, client_id, assessment_year_id),
   constraint invoices_status_allowed
     check (status in ('draft','issued','partially_paid','paid','overdue','cancelled')),
-  constraint invoices_serial_positive check (serial_number is null or serial_number > 0),
+  constraint invoices_serial_positive check (serial_number > 0),
   constraint invoices_amounts_nonnegative
     check (subtotal >= 0 and discount_amount >= 0 and total_amount >= 0),
   constraint invoices_discount_not_above_subtotal check (discount_amount <= subtotal),
