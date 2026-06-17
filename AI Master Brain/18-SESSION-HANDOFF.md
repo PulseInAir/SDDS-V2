@@ -8,9 +8,9 @@ This file is rewritten after every task. Keep it compact and factual.
 - Active task: none
 - Next READY task: G07 — Create invoice, item, sequence, and payment migrations
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g06-document-storage`
-- Base branch: `master`
-- Pull request: `#7`
+- Branch: `master`
+- G06 pull request: `#7` merged
+- G06 merge commit: `4adef88eaddb842900e4e9f5feba3ae4f5e9de6b`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Completed work
@@ -27,7 +27,8 @@ This file is rewritten after every task. Keep it compact and factual.
 - Document policies: 3. Storage policies: 2. No authenticated overwrite/delete policy exists.
 - Supabase security advisor: no findings.
 - Performance advisor: unused-index information only on the empty schema.
-- GitHub Actions run `27661901771` passed install, lint, typecheck, tests, build, and dependency audit.
+- GitHub Actions run `27661942836` passed install, lint, typecheck, tests, build, and dependency audit.
+- PR `#7` was marked ready and squash-merged into `master`.
 
 ## Exact next action
 
