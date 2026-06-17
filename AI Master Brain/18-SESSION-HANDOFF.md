@@ -5,8 +5,8 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: G17 — Implement Filing Queue table view
-- Next READY task: none
+- Active task: none
+- Next READY task: G18 — Implement Filing Queue board view
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
@@ -17,13 +17,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Completed work this session
 
-- Defined `CASE_STATUSES` and `VALID_TRANSITIONS` in `workflows.ts` according to the domain model.
-- Created `cases.ts` validations and `updateFilingCase`, `transitionFilingCase` server actions.
-- Built `CaseTransitionMenu` component to dynamically render allowed states and enforce reasons for transitions.
-- Created `CaseDetailsPanel` to display contextual information and a timeline of `case_status_history`.
-- Implemented `/clients/[clientId]/filings` tab to list active cases.
-- Implemented `/filing-queue/[caseId]` as the primary case view.
-- Marked G16 as DONE and G17 as READY.
+- Created `getFilingQueueCases` server action to query joined cases, clients, and assessment years.
+- Implemented `FilingQueueFilters` to provide Search, AY, and Status filtering through URL state.
+- Created `CaseTable` component to display active cases using the operational contract.
+- Built the `/filing-queue` page combining filters and table view with pagination and privacy-mode handling.
+- Marked G17 as DONE and G18 as READY.
 
 ## Verification
 
@@ -32,4 +30,4 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Exact next action
 
-Run G17 only: Implement Filing Queue table view. Do not start unless explicit user command 'Continue SDDS.' is received.
+Run G18 only: Implement Filing Queue board view. Do not start unless explicit user command 'Continue SDDS.' is received.
