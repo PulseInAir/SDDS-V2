@@ -6,34 +6,36 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G20 — Implement Invoices & Revenue module
+- Next READY task: G21 — Implement Refunds module
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `59bce2a`
+- HEAD: `6165680`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean after documentation commit
+- Working tree: clean after G20 code commit, pending ledger/handoff update
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Changed
 
-- Added the dedicated `/documents` route with an exceptions-first workspace view, AY/type/status filters, checklist summaries, and preserved version-history tables.
-- Replaced the client-profile Documents placeholder with the real client-scoped module, including upload and replacement flows.
-- Extended document actions to fetch scoped module data, upload files into private Supabase Storage, preserve version chains, update checklist status, and revalidate related routes.
-- Added an authorised signed-download route handler plus structural tests for the new module.
+- Added the dedicated `/invoices` workspace route with create-draft, search, AY/status/overdue filters, billed/received/outstanding/overdue summaries, and a reconciled invoice register.
+- Replaced the client-profile Invoices & Payments placeholder with the real client-scoped module and shared creation flow.
+- Added server-side invoice queries, validation, and actions for draft creation, issue, payment recording, reconciliation-safe totals, and activity logging.
+- Added invoice detail and print flows with line items, payment history, partial-payment support, and placeholder-safe legal copy governed by open decision `O-002`.
+- Added a shared `MoneyValue` component plus focused G20 structural tests.
 
 ## Deferred work
 
-- Business rule validations that require document existence remain structural until the Documents module (G19) supplies the required data checks.
+- Invoice legal identity, address, logo, signature, and GST/tax treatment remain governed by open decision `O-002`; the current print layout intentionally avoids unsupported tax/legal claims.
 
 ## Verification
 
-- `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
 - `npm run typecheck`: passed.
-- `npm test`: passed.
-- `npm run build`: passed.
+- `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
+- `npm test`: passed, including new `tests/invoice-module-contract.test.mjs`.
+- `npm run build`: passed and generated `/invoices`, `/invoices/[invoiceId]`, and `/clients/[clientId]/invoices`.
 - `git diff --check`: passed with line-ending warnings only.
-- Local `next dev` smoke attempt reached middleware, but route rendering in this shell was blocked because `NEXT_PUBLIC_SUPABASE_URL` is not configured.
+- Local dev smoke: `http://127.0.0.1:3001/invoices` started returning HTTP `500`, so route-level runtime verification remains blocked by local auth/environment state in this shell.
+- Browser automation smoke: blocked because Playwright browser binaries are not installed in this environment.
 
 ## Exact next action
 
-Run G20 only after the explicit user command `Continue SDDS`.
+Run G21 — Implement Refunds module.

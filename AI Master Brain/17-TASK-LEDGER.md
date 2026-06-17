@@ -26,8 +26,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G17 | DONE | Implement Filing Queue table view | G14,G16 | canonical query, filters, pagination, privacy | `49a7849` |
 | G18 | DONE | Implement Filing Queue board view | G17 | same dataset/filters, transition validation, reconciliation | `e66ea2d` |
 | G19 | DONE | Implement Documents module and checklist/history | G11,G15 | exceptions-first page, signed actions, version history | `59bce2a` |
-| G20 | READY | Implement Invoices & Revenue module | G07,G15 | create/issue/print, partial payments, reconciliation | — |
-| G21 | PENDING | Implement Refunds module | G08,G15 | statuses, amounts, dates, next action, filters | — |
+| G20 | DONE | Implement Invoices & Revenue module | G07,G15 | create/issue/print, partial payments, reconciliation | `6165680ebd77ee0a02b1571a44f7b85a92a3f7cc` |
+| G21 | READY | Implement Refunds module | G08,G15 | statuses, amounts, dates, next action, filters | — |
 | G22 | PENDING | Implement Intimations / Notices module | G08,G15 | due dates, documents, responses, closure | — |
 | G23 | PENDING | Implement Follow-up module | G08,G15 | annual creation, exclusion/reactivation, contact log | — |
 | G24 | PENDING | Implement Settings and AY/invoice/privacy configuration | G13,G20 | controlled settings without speculative features | — |
