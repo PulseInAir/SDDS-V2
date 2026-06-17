@@ -6,7 +6,7 @@ const packageJson = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
 const homePage = await readFile(
-  new URL("../src/app/page.tsx", import.meta.url),
+  new URL("../src/app/(app)/page.tsx", import.meta.url),
   "utf8",
 );
 
