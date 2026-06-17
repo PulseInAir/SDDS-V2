@@ -6,34 +6,35 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G22 — Implement Intimations / Notices module
+- Next READY task: G23 — Implement Follow-up module
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `230d47a`
+- HEAD: `be4c64a`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean after code commit, pending ledger/handoff update
+- Working tree: clean after task commit, pending ledger/handoff update
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Changed
 
-- Added the dedicated `/refunds` workspace route with search, AY/status/unresolved/attention filters, privacy-safe summary metrics, and an unresolved-first refund register.
-- Replaced the client-profile Refunds placeholder with the real client-scoped module and shared create/update flow.
-- Added server-side refund queries, validation, and actions for refund creation, status updates, filing-link validation, activity logging, and route revalidation.
-- Added refund utilities and focused G21 structural tests covering route wiring and editable refund fields for statuses, amounts, dates, and next action.
+- Added the dedicated `/notices` workspace route with search, AY/status/type/unresolved/attention filters, privacy-safe summary metrics, and a due-first tax-event register.
+- Replaced the client-profile Intimations / Notices placeholder with the real client-scoped module and shared create/update flow.
+- Added server-side tax-event queries, validation, and actions for record creation, status updates, filing-link validation, activity logging, document-context counts, and route revalidation.
+- Added notice utilities and focused G22 structural tests covering route wiring and editable notice fields for due dates, response submission, documents context, and closure.
 
 ## Deferred work
 
-- Refund taxonomy remains limited to the approved minimum contract while open decision `O-006` is unresolved; no extra statuses or business rules were introduced.
+- Final notice/intimation taxonomy beyond the minimum approved contract remains deferred under open decision `O-006`; this task stayed inside the committed schema values and did not add new statuses or event types.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `a9859a9`, remote `origin`.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `e012e59`, remote `origin`.
+- Required project-brain files reviewed for G22 scope: 00, 01, 02, 03, 04, 05, 06, 07, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
 - `npm run typecheck`: passed.
-- `npm test`: passed, including new `tests/refund-module-contract.test.mjs`.
+- `npm test`: passed, including new `tests/notice-module-contract.test.mjs`.
 - `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
-- `npm run build`: passed and generated `/refunds` and `/clients/[clientId]/refunds`.
+- `npm run build`: passed and generated `/notices` and `/clients/[clientId]/notices`.
 - `git diff --check`: passed with line-ending warnings only.
 
 ## Exact next action
 
-Run G22 — Implement Intimations / Notices module.
+Run G23 — Implement Follow-up module.
