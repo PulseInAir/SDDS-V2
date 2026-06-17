@@ -5,31 +5,22 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 1 — Domain and database foundation
-- Active task: none
-- Next READY task: G07 — Create invoice, item, sequence, and payment migrations
+- Active task: G07 — Create invoice, item, sequence, and payment migrations
+- Next READY task: none while G07 is active
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `master`
-- G06 pull request: `#7` merged
-- G06 merge commit: `4adef88eaddb842900e4e9f5feba3ae4f5e9de6b`
+- Branch: `codex/g07-financial-schema`
+- Base branch: `master`
+- Starting Git state: `4869298f2345be3c541cb337dab977b139509fa3`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
-## Completed work
+## Scope
 
-- G00 through G06 are complete.
-- Added private document metadata, private bucket policies, immutable object paths, and additive replacement history.
-- Refreshed generated Supabase types and added contract tests.
-
-## Verification
-
-- Live migrations: `20260617021439` and `20260617021529`.
-- Bucket `sdds-documents` is private.
-- Rollback-only metadata, Storage, versioning, immutability, anonymous-denial, and cross-workspace tests passed; no test rows remain.
-- Document policies: 3. Storage policies: 2. No authenticated overwrite/delete policy exists.
-- Supabase security advisor: no findings.
-- Performance advisor: unused-index information only on the empty schema.
-- GitHub Actions run `27661942836` passed install, lint, typecheck, tests, build, and dependency audit.
-- PR `#7` was marked ready and squash-merged into `master`.
+- Add atomic invoice sequences by workspace and assessment year.
+- Add invoices, line items, and partial/full payments.
+- Enforce invoice number format, 30-day default due date, immutable issued numbering, derived financial totals, payment reversal, and overpayment prevention.
+- Do not add GST/tax assumptions.
+- Add RLS, generated types, live tests, advisors, CI, merge, ledger update, and handoff update.
 
 ## Exact next action
 
-Run G07 only: create invoice sequence, invoice, item, and payment migrations, verify, merge, and stop.
+Complete G07 only, verify live financial invariants and access isolation, merge, and stop.
