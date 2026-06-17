@@ -6,36 +6,34 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G19 — Implement Documents module and checklist/history
+- Next READY task: G20 — Implement Invoices & Revenue module
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
+- HEAD: `59bce2a`
+- Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
+- Working tree: clean after documentation commit
 - Supabase project: `vorcxrxggfybhucpimfx`
+
+## Changed
+
+- Added the dedicated `/documents` route with an exceptions-first workspace view, AY/type/status filters, checklist summaries, and preserved version-history tables.
+- Replaced the client-profile Documents placeholder with the real client-scoped module, including upload and replacement flows.
+- Extended document actions to fetch scoped module data, upload files into private Supabase Storage, preserve version chains, update checklist status, and revalidate related routes.
+- Added an authorised signed-download route handler plus structural tests for the new module.
 
 ## Deferred work
 
 - Business rule validations that require document existence remain structural until the Documents module (G19) supplies the required data checks.
 
-## Completed work this session
-
-- Added a URL-controlled Table/Board switch to `/filing-queue`.
-- Added `CaseBoard` using the existing G17 query result, URL filters, pagination, Privacy Mode masking, and case-detail routes.
-- Built columns exclusively from `CASE_STATUSES` and status-move choices from `VALID_TRANSITIONS`.
-- Routed moves through the existing `transitionFilingCase` server action, preserving server-side transition validation and status history.
-- Marked G18 DONE and G19 READY.
-- Pull request: #10.
-
 ## Verification
 
-- GitHub Actions CI run `27687666469`: passed.
-- `npm run lint`: passed.
+- `npm run lint`: passed with one pre-existing warning in `src/components/clients/ClientForm.tsx` about React Hook Form `watch()`.
 - `npm run typecheck`: passed.
 - `npm test`: passed.
 - `npm run build`: passed.
-- `npm audit --omit=dev --audit-level=high`: passed.
-- Board/table reconciliation is structural: both views receive the same `cases`, `page`, and `totalPages` from one `getFilingQueueCases` call, with the same URL filters.
-- Transition validation is preserved by limiting choices through `VALID_TRANSITIONS` and revalidating in `transitionFilingCase`.
-- Browser interaction and console inspection were not run because the connected Vercel account has no SDDS-V2 project or preview deployment.
+- `git diff --check`: passed with line-ending warnings only.
+- Local `next dev` smoke attempt reached middleware, but route rendering in this shell was blocked because `NEXT_PUBLIC_SUPABASE_URL` is not configured.
 
 ## Exact next action
 
-Run G19 only after the explicit user command `Continue SDDS`.
+Run G20 only after the explicit user command `Continue SDDS`.
