@@ -5,31 +5,31 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: G16 — Implement filing-case detail and transition engine
-- Next READY task: G17 — Implement Filing Queue table view (Blocked by G16)
+- Active task: none
+- Next READY task: G17 — Implement Filing Queue table view
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Deferred work
 
-- Full UI implementation for the placeholder tabs (Assessment Years, Documents, Filings, Invoices, Refunds, Notices, Communications) is deferred to their respective upcoming tasks.
+- Business rule validations (e.g., verifying a document exists before allowing a transition to Verification Pending) are currently structural (graph-based) and stubbed for complex queries, to be fully strict once the Documents module (G19) is complete.
 
 ## Completed work this session
 
-- Created `Tabs` UI component and extracted `MaskedValue` for reuse.
-- Designed `ClientProfileHeader` to display client context globally across tabs, respecting `PrivacyMode`.
-- Implemented `layout.tsx` for `/clients/[clientId]` to create the tabbed navigation framework.
-- Restructured `/clients/[clientId]/page.tsx` to serve as the Overview tab with the client form.
-- Added route placeholders for `assessment-years`, `documents`, `filings`, `invoices`, `refunds`, `notices`, and `communications`.
-- Implemented `CredentialsManager` and wired it into the `/clients/[clientId]/credentials` tab using `updateCredential` and `revealCredential` Server Actions from G10.
-- Marked G15 as DONE and G16 as READY in the ledger.
+- Defined `CASE_STATUSES` and `VALID_TRANSITIONS` in `workflows.ts` according to the domain model.
+- Created `cases.ts` validations and `updateFilingCase`, `transitionFilingCase` server actions.
+- Built `CaseTransitionMenu` component to dynamically render allowed states and enforce reasons for transitions.
+- Created `CaseDetailsPanel` to display contextual information and a timeline of `case_status_history`.
+- Implemented `/clients/[clientId]/filings` tab to list active cases.
+- Implemented `/filing-queue/[caseId]` as the primary case view.
+- Marked G16 as DONE and G17 as READY.
 
 ## Verification
 
-- `npm run check` completed successfully with linting, typechecking, tests, and build passing (no errors, 1 ignored compiler warning for react-hook-form).
-- Local commit is saved.
+- `npm run check` completed successfully (typecheck, lint, test, and build passing, with 1 expected hook warning).
+- Changes committed and pushed.
 
 ## Exact next action
 
-Run G16 only: Implement filing-case detail and transition engine. Do not start unless explicit user command 'Continue SDDS.' is received.
+Run G17 only: Implement Filing Queue table view. Do not start unless explicit user command 'Continue SDDS.' is received.
