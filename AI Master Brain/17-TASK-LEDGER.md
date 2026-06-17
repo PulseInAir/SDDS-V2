@@ -20,8 +20,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G11 | DONE | Implement document upload/download/version foundation | G06,G09 | validated private upload, signed download, history | `69d6c1e` |
 | G12 | DONE | Build design tokens and shared UI primitives | G01 | locked SDDS tokens/components/states, Storybook not required | `9366375` |
 | G13 | DONE | Build authenticated application shell | G09,G12 | sidebar, top utility, AY context, Privacy Mode, responsive shell | `9cf4d78` |
-| G14 | IN_PROGRESS | Implement client repository, list, search, create, and edit | G04,G13 | real data, validation, privacy, pagination | — |
-| G15 | PENDING | Implement client profile source of truth | G14,G05,G06,G07,G08 | all approved contexts without duplicate identity ownership | — |
+| G14 | DONE | Implement client repository, list, search, create, and edit | G04,G13 | real data, validation, privacy, pagination | `13d0e8e` |
+| G15 | READY | Implement client profile source of truth | G14,G05,G06,G07,G08 | all approved contexts without duplicate identity ownership | — |
 | G16 | PENDING | Implement filing-case detail and transition engine | G05,G13 | valid transitions, requirements, history, errors | — |
 | G17 | PENDING | Implement Filing Queue table view | G14,G16 | canonical query, filters, pagination, privacy | — |
 | G18 | PENDING | Implement Filing Queue board view | G17 | same dataset/filters, transition validation, reconciliation | — |

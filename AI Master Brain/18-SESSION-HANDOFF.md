@@ -5,30 +5,32 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: G14 — Implement client repository, list, search, create, and edit
-- Next READY task: none
+- Active task: none
+- Next READY task: G15 — Implement client profile source of truth
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Deferred work
 
-- None. G13 has been completed.
+- None. G14 has been completed.
 
 ## Completed work this session
 
-- Installed `lucide-react` for standard icons.
-- Created `AppContext` for global state (Assessment Year and Privacy Mode).
-- Implemented core shell components in `src/components/layout/` (`SidebarNav`, `TopUtilityBar`, `AppShell`) and related UI components (`PrivacyToggle`, `AssessmentYearSelect`).
-- Refactored `src/app/(app)/layout.tsx` to integrate the application shell context.
-- Updated `src/app/(app)/page.tsx` with the dashboard layout scaffold satisfying the foundation tests.
-- Marked G13 as DONE and G14 as READY in the ledger.
+- Installed `zod`, `react-hook-form`, and `@hookform/resolvers` for robust client-side validation.
+- Created `src/lib/validations/clients.ts` with strict Zod schemas for client data, including PAN format validation and automatic uppercase transformation.
+- Created server actions in `src/lib/actions/clients.ts` to fetch, search, create, and update clients.
+- Implemented `ClientList.tsx` with pagination and Privacy Mode integration (masking PAN and mobile).
+- Implemented `ClientSearch.tsx` with debounced URL-based search.
+- Implemented `ClientForm.tsx` for creating and editing clients with real-time validation and error handling.
+- Built routes `/clients`, `/clients/new`, and `/clients/[clientId]`.
+- Marked G14 as DONE and G15 as READY in the ledger.
 
 ## Verification
 
-- `npm run check` completed successfully with linting, typechecking, tests, and build passing.
-- Push failed (403 forbidden), but local commit `9cf4d78` is saved.
+- `npm run check` completed successfully with linting, typechecking, tests, and build passing (no errors, 1 ignored compiler warning for react-hook-form).
+- Local commit `13d0e8e` is saved.
 
 ## Exact next action
 
-Run G14 only: Implement client repository, list, search, create, and edit. Do not start unless explicit user command 'Continue SDDS.' is received.
+Run G15 only: Implement client profile source of truth. Do not start unless explicit user command 'Continue SDDS.' is received.
