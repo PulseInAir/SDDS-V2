@@ -1,0 +1,154 @@
+'use server'
+
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { clientFormSchema, ClientFormData } from '@/lib/validations/clients'
+
+export async function getClients(params: { search?: string; page?: number; pageSize?: number }) {
+  const supabase = await createSupabaseServerClient()
+  const { search, page = 1, pageSize = 20 } = params
+
+  let query = supabase
+    .from('clients')
+    .select('*', { count: 'exact' })
+    .is('archived_at', null)
+    .order('created_at', { ascending: false })
+
+  if (search) {
+    // Basic search across name, PAN, and mobile
+    const searchUpper = search.toUpperCase()
+    query = query.or(
+      `full_name.ilike.%${search}%,pan_uppercase.ilike.%${searchUpper}%,mobile.ilike.%${search}%`
+    )
+  }
+
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  query = query.range(from, to)
+
+  const { data, error, count } = await query
+
+  if (error) {
+    console.error('Error fetching clients:', error)
+    throw new Error('Failed to fetch clients')
+  }
+
+  return {
+    clients: data,
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: Math.ceil((count || 0) / pageSize),
+  }
+}
+
+export async function getClientById(id: string) {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching client by id:', error)
+    return null
+  }
+
+  return data
+}
+
+export async function createClientAction(formData: ClientFormData) {
+  const supabase = await createSupabaseServerClient()
+
+  // Ensure user is authenticated and get workspace_id
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const { data: workspaceMembers, error: wmError } = await supabase
+    .from('workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (wmError || !workspaceMembers) {
+    return { error: 'Workspace not found' }
+  }
+
+  const validatedData = clientFormSchema.safeParse(formData)
+
+  if (!validatedData.success) {
+    return { error: 'Validation failed', errors: validatedData.error.flatten().fieldErrors }
+  }
+
+  const { data, error } = await supabase
+    .from('clients')
+    .insert([
+      {
+        ...validatedData.data,
+        workspace_id: workspaceMembers.workspace_id,
+        // Optional string fields should be mapped to null if empty
+        date_of_birth: validatedData.data.date_of_birth || null,
+        mobile: validatedData.data.mobile || null,
+        email: validatedData.data.email || null,
+        address: validatedData.data.address || null,
+        family_group: validatedData.data.family_group || null,
+        exclusion_reason: validatedData.data.exclusion_reason || null,
+      },
+    ])
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating client:', error)
+    if (error.code === '23505') { // Unique violation
+      return { error: 'A client with this PAN already exists in this workspace.' }
+    }
+    return { error: 'Failed to create client' }
+  }
+
+  revalidatePath('/clients')
+  return { success: true, client: data }
+}
+
+export async function updateClientAction(id: string, formData: ClientFormData) {
+  const supabase = await createSupabaseServerClient()
+
+  const validatedData = clientFormSchema.safeParse(formData)
+
+  if (!validatedData.success) {
+    return { error: 'Validation failed', errors: validatedData.error.flatten().fieldErrors }
+  }
+
+  const { data, error } = await supabase
+    .from('clients')
+    .update({
+      ...validatedData.data,
+      date_of_birth: validatedData.data.date_of_birth || null,
+      mobile: validatedData.data.mobile || null,
+      email: validatedData.data.email || null,
+      address: validatedData.data.address || null,
+      family_group: validatedData.data.family_group || null,
+      exclusion_reason: validatedData.data.exclusion_reason || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating client:', error)
+    if (error.code === '23505') {
+      return { error: 'A client with this PAN already exists.' }
+    }
+    return { error: 'Failed to update client' }
+  }
+
+  revalidatePath('/clients')
+  revalidatePath(`/clients/${id}`)
+  return { success: true, client: data }
+}

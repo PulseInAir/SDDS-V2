@@ -4,9 +4,9 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 2 — UI Primitives and Shell
-- Active task: none
-- Next READY task: G14 — Implement client repository, list, search, create, and edit
+- Project phase: Phase 3 — Core Operational Modules
+- Active task: G14 — Implement client repository, list, search, create, and edit
+- Next READY task: none
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
