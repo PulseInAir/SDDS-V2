@@ -9,6 +9,7 @@ import {
   transitionCaseSchema,
 } from '@/lib/validations/cases';
 import { VALID_TRANSITIONS, CaseStatus } from '@/lib/constants/workflows';
+import { ensureNextYearFollowUpForCase } from '@/lib/actions/follow-ups';
 
 export async function getFilingQueueCases(params: {
   search?: string;
@@ -203,6 +204,13 @@ export async function transitionFilingCase(
     return { error: `Invalid transition from ${currentStatus} to ${toStatus}` };
   }
 
+  if (toStatus === 'Completed') {
+    const followUpResult = await ensureNextYearFollowUpForCase(caseId);
+    if (!followUpResult.ok) {
+      return { error: followUpResult.error };
+    }
+  }
+
   // 3. User
   const {
     data: { user },
@@ -216,6 +224,7 @@ export async function transitionFilingCase(
     .from('filing_cases')
     .update({
       case_status: toStatus,
+      completed_at: toStatus === 'Completed' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', caseId);
@@ -242,6 +251,7 @@ export async function transitionFilingCase(
 
   revalidatePath(`/filing-queue/${caseId}`);
   revalidatePath(`/clients/${currentCase.client_id}`);
+  revalidatePath('/follow-up');
 
   return { success: true };
 }
