@@ -19,7 +19,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G10 | DONE | Implement credential encryption, update, and reveal flow | G09 | AES-GCM envelope, record-specific reveal, audit metadata | `a4fb8ac` |
 | G11 | DONE | Implement document upload/download/version foundation | G06,G09 | validated private upload, signed download, history | `69d6c1e` |
 | G12 | DONE | Build design tokens and shared UI primitives | G01 | locked SDDS tokens/components/states, Storybook not required | `9366375` |
-| G13 | READY | Build authenticated application shell | G09,G12 | sidebar, top utility, AY context, Privacy Mode, responsive shell | — |
+| G13 | IN_PROGRESS | Build authenticated application shell | G09,G12 | sidebar, top utility, AY context, Privacy Mode, responsive shell | — |
 | G14 | PENDING | Implement client repository, list, search, create, and edit | G04,G13 | real data, validation, privacy, pagination | — |
 | G15 | PENDING | Implement client profile source of truth | G14,G05,G06,G07,G08 | all approved contexts without duplicate identity ownership | — |
 | G16 | PENDING | Implement filing-case detail and transition engine | G05,G13 | valid transitions, requirements, history, errors | — |
