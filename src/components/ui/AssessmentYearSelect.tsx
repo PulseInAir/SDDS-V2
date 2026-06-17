@@ -1,23 +1,45 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+
+import { setAssessmentYearPreferenceAction } from "@/lib/actions/settings";
 import { useAppContext } from "@/contexts/AppContext";
 import { ChevronDown } from "lucide-react";
 
 export function AssessmentYearSelect() {
-  const { assessmentYear, setAssessmentYear } = useAppContext();
-
-  const years = ["2024-25", "2025-26", "2026-27"];
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const { assessmentYears, assessmentYearId, setAssessmentYearId } = useAppContext();
 
   return (
     <div className="relative">
       <select
-        value={assessmentYear}
-        onChange={(e) => setAssessmentYear(e.target.value)}
-        className="h-9 cursor-pointer appearance-none rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel py-1.5 pl-3 pr-8 text-sm font-medium text-text-primary shadow-sm outline-none transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+        value={assessmentYearId ?? ""}
+        disabled={assessmentYears.length === 0 || isPending}
+        onChange={(event) => {
+          const nextValue = event.target.value;
+          const previousValue = assessmentYearId;
+          setAssessmentYearId(nextValue || null);
+
+          startTransition(async () => {
+            try {
+              await setAssessmentYearPreferenceAction(nextValue);
+              router.refresh();
+            } catch {
+              setAssessmentYearId(previousValue);
+            }
+          });
+        }}
+        className="h-9 cursor-pointer appearance-none rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel py-1.5 pl-3 pr-8 text-sm font-medium text-text-primary shadow-sm outline-none transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        aria-label="Selected assessment year"
       >
-        {years.map((year) => (
-          <option key={year} value={year}>
-            AY {year}
+        {assessmentYears.length === 0 ? (
+          <option value="">No AY configured</option>
+        ) : null}
+        {assessmentYears.map((year) => (
+          <option key={year.id} value={year.id}>
+            AY {year.label}{year.is_open ? "" : " (Closed)"}
           </option>
         ))}
       </select>

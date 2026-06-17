@@ -1,4 +1,5 @@
 import { getAuthenticatedWorkspaceSession } from "@/lib/auth/session";
+import { getShellContextData } from "@/lib/actions/settings";
 import { AppContextProvider } from "@/contexts/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 
@@ -7,11 +8,15 @@ export default async function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // This will throw a redirect if the user is unauthenticated or lacks workspace membership
-  await getAuthenticatedWorkspaceSession();
+  const session = await getAuthenticatedWorkspaceSession();
+  const shellContext = await getShellContextData(session.workspace.id);
 
   return (
-    <AppContextProvider>
+    <AppContextProvider
+      assessmentYears={shellContext.assessmentYears}
+      initialAssessmentYearId={shellContext.selectedAssessmentYearId}
+      initialPrivacyMode={shellContext.isPrivacyMode}
+    >
       <AppShell>
         {children}
       </AppShell>
