@@ -5,48 +5,22 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 1 — Domain and database foundation
-- Active task: none
-- Next READY task: G06 — Create document metadata and private Storage policies
+- Active task: G06 — Create document metadata and private Storage policies
+- Next READY task: none while G06 is active
 - Repository: `PulseInAir/SDDS-V2`
-- Branch: `codex/g05-filing-schema`
+- Branch: `codex/g06-document-storage`
 - Base branch: `master`
-- Pull request: `#6`
-- Vercel project: not linked yet
+- Starting Git state: `8eb520a75ee2f8bf9e9d2c28fae1574797a33bd8`
 - Supabase project: `vorcxrxggfybhucpimfx`
-- Supabase URL: `https://vorcxrxggfybhucpimfx.supabase.co`
 
-## Completed work
+## Scope
 
-- G00 through G05 are complete.
-- Added `filing_cases`, `filing_records`, and append-only `case_status_history`.
-- Enforced one active case per workspace/client/assessment year.
-- Kept operational case state separate from filing submissions.
-- Added typed case statuses, ITR categories, filing kinds, verification states, processing states, terminal timestamp rules, same-case parent linkage, acknowledgement uniqueness, and archive constraints.
-- Added supporting indexes, updated-at triggers, RLS, explicit least-privilege grants, and append-only history protection.
-- Refreshed generated Supabase TypeScript database types.
-- Added G05 migration contract tests.
-
-## Changed
-
-- `supabase/migrations/20260617090000_create_filing_schema.sql`
-- `supabase/migrations/20260617090100_secure_filing_schema.sql`
-- `src/types/database.types.ts`
-- `tests/filing-schema-contract.test.mjs`
-- task ledger and session handoff
-
-## Verification
-
-- Live migration history matches repository versions `20260617090000` and `20260617090100`.
-- RLS enabled on all three G05 tables.
-- Eight intended authenticated policies exist.
-- Anonymous privileges are absent; destructive delete grants are absent.
-- Status history rejects mutation and is insert/select only.
-- Rollback-only live tests passed for authorised reads/inserts, one-active-case uniqueness, typed status rejection, revision-parent enforcement, append-only history, anonymous denial, and cross-workspace isolation.
-- Test rows rolled back.
-- Supabase security advisor: no findings.
-- Supabase performance advisor: informational unused-index notices only, expected on an empty schema.
-- GitHub Actions run `27651088618`: install, lint, typecheck, tests, build, and production dependency audit passed.
+- Add document metadata and version/replacement history.
+- Create one private Supabase Storage bucket.
+- Enforce workspace/client ownership in both metadata RLS and Storage object policies.
+- Keep objects immutable to authenticated users; replacements use new objects and metadata rows.
+- Add generated types, live RLS/storage verification, advisors, CI, ledger update, and final merge.
 
 ## Exact next action
 
-Run G06 only: create document metadata and private Supabase Storage policies with validated ownership, private object paths, version/replacement history, RLS/storage tests, generated types, advisors, CI, ledger update, and handoff update.
+Complete G06 only, verify database and Storage access, merge, and stop.
