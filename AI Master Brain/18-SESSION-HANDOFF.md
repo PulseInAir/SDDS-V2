@@ -6,31 +6,28 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 1 — Domain and database foundation / auth boundary next
 - Active task: none
-- Next READY task: G09 — Implement authenticated app boundary and owner workspace membership
+- Next READY task: G10 — Implement credential encryption, update, and reveal flow
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Deferred work
 
-- None. G08 has been completed.
+- None. G09 has been completed.
 
 ## Completed work this session
 
-- Linked remote Supabase project `vorcxrxggfybhucpimfx`.
-- Regenerated `src/types/database.types.ts` from the linked project using utf8 encoding.
-- Pushed pending G08 migrations (`20260617050000` and `20260617050100`) to the remote Supabase database.
-- Ran live Supabase RLS checks verifying anonymous denial and destructive delete protection.
-- Ran `supabase db lint` confirming no schema errors from advisors.
-- Marked G08 as DONE and appended commit hash `78a5bd2` to the ledger.
+- Created Next.js route groups `(auth)` and `(app)` to enforce app boundaries.
+- Moved `/login` to `(auth)/login` and `/` to `(app)/page.tsx`.
+- Implemented `(app)/layout.tsx` to automatically verify owner workspace membership via `getAuthenticatedWorkspaceSession()` on all protected routes.
+- Updated the foundation test to assert against the new `(app)/page.tsx` location.
+- Marked G09 as DONE and appended commit hash `e983b0c` to the ledger.
 
 ## Verification
 
 - `npm run check` (lint, typecheck, tests, build) passed locally.
-- `git diff --check` passed.
-- Remote Supabase types regenerated and pushed successfully.
-- Rollback-only live checks on G08 tables successfully validated RLS behavior.
+- Next.js build compiled correctly with route groups.
 
 ## Exact next action
 
-Run G09 only: implement authenticated app boundary and owner workspace membership, protecting routes and preserving existing Supabase/RLS boundaries. Do not start G10 or any G08-dependent module.
+Run G10 only: Implement credential encryption, update, and reveal flow. This involves implementing AES-GCM envelope and tracking reveal metadata without logging plain text. Do not start G11 or skip dependencies.
