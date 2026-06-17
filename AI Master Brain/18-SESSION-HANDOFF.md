@@ -6,28 +6,36 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 3 — Core Operational Modules
 - Active task: none
-- Next READY task: G18 — Implement Filing Queue board view
+- Next READY task: G19 — Implement Documents module and checklist/history
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Deferred work
 
-- Business rule validations (e.g., verifying a document exists before allowing a transition to Verification Pending) are currently structural (graph-based) and stubbed for complex queries, to be fully strict once the Documents module (G19) is complete.
+- Business rule validations that require document existence remain structural until the Documents module (G19) supplies the required data checks.
 
 ## Completed work this session
 
-- Created `getFilingQueueCases` server action to query joined cases, clients, and assessment years.
-- Implemented `FilingQueueFilters` to provide Search, AY, and Status filtering through URL state.
-- Created `CaseTable` component to display active cases using the operational contract.
-- Built the `/filing-queue` page combining filters and table view with pagination and privacy-mode handling.
-- Marked G17 as DONE and G18 as READY.
+- Added a URL-controlled Table/Board switch to `/filing-queue`.
+- Added `CaseBoard` using the existing G17 query result, URL filters, pagination, Privacy Mode masking, and case-detail routes.
+- Built columns exclusively from `CASE_STATUSES` and status-move choices from `VALID_TRANSITIONS`.
+- Routed moves through the existing `transitionFilingCase` server action, preserving server-side transition validation and status history.
+- Marked G18 DONE and G19 READY.
+- Pull request: #10.
 
 ## Verification
 
-- `npm run check` completed successfully (typecheck, lint, test, and build passing, with 1 expected hook warning).
-- Changes committed and pushed.
+- GitHub Actions CI run `27687666469`: passed.
+- `npm run lint`: passed.
+- `npm run typecheck`: passed.
+- `npm test`: passed.
+- `npm run build`: passed.
+- `npm audit --omit=dev --audit-level=high`: passed.
+- Board/table reconciliation is structural: both views receive the same `cases`, `page`, and `totalPages` from one `getFilingQueueCases` call, with the same URL filters.
+- Transition validation is preserved by limiting choices through `VALID_TRANSITIONS` and revalidating in `transitionFilingCase`.
+- Browser interaction and console inspection were not run because the connected Vercel account has no SDDS-V2 project or preview deployment.
 
 ## Exact next action
 
-Run G18 only: Implement Filing Queue board view. Do not start unless explicit user command 'Continue SDDS.' is received.
+Run G19 only after the explicit user command `Continue SDDS`.
