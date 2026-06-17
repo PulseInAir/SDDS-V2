@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -557,11 +557,11 @@ export type Database = {
           discount_amount: number
           due_date: string | null
           id: string
-          invoice_number: string | null
+          invoice_number: string
           issue_date: string | null
           issued_at: string | null
           notes: string | null
-          serial_number: number | null
+          serial_number: number
           status: string
           subtotal: number
           total_amount: number
@@ -578,11 +578,11 @@ export type Database = {
           discount_amount?: number
           due_date?: string | null
           id?: string
-          invoice_number?: string | null
+          invoice_number: string
           issue_date?: string | null
           issued_at?: string | null
           notes?: string | null
-          serial_number?: number | null
+          serial_number: number
           status?: string
           subtotal?: number
           total_amount?: number
@@ -599,11 +599,11 @@ export type Database = {
           discount_amount?: number
           due_date?: string | null
           id?: string
-          invoice_number?: string | null
+          invoice_number?: string
           issue_date?: string | null
           issued_at?: string | null
           notes?: string | null
-          serial_number?: number | null
+          serial_number?: number
           status?: string
           subtotal?: number
           total_amount?: number
@@ -620,10 +620,20 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_case_context_fk"
-            columns: ["workspace_id", "case_id", "client_id", "assessment_year_id"]
+            columns: [
+              "workspace_id",
+              "case_id",
+              "client_id",
+              "assessment_year_id",
+            ]
             isOneToOne: false
             referencedRelation: "filing_cases"
-            referencedColumns: ["workspace_id", "id", "client_id", "assessment_year_id"]
+            referencedColumns: [
+              "workspace_id",
+              "id",
+              "client_id",
+              "assessment_year_id",
+            ]
           },
           {
             foreignKeyName: "invoices_client_workspace_fk"
