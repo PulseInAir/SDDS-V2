@@ -4,14 +4,14 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 3 — Core Operational Modules
-- Active task: G27 — Build operational dashboard
-- Next READY task: none until G27 completes
+- Project phase: Phase 7 — Dashboard
+- Active task: none
+- Next READY task: G28 — Run dashboard visual/interaction correction loop
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `d26bdc5`
+- HEAD before this handoff update: `ca00f98`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: GitHub connector execution in progress
+- Working tree: documentation update pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
@@ -22,7 +22,9 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Changed
 
-- G27 marked `IN_PROGRESS` in `17-TASK-LEDGER.md`.
+- Added `src/lib/actions/dashboard.ts` to assemble the selected-AY operational dashboard snapshot from real filing cases, document exceptions, invoices/payments, refunds, notices, follow-ups, and recent activity using the locked G26 contracts.
+- Added `src/components/dashboard/OperationalDashboard.tsx` to render the dashboard hierarchy: AY context, compact attention strip, workflow distribution, immediate work queue, financial exceptions, resolution watchlist, follow-ups due, and recent activity with privacy-safe PAN and money handling.
+- Replaced the placeholder `/` route with the real dashboard loader and added `tests/dashboard-page-contract.test.mjs` to prevent regression back to placeholder sections.
 
 ## Deferred work
 
@@ -31,9 +33,14 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Verification
 
-- Ledger inspected from GitHub URL.
-- G27 selected because it is the first dependency-satisfied READY task.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `9fbe0ed`, remote `origin`.
+- Required project-brain files reviewed for G27 scope: 00, 01, 02, 03, 05, 08, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
+- `npm run typecheck`: passed.
+- `npm test`: passed, including new `dashboard-page-contract` coverage.
+- `npm run lint`: passed with the pre-existing `src/components/clients/ClientForm.tsx` React Hook Form `watch()` warning only.
+- `npm run build`: passed.
+- `git diff --check`: passed with line-ending warnings only.
 
 ## Exact next action
 
-Implement G27 dashboard data loader and dashboard page UI, then mark G27 DONE and set G28 READY after verification evidence is recorded.
+Run G28 to visually and interactively correct the dashboard across desktop, laptop, tablet, and mobile widths, with accessibility and route-behaviour evidence.
