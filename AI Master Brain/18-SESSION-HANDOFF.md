@@ -5,37 +5,35 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 3 — Core Operational Modules
-- Active task: none
-- Next READY task: G27 — Build operational dashboard
+- Active task: G27 — Build operational dashboard
+- Next READY task: none until G27 completes
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `af5734f`
+- HEAD before this handoff update: `d26bdc5`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: documentation update pending commit
+- Working tree: GitHub connector execution in progress
 - Supabase project: `vorcxrxggfybhucpimfx`
+
+## Scope
+
+- Replace placeholder dashboard content with a real operational dashboard.
+- Use the locked dashboard query contracts from G26.
+- Preserve auth, Supabase policies, route names, workflow statuses, and module calculations.
 
 ## Changed
 
-- Added `src/lib/dashboard/contracts.ts` to lock the dashboard metric catalog, workflow distribution contract, reconciliation helpers, and concrete filtered destinations for filing queue, documents, invoices, refunds, notices, and follow-up.
-- Extended filing queue, documents, and invoices route/query handling with dashboard destination scopes: filing-queue `scope=attention`, documents `scope=exceptions`, and invoices `scope=billed|received|outstanding|overdue`.
-- Added `tests/dashboard-query-contract.test.mjs` to verify every locked dashboard metric, its destination wiring, and the reconciliation helper coverage.
+- G27 marked `IN_PROGRESS` in `17-TASK-LEDGER.md`.
 
 ## Deferred work
 
-- Assessment-year rollover automation remains constrained by open decision `O-003`; the app uses configured assessment-year records only.
-- Invoice legal identity, GST treatment, logo, and signature assets remain constrained by open decision `O-002`; settings intentionally expose sequencing visibility without speculative invoice identity fields.
+- Visual/interaction correction loop remains G28 after G27 is functionally complete.
+- Backup destination remains blocked by owner decision G31.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `f14b663`, remote `origin`.
-- Required project-brain files reviewed for G26 scope: 00, 01, 02, 03, 05, 08, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
-- `node --test tests/dashboard-query-contract.test.mjs`: passed.
-- `npm run typecheck`: passed.
-- `npm test`: passed.
-- `npm run lint`: passed with the pre-existing `ClientForm.tsx` React Hook Form `watch()` warning.
-- `npm run build`: passed.
-- `git diff --check`: passed with line-ending warnings only.
+- Ledger inspected from GitHub URL.
+- G27 selected because it is the first dependency-satisfied READY task.
 
 ## Exact next action
 
-Run G27 — build the operational dashboard UI on top of the locked dashboard query contracts.
+Implement G27 dashboard data loader and dashboard page UI, then mark G27 DONE and set G28 READY after verification evidence is recorded.
