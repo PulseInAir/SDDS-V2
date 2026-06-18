@@ -4,27 +4,28 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 8 — Import, export, and recovery
+- Project phase: Phase 9 — Hardening and release
 - Active task: none
-- Next READY task: G32 — Performance and accessibility hardening
+- Next READY task: none
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `23b0f6e`
+- HEAD before this handoff update: `59cbe78`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: documentation closeout pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
 
-- Record completion evidence for G30 after the verified business-export implementation commit.
-- Keep the ledger and handoff aligned with the shipped export route, API handler, and contract coverage.
+- Record G32 completion evidence after the verified hardening implementation commit.
+- Keep the ledger and handoff aligned with the shipped query, accessibility, and loading-state hardening changes.
 
 ## Changed
 
-- Added `src/app/(app)/settings/export/page.tsx`, `src/components/settings/ExportPageContent.tsx`, `src/app/api/exports/[exportKey]/route.ts`, and `src/lib/exports/business.ts` to ship the real `/settings/export` route, the authenticated CSV download endpoint, the locked business-export definitions, server-side row assembly, and export audit logging through `activity_events`.
-- Updated `src/components/settings/SettingsPageContent.tsx` to expose the dedicated business-export route from Settings alongside the existing import flow.
-- Added `tests/export-module-contract.test.mjs` to lock the export route wiring, audited CSV generation, and the privacy-safe export guardrails required by G30.
-- Updated the task ledger and handoff to mark G30 done, record the implementation commit hash, and release G32 as the next dependency-satisfied task.
+- Added `src/app/(app)/loading.tsx` plus reduced-motion-safe skeleton behavior to keep authenticated route transitions responsive without blank-screen swaps.
+- Updated `src/components/layout/AppShell.tsx`, `src/components/layout/TopUtilityBar.tsx`, and `src/components/layout/GlobalSearch.tsx` to add a skip link, focusable main landmark, mobile-navigation focus management, body scroll lock, and keyboard-first combobox/listbox search navigation.
+- Updated `src/app/globals.css`, `src/app/(auth)/login/LoginForm.tsx`, `src/components/cases/CaseTable.tsx`, and `src/components/cases/CaseBoard.tsx` to harden contrast, focus visibility, touch targets, mobile action visibility, and board rendering efficiency.
+- Updated `src/lib/actions/cases.ts` to paginate the filing queue at the database layer, select only the needed case fields, and move attention-scope filtering onto the server query path.
+- Added `tests/hardening-contract.test.mjs` to lock the skip-link, route-loading, keyboard-navigation, and filing-queue pagination expectations required by G32.
 
 ## Deferred work
 
@@ -32,15 +33,16 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `0941483`, remote `origin`.
-- Required project-brain files reviewed for G30 scope: 00, 01, 02, 03, 07, 09, 10, 11, 12, 14, 15, 16, 17, 18, and 19.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `3ae4214`, remote `origin`.
+- Required project-brain files reviewed for G32 scope: 00, 01, 02, 06, 08, 09, 11, 12, 15, 16, 17, 18, and 19.
+- Codebase inspection completed for the shell, dashboard, and filing queue surfaces that are most likely to carry cross-route hardening risk.
 - `npm run typecheck`: passed.
 - `npm run lint`: passed.
-- `npm test`: passed, including new `export-module-contract` coverage.
-- `npm run build`: passed, and the generated route list now includes `/settings/export` plus `/api/exports/[exportKey]`.
+- `npm test`: passed, including new `hardening-contract` coverage.
+- `npm run build`: passed, and the authenticated route list now includes the shared `(app)` loading boundary without compilation regressions.
 - `git diff --check`: passed with line-ending warnings only.
-- Interactive authenticated browser verification was not run because the repository does not include owner login credentials; this task was verified through route compilation, route-handler build output, and contract tests.
+- Interactive browser verification was not run in this session because the local workspace does not have configured Supabase public environment values for a live app boot; G32 was verified through static contract coverage, type/lint/test/build checks, and direct code review of the hardened surfaces.
 
 ## Exact next action
 
-Start G32 by hardening the shipped application for performance, responsiveness, keyboard access, and contrast without changing locked workflow or data contracts.
+Wait for the owner decision on G31 backup destination and retention; once that blocker is resolved, resume with G33 full end-to-end regression.
