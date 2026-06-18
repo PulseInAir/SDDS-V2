@@ -45,6 +45,24 @@ type ActivityRow = {
   case_id: string | null;
 };
 
+type QueryResult<T> = {
+  data: T | null;
+  error: { message: string } | null;
+};
+
+type UntypedQuery<T> = PromiseLike<QueryResult<T>> & {
+  eq(column: string, value: unknown): UntypedQuery<T>;
+  is(column: string, value: null): UntypedQuery<T>;
+  order(column: string, options: { ascending: boolean }): UntypedQuery<T>;
+  limit(count: number): UntypedQuery<T>;
+};
+
+type UntypedSupabase = {
+  from<T>(table: string): {
+    select(columns: string): UntypedQuery<T>;
+  };
+};
+
 function normalizeRelation<T>(value: T | T[] | null) {
   return Array.isArray(value) ? value[0] ?? null : value;
 }
@@ -81,7 +99,7 @@ export async function getOperationalDashboardData() {
   const assessmentYearId = shell.selectedAssessmentYearId;
   const assessmentYear = shell.assessmentYears.find((year) => year.id === assessmentYearId) ?? null;
   const supabase = await createSupabaseServerClient();
-  const supabaseAny = supabase as any;
+  const untypedSupabase = supabase as unknown as UntypedSupabase;
 
   let casesQuery = supabase
     .from("filing_cases")
@@ -111,29 +129,29 @@ export async function getOperationalDashboardData() {
     .eq("workspace_id", session.workspace.id)
     .is("archived_at", null);
 
-  let refundsQuery = supabaseAny
-    .from("refunds")
+  let refundsQuery = untypedSupabase
+    .from<unknown[]>("refunds")
     .select("status, expected_date, next_action, expected_amount, received_amount, updated_at, clients!inner(id, full_name, pan_uppercase)")
     .eq("workspace_id", session.workspace.id)
     .is("archived_at", null)
     .order("updated_at", { ascending: false });
 
-  let noticesQuery = supabaseAny
-    .from("tax_events")
+  let noticesQuery = untypedSupabase
+    .from<unknown[]>("tax_events")
     .select("status, response_due_date, event_type, category, next_action, updated_at, clients!inner(id, full_name, pan_uppercase)")
     .eq("workspace_id", session.workspace.id)
     .is("archived_at", null)
     .order("updated_at", { ascending: false });
 
-  let followUpsQuery = supabaseAny
-    .from("follow_ups")
+  let followUpsQuery = untypedSupabase
+    .from<unknown[]>("follow_ups")
     .select("status, due_date, next_action, updated_at, clients!inner(id, full_name, pan_uppercase, mobile)")
     .eq("workspace_id", session.workspace.id)
     .is("archived_at", null)
     .order("due_date", { ascending: true });
 
-  const activityQuery = supabaseAny
-    .from("activity_events")
+  const activityQuery = untypedSupabase
+    .from<unknown[]>("activity_events")
     .select("id, entity_type, action, message, created_at, client_id, case_id")
     .eq("workspace_id", session.workspace.id)
     .order("created_at", { ascending: false })
