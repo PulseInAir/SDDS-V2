@@ -1,36 +1,76 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LogOut, Menu, UserCircle, X } from "lucide-react";
+
 import { PrivacyToggle } from "@/components/ui/PrivacyToggle";
 import { AssessmentYearSelect } from "@/components/ui/AssessmentYearSelect";
 import { IconButton } from "@/components/ui/IconButton";
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { signOut } from "@/app/(auth)/login/actions";
 import { classNames } from "@/lib/utils/styles";
-import { isNavigationItemActive, primaryNavigation, settingsNavigationItem } from "@/components/layout/navigation";
+import {
+  isNavigationItemActive,
+  primaryNavigation,
+  settingsNavigationItem,
+} from "@/components/layout/navigation";
 
 export function TopUtilityBar() {
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const mobileNavRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
+    const triggerButton = triggerButtonRef.current;
+
     if (!isMobileNavOpen) {
+      document.body.style.removeProperty("overflow");
       return;
     }
 
-    function handleEscape(event: KeyboardEvent) {
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    function handleKeydown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsMobileNavOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableItems = mobileNavRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+
+      if (!focusableItems || focusableItems.length === 0) {
+        return;
+      }
+
+      const firstItem = focusableItems[0];
+      const lastItem = focusableItems[focusableItems.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstItem) {
+        event.preventDefault();
+        lastItem.focus();
+      } else if (!event.shiftKey && document.activeElement === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
       }
     }
 
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleKeydown);
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
+      document.body.style.removeProperty("overflow");
+      document.removeEventListener("keydown", handleKeydown);
+      triggerButton?.focus();
     };
   }, [isMobileNavOpen]);
 
@@ -40,6 +80,7 @@ export function TopUtilityBar() {
         <div className="flex min-w-0 flex-1 items-center gap-x-4">
           <div className="md:hidden">
             <IconButton
+              ref={triggerButtonRef}
               variant="ghost"
               title="Open navigation"
               aria-label="Open navigation"
@@ -54,6 +95,7 @@ export function TopUtilityBar() {
             <GlobalSearch />
           </div>
         </div>
+
         <div className="flex items-center gap-x-3 sm:gap-x-4">
           <AssessmentYearSelect />
           <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
@@ -77,8 +119,10 @@ export function TopUtilityBar() {
             aria-label="Close navigation overlay"
             onClick={() => setIsMobileNavOpen(false)}
           />
+
           <div
             id="mobile-navigation"
+            ref={mobileNavRef}
             className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,calc(100vw-2rem))] flex-col border-r border-border-subtle bg-surface-panel shadow-xl"
           >
             <div className="flex h-[60px] items-center justify-between border-b border-border-subtle px-4">
@@ -88,7 +132,13 @@ export function TopUtilityBar() {
                   Navigation
                 </h2>
               </div>
-              <IconButton variant="ghost" aria-label="Close navigation" title="Close navigation" onClick={() => setIsMobileNavOpen(false)}>
+              <IconButton
+                ref={closeButtonRef}
+                variant="ghost"
+                aria-label="Close navigation"
+                title="Close navigation"
+                onClick={() => setIsMobileNavOpen(false)}
+              >
                 <X className="h-5 w-5 text-text-muted" aria-hidden="true" />
               </IconButton>
             </div>
@@ -152,7 +202,10 @@ export function TopUtilityBar() {
                   type="submit"
                   className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
-                  <LogOut className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary" aria-hidden="true" />
+                  <LogOut
+                    className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary"
+                    aria-hidden="true"
+                  />
                   Sign out
                 </button>
               </form>

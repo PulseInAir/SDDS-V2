@@ -41,6 +41,7 @@ export function GlobalSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [response, setResponse] = useState<GlobalSearchResponse>({
     query: "",
     supportedFields: ["Client name", "PAN", "Mobile", "Invoice number", "Acknowledgement number"],
@@ -51,12 +52,14 @@ export function GlobalSearch() {
     function handleClickOutside(event: MouseEvent) {
       if (!containerRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
+        setActiveIndex(-1);
       }
     }
 
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsOpen(false);
+        setActiveIndex(-1);
       }
     }
 
@@ -91,11 +94,13 @@ export function GlobalSearch() {
 
         const payload = (await result.json()) as GlobalSearchResponse;
         setResponse(payload);
+        setActiveIndex(payload.results.length > 0 ? 0 : -1);
       } catch (fetchError) {
         if ((fetchError as Error).name === "AbortError") {
           return;
         }
 
+        setActiveIndex(-1);
         setError(fetchError instanceof Error ? fetchError.message : "Search results could not be loaded.");
       } finally {
         setIsLoading(false);
@@ -121,9 +126,15 @@ export function GlobalSearch() {
       },
     );
   }, [response.results]);
+  const resultIndexMap = useMemo(() => {
+    return new Map(response.results.map((result, index) => [result.id, index]));
+  }, [response.results]);
+
+  const resultsListId = "global-search-results";
+  const activeDescendantId = activeIndex >= 0 ? `${resultsListId}-${activeIndex}` : undefined;
 
   return (
-    <div ref={containerRef} className="relative min-w-0 flex-1 max-w-2xl">
+    <div ref={containerRef} className="relative min-w-0 max-w-2xl flex-1">
       <label className="sr-only" htmlFor="global-search">
         Global search
       </label>
@@ -134,16 +145,40 @@ export function GlobalSearch() {
         <input
           id="global-search"
           type="search"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls={resultsListId}
+          aria-expanded={isOpen}
+          aria-activedescendant={activeDescendantId}
           value={query}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={(event) => {
+            if (!isOpen || response.results.length === 0) {
+              return;
+            }
+
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              setActiveIndex((current) => (current + 1) % response.results.length);
+            } else if (event.key === "ArrowUp") {
+              event.preventDefault();
+              setActiveIndex((current) => (current <= 0 ? response.results.length - 1 : current - 1));
+            } else if (event.key === "Enter" && activeIndex >= 0) {
+              event.preventDefault();
+              window.location.assign(response.results[activeIndex].destination);
+            }
+          }}
           onChange={(event) => {
             const nextQuery = event.target.value;
             setQuery(nextQuery);
+            setActiveIndex(-1);
+
             if (nextQuery.trim().length < MIN_SEARCH_LENGTH) {
               setError(null);
               setIsLoading(false);
               setResponse((current) => ({ ...current, query: nextQuery.trim(), results: [] }));
             }
+
             setIsOpen(true);
           }}
           placeholder="Search clients, PAN, invoices, or acknowledgement numbers"
@@ -156,9 +191,10 @@ export function GlobalSearch() {
             onClick={() => {
               setQuery("");
               setError(null);
+              setActiveIndex(-1);
               setResponse((current) => ({ ...current, query: "", results: [] }));
             }}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-text-muted transition-colors hover:text-text-secondary"
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-text-muted transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             aria-label="Clear search"
           >
             <XCircle className="h-4 w-4" aria-hidden="true" />
@@ -167,7 +203,11 @@ export function GlobalSearch() {
       </div>
 
       {isOpen ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 overflow-hidden rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-lg">
+        <div
+          id={resultsListId}
+          role="listbox"
+          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 overflow-hidden rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-lg"
+        >
           <div className="border-b border-border-subtle bg-surface-muted px-4 py-3 text-xs text-text-secondary">
             Search scope: {response.supportedFields.join(", ")}.
           </div>
@@ -179,11 +219,15 @@ export function GlobalSearch() {
           ) : null}
 
           {deferredQuery.length >= MIN_SEARCH_LENGTH && isLoading ? (
-            <div className="px-4 py-5 text-sm text-text-secondary">Searching across workspace records...</div>
+            <div className="px-4 py-5 text-sm text-text-secondary" aria-live="polite">
+              Searching across workspace records...
+            </div>
           ) : null}
 
           {deferredQuery.length >= MIN_SEARCH_LENGTH && error ? (
-            <div className="px-4 py-5 text-sm text-red-700">{error}</div>
+            <div className="px-4 py-5 text-sm text-red-700" role="alert">
+              {error}
+            </div>
           ) : null}
 
           {deferredQuery.length >= MIN_SEARCH_LENGTH && !isLoading && !error ? (
@@ -196,36 +240,50 @@ export function GlobalSearch() {
                         {getResultTypeLabel(groupKey)}
                       </div>
                       <div className="pb-2">
-                        {groupedResults[groupKey].map((result) => (
-                          <Link
-                            key={result.id}
-                            href={result.destination}
-                            onClick={() => setIsOpen(false)}
-                            className="mx-2 flex items-start gap-3 rounded-[var(--radius-input)] px-3 py-3 transition-colors hover:bg-surface-hover"
-                          >
-                            <div className="mt-0.5 rounded-full bg-surface-muted p-2 text-text-secondary">
-                              {getResultIcon(result.type)}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-3">
-                                <p className="truncate text-sm font-semibold text-text-primary">{result.title}</p>
-                                <span className="rounded-full bg-surface-muted px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
-                                  {getResultTypeLabel(result.type)}
-                                </span>
+                        {groupedResults[groupKey].map((result) => {
+                          const resultIndex = resultIndexMap.get(result.id) ?? -1;
+                          const isActive = resultIndex === activeIndex;
+
+                          return (
+                            <Link
+                              key={result.id}
+                              id={`${resultsListId}-${resultIndex}`}
+                              role="option"
+                              aria-selected={isActive}
+                              href={result.destination}
+                              onMouseEnter={() => setActiveIndex(resultIndex)}
+                              onClick={() => {
+                                setIsOpen(false);
+                                setActiveIndex(-1);
+                              }}
+                              className={`mx-2 flex items-start gap-3 rounded-[var(--radius-input)] px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 ${
+                                isActive ? "bg-brand-50" : "hover:bg-surface-hover"
+                              }`}
+                            >
+                              <div className="mt-0.5 rounded-full bg-surface-muted p-2 text-text-secondary">
+                                {getResultIcon(result.type)}
                               </div>
-                              <p className="mt-1 text-xs font-medium text-text-secondary">{result.identifier}</p>
-                              <p className="mt-1 text-xs text-text-muted">{result.context}</p>
-                            </div>
-                            <ArrowUpRight className="mt-1 h-4 w-4 flex-shrink-0 text-text-muted" aria-hidden="true" />
-                          </Link>
-                        ))}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="truncate text-sm font-semibold text-text-primary">{result.title}</p>
+                                  <span className="rounded-full bg-surface-muted px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+                                    {getResultTypeLabel(result.type)}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-xs font-medium text-text-secondary">{result.identifier}</p>
+                                <p className="mt-1 text-xs text-text-muted">{result.context}</p>
+                              </div>
+                              <ArrowUpRight className="mt-1 h-4 w-4 flex-shrink-0 text-text-muted" aria-hidden="true" />
+                            </Link>
+                          );
+                        })}
                       </div>
                     </div>
                   ) : null,
                 )}
               </div>
             ) : (
-              <div className="px-4 py-5 text-sm text-text-secondary">
+              <div className="px-4 py-5 text-sm text-text-secondary" aria-live="polite">
                 No results found in the supported search fields for &quot;{response.query}&quot;.
               </div>
             )

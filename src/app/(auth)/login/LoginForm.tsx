@@ -15,7 +15,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-5">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700" htmlFor="email">
+        <label className="text-sm font-medium text-text-secondary" htmlFor="email">
           Email
         </label>
         <input
@@ -24,11 +24,11 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           required
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+          className="w-full rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
         />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700" htmlFor="password">
+        <label className="text-sm font-medium text-text-secondary" htmlFor="password">
           Password
         </label>
         <input
@@ -37,7 +37,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+          className="w-full rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
         />
       </div>
       {state.error ? (
@@ -48,7 +48,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-[var(--radius-input)] bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

@@ -114,7 +114,7 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link 
                     href={`/filing-queue/${c.id}`} 
-                    className="inline-flex items-center text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-[var(--radius-button)] transition-colors opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+                    className="inline-flex items-center rounded-[var(--radius-input)] bg-brand-50 px-3 py-1.5 text-brand-700 transition-colors hover:bg-brand-100 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                   >
                     View
                     <ArrowRight className="w-4 h-4 ml-1.5" />

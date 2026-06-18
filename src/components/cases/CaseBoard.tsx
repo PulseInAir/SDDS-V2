@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   AlertTriangle,
@@ -163,10 +163,30 @@ export function CaseBoard({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const visibleStatuses =
-    statusFilter && isCaseStatus(statusFilter)
-      ? [statusFilter]
-      : [...CASE_STATUSES];
+  const visibleStatuses = useMemo(
+    () => (
+      statusFilter && isCaseStatus(statusFilter)
+        ? [statusFilter]
+        : [...CASE_STATUSES]
+    ),
+    [statusFilter],
+  );
+  const casesByStatus = useMemo(() => {
+    const grouped = new Map<string, FilingQueueCaseRow[]>();
+
+    for (const status of visibleStatuses) {
+      grouped.set(status, []);
+    }
+
+    for (const filingCase of cases) {
+      const currentGroup = grouped.get(filingCase.case_status);
+      if (currentGroup) {
+        currentGroup.push(filingCase);
+      }
+    }
+
+    return grouped;
+  }, [cases, visibleStatuses]);
 
   function navigateToPage(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -192,9 +212,7 @@ export function CaseBoard({
       <div className="overflow-x-auto pb-3" aria-label="Filing Queue board">
         <div className="flex min-w-max items-start gap-4">
           {visibleStatuses.map((status) => {
-            const statusCases = cases.filter(
-              (filingCase) => filingCase.case_status === status,
-            );
+            const statusCases = casesByStatus.get(status) ?? [];
             const columnId = `column-${status
               .replaceAll(' ', '-')
               .toLowerCase()}`;
@@ -276,7 +294,7 @@ export function CaseBoard({
 
                         <Link
                           href={`/filing-queue/${filingCase.id}`}
-                          className="mt-4 inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800"
+                          className="mt-4 inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                         >
                           Open case
                           <ArrowRight

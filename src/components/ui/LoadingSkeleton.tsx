@@ -8,7 +8,7 @@ export const LoadingSkeleton = React.forwardRef<HTMLDivElement, LoadingSkeletonP
     return (
       <div
         ref={ref}
-        className={classNames('animate-pulse bg-surface-muted rounded', className)}
+        className={classNames('rounded bg-surface-muted motion-safe:animate-pulse', className)}
         {...props}
       />
     );

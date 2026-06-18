@@ -11,6 +11,26 @@ import {
 import { VALID_TRANSITIONS, CaseStatus } from '@/lib/constants/workflows';
 import { ensureNextYearFollowUpForCase } from '@/lib/actions/follow-ups';
 
+type FilingQueueQueryRow = {
+  id: string;
+  case_status: string;
+  next_action: string | null;
+  due_date: string | null;
+  updated_at: string;
+  blocker_code: string | null;
+  blocker_note: string | null;
+  clients: {
+    id: string;
+    full_name: string;
+    pan_uppercase: string;
+    mobile: string | null;
+  }[];
+  assessment_years: {
+    id: string;
+    label: string;
+  }[];
+};
+
 export async function getFilingQueueCases(params: {
   search?: string;
   ay_label?: string;
@@ -21,16 +41,28 @@ export async function getFilingQueueCases(params: {
 }) {
   const supabase = await createSupabaseServerClient();
   const { search, ay_label, status, scope, page = 1, pageSize = 20 } = params;
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+  const safePageSize = Number.isFinite(pageSize) ? Math.min(Math.max(pageSize, 1), 100) : 20;
+  const today = new Date().toISOString().slice(0, 10);
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
 
   let query = supabase
     .from('filing_cases')
     .select(`
-      *,
+      id,
+      case_status,
+      next_action,
+      due_date,
+      updated_at,
+      blocker_code,
+      blocker_note,
       clients!inner (id, full_name, pan_uppercase, mobile),
       assessment_years!inner (id, label)
     `, { count: 'exact' })
     .is('archived_at', null)
-    .order('updated_at', { ascending: false });
+    .order('updated_at', { ascending: false })
+    .range(from, to);
 
   if (search) {
     const searchUpper = search.toUpperCase();
@@ -48,43 +80,38 @@ export async function getFilingQueueCases(params: {
     query = query.eq('case_status', status);
   }
 
-  const { data, error } = await query;
+  if (scope !== 'attention') {
+    // Non-attention scopes keep the canonical filing queue dataset and pagination.
+  } else {
+    query = query.or(
+      `case_status.eq.Rectification Required,case_status.eq.Notice Received,blocker_code.not.is.null,blocker_note.not.is.null,and(due_date.lt.${today},case_status.not.in.(Completed,Cancelled))`,
+    );
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     console.error('Error fetching filing queue cases:', error);
     throw new Error('Failed to fetch filing cases');
   }
-
-  const scopedCases = (data ?? []).filter((filingCase) => {
-    if (scope !== 'attention') {
-      return true;
-    }
-
-    const hasAttentionStatus =
-      filingCase.case_status === 'Rectification Required' ||
-      filingCase.case_status === 'Notice Received';
-    const hasBlocker = Boolean(filingCase.blocker?.trim());
-    const isOverdue =
-      filingCase.case_status !== 'Completed' &&
-      filingCase.case_status !== 'Cancelled' &&
-      Boolean(
-        filingCase.due_date &&
-          new Date(`${filingCase.due_date}T00:00:00`) < new Date(new Date().setHours(0, 0, 0, 0)),
-      );
-
-    return hasAttentionStatus || hasBlocker || isOverdue;
-  });
-
-  const from = (page - 1) * pageSize;
-  const paginatedCases = scopedCases.slice(from, from + pageSize);
-  const scopedCount = scopedCases.length;
+  const cases = ((data ?? []) as FilingQueueQueryRow[]).map((filingCase) => ({
+    id: filingCase.id,
+    case_status: filingCase.case_status,
+    next_action: filingCase.next_action,
+    due_date: filingCase.due_date,
+    updated_at: filingCase.updated_at,
+    clients: filingCase.clients[0] ?? null,
+    assessment_years: filingCase.assessment_years[0] ?? null,
+    blocker: filingCase.blocker_note?.trim() || filingCase.blocker_code?.trim() || null,
+  }));
+  const scopedCount = count ?? cases.length;
 
   return {
-    cases: paginatedCases,
+    cases,
     count: scopedCount,
-    page,
-    pageSize,
-    totalPages: Math.max(1, Math.ceil(scopedCount / pageSize)),
+    page: safePage,
+    pageSize: safePageSize,
+    totalPages: Math.max(1, Math.ceil(scopedCount / safePageSize)),
   };
 }
 

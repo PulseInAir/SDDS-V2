@@ -15,7 +15,7 @@
 
   --color-text-primary: #172033;
   --color-text-secondary: #4B5565;
-  --color-text-muted: #7A8495;
+  --color-text-muted: #667085;
 
   --color-border-subtle: #DDE3EC;
   --color-surface-app: #F4F6F9;
@@ -45,6 +45,10 @@ body {
   min-height: 100%;
 }
 
+html {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   background-color: var(--background);
@@ -61,4 +65,45 @@ select,
 textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-brand-200);
+  background: var(--color-surface-panel);
+  color: var(--color-text-primary);
+  padding: 0.625rem 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgb(23 32 51 / 0.12);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
