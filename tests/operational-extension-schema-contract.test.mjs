@@ -21,6 +21,7 @@ const g08Tables = [
   "communications",
   "activity_events",
   "import_jobs",
+  "import_rows",
 ];
 
 test("G08 creates every operational extension table", () => {
@@ -46,6 +47,8 @@ test("G08 enforces operational invariants", () => {
   assert.match(migration, /tax_events_amount_nonnegative/i);
   assert.match(migration, /follow_ups_excluded_rule/i);
   assert.match(migration, /refunds_received_requires_date/i);
+  assert.match(migration, /import_rows_status_allowed/i);
+  assert.match(migration, /import_rows_committed_rule/i);
 });
 
 test("G08 provides dashboard and workflow indexes", () => {
@@ -53,6 +56,7 @@ test("G08 provides dashboard and workflow indexes", () => {
   assert.match(migration, /follow_ups_due_idx/i);
   assert.match(migration, /communications_client_time_idx/i);
   assert.match(migration, /activity_events_workspace_time_idx/i);
+  assert.match(migration, /import_rows_source_key_idx/i);
 });
 
 test("every G08 table enables RLS and denies anon grants", () => {

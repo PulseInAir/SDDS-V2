@@ -1,4 +1,5 @@
-import { LockKeyhole, Receipt, Settings2 } from "lucide-react";
+import Link from "next/link";
+import { DatabaseBackup, LockKeyhole, Receipt, Settings2 } from "lucide-react";
 
 import {
   getSettingsPageData,
@@ -166,6 +167,31 @@ export function SettingsPageContent({ data }: { data: SettingsPageData }) {
               <li>Invoice, payment, and refund values stay masked by default when Privacy Mode is on.</li>
               <li>Closed assessment years preserve history without weakening RLS, storage privacy, or auditability.</li>
             </ul>
+          </section>
+
+          <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-text-primary">Data import</h2>
+                <p className="mt-1 text-sm text-text-muted">
+                  Historical CSV import is now routed through an auditable dry-run and explicit commit flow under Settings.
+                </p>
+              </div>
+              <DatabaseBackup className="h-5 w-5 text-text-muted" aria-hidden="true" />
+            </div>
+
+            <div className="mt-4 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+              <p className="text-sm text-text-secondary">
+                Upsert clients by canonical PAN, validate filing-case and invoice conflicts before write, and keep repeat imports idempotent through recorded source keys.
+              </p>
+            </div>
+
+            <Link
+              href="/settings/import"
+              className="mt-4 inline-flex h-10 items-center justify-center rounded-[var(--radius-input)] border border-border-subtle bg-white px-4 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
+            >
+              Open CSV import
+            </Link>
           </section>
         </div>
       </div>
