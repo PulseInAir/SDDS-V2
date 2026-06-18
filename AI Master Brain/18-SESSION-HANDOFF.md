@@ -5,34 +5,42 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 9 — Hardening and release
-- Active task: G31 — Implement production backup destination and retention
-- Next READY task: none
+- Active task: none
+- Next READY task: G33 — Full end-to-end regression
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `237fd36`
+- HEAD before this handoff update: `e0d5cd9`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: G31 implementation in progress
+- Working tree: documentation closeout pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
 
-- Record the owner-approved Google Drive backup destination in the locked project brain.
-- Replace the old blocked-state backup messaging with the approved retention, encryption, and restore procedure needed for release readiness.
+- Record G31 completion after implementing the approved Google Drive backup destination, retention, and restore procedure.
+- Unlock G33 once the backup policy, UI messaging, and verification evidence are committed.
 
 ## Changed
 
-- In progress.
+- Added `D-019` to the decision register and updated the backup contract to lock Google Drive as the private encrypted off-platform backup destination while keeping Supabase private Storage as the live document source of truth.
+- Removed the resolved backup blocker from open decisions and replaced the blocked export-page messaging with an approved backup policy, package contents summary, retention rule, and restore checklist on `/settings/export`.
+- Updated the main Settings export card plus `src/lib/exports/business.ts` to expose the shared backup policy contract to the authenticated UI.
+- Expanded `tests/export-module-contract.test.mjs` to lock the approved Google Drive destination, 30-day retention wording, and restore-checklist presence.
 
 ## Deferred work
 
-- G33 full regression remains pending until G31 verification and closeout are complete.
+- G33 remains the next release gate because the full end-to-end regression still needs to run, including the non-production restore test.
 
 ## Verification
 
 - Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `237fd36`, remote `origin`.
 - Required project-brain files reviewed for G31 scope: 00, 01, 02, 03, 06, 07, 10, 14, 15, 16, 17, 18, and 19.
 - Existing export/settings implementation and contract tests reviewed before editing.
+- `npm run typecheck`: passed.
+- `npm run lint`: passed.
+- `npm test`: passed.
+- `npm run build`: passed.
+- `git diff --check`: passed with line-ending warnings only.
 
 ## Exact next action
 
-Implement the approved Google Drive backup policy, retention, and restore procedure; run verification; then mark G31 done and unlock G33.
+Resume with G33 full end-to-end regression, including the restore test against the approved Google Drive encrypted backup workflow.
