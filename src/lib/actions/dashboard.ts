@@ -17,12 +17,14 @@ import {
 } from "@/lib/dashboard/contracts";
 import type { DocumentChecklistStatus } from "@/types/documents";
 
-type ClientRelation = {
+type ClientSnapshot = {
   id: string;
   full_name: string;
   pan_uppercase: string;
   mobile?: string | null;
-} | ClientRelation[] | null;
+};
+
+type ClientRelation = ClientSnapshot | ClientSnapshot[] | null;
 
 type FilingCaseDashboardRow = {
   id: string;
@@ -190,7 +192,7 @@ export async function getOperationalDashboardData() {
       checklist_status: row.checklist_status as DocumentChecklistStatus,
     }),
   );
-  const invoiceSnapshots = ((invoicesResult.data ?? []) as DashboardInvoiceSnapshot[]).map((invoice) => ({
+  const invoiceSnapshots = ((invoicesResult.data ?? []) as unknown as DashboardInvoiceSnapshot[]).map((invoice) => ({
     ...invoice,
     payments: invoice.payments ?? [],
   }));
