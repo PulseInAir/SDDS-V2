@@ -5,7 +5,7 @@ import { getSupabasePublicEnv } from "@/lib/env/supabase";
 
 const PUBLIC_ROUTES = new Set(["/login"]);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (PUBLIC_ROUTES.has(pathname)) {

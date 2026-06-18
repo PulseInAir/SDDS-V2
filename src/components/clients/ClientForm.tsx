@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createClientAction, updateClientAction } from '@/lib/actions/clients'
 import { clientFormSchema, ClientFormData } from '@/lib/validations/clients'
@@ -14,10 +14,10 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
+    control,
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    watch
+    formState: { errors, isSubmitting }
   } = useForm<ClientFormData>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
@@ -34,7 +34,10 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
     }
   })
 
-  const followUpExcluded = watch('follow_up_excluded')
+  const followUpExcluded = useWatch({
+    control,
+    name: 'follow_up_excluded',
+  }) ?? false
 
   const onSubmit = async (data: ClientFormData) => {
     setServerError(null)
