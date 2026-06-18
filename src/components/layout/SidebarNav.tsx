@@ -3,30 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { classNames } from "@/lib/utils/styles";
-import {
-  LayoutDashboard,
-  Users,
-  Inbox,
-  FileText,
-  Receipt,
-  IndianRupee,
-  AlertCircle,
-  PhoneCall,
-  Settings,
-  LogOut
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { signOut } from "@/app/(auth)/login/actions";
-
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Clients", href: "/clients", icon: Users },
-  { name: "Filing Queue", href: "/filing-queue", icon: Inbox },
-  { name: "Documents", href: "/documents", icon: FileText },
-  { name: "Invoices", href: "/invoices", icon: Receipt },
-  { name: "Refunds", href: "/refunds", icon: IndianRupee },
-  { name: "Notices", href: "/notices", icon: AlertCircle },
-  { name: "Follow-up", href: "/follow-up", icon: PhoneCall },
-];
+import { isNavigationItemActive, primaryNavigation, settingsNavigationItem } from "@/components/layout/navigation";
 
 export function SidebarNav() {
   const pathname = usePathname();
@@ -38,21 +17,20 @@ export function SidebarNav() {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {navigation.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href));
-          
+        {primaryNavigation.map((item) => {
+          const isActive = isNavigationItemActive(pathname, item.href);
+
           return (
             <Link
               key={item.name}
               href={item.href}
               className={classNames(
-                "group flex items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium transition-colors",
+                "group flex items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
                 isActive
                   ? "bg-surface-selected text-brand-700"
                   : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
               )}
+              aria-current={isActive ? "page" : undefined}
             >
               <item.icon
                 className={classNames(
@@ -71,33 +49,34 @@ export function SidebarNav() {
 
       <div className="border-t border-border-subtle p-3 space-y-1">
         <Link
-          href="/settings"
+          href={settingsNavigationItem.href}
           className={classNames(
-            "group flex items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium transition-colors",
-            pathname.startsWith("/settings")
+            "group flex items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+            isNavigationItemActive(pathname, settingsNavigationItem.href)
               ? "bg-surface-selected text-brand-700"
               : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
           )}
+          aria-current={isNavigationItemActive(pathname, settingsNavigationItem.href) ? "page" : undefined}
         >
-          <Settings
+          <settingsNavigationItem.icon
             className={classNames(
               "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-              pathname.startsWith("/settings")
+              isNavigationItemActive(pathname, settingsNavigationItem.href)
                 ? "text-brand-700"
                 : "text-text-muted group-hover:text-text-secondary"
             )}
             aria-hidden="true"
           />
-          Settings
+          {settingsNavigationItem.name}
         </Link>
         <form action={signOut}>
           <button
             type="submit"
-            className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
+            className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
-            <LogOut 
-              className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary" 
-              aria-hidden="true" 
+            <LogOut
+              className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary"
+              aria-hidden="true"
             />
             Sign out
           </button>

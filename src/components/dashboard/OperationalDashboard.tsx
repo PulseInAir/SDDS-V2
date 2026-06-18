@@ -38,6 +38,12 @@ const SUMMARY_METRIC_IDS = [
   "completed",
 ] as const;
 
+const interactivePanelClassName =
+  "rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm transition-colors hover:border-brand-200 hover:bg-brand-50/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2";
+
+const compactMetricLinkClassName =
+  "rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3 transition-colors hover:border-brand-200 hover:bg-brand-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2";
+
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
     dateStyle: "medium",
@@ -93,6 +99,18 @@ function getMetricTone(metricId: string) {
   }
 }
 
+function getCaseAttentionVariant(reason: string) {
+  if (reason === "Rectification required" || reason === "Notice received" || reason === "Case due date has passed") {
+    return "error" as const;
+  }
+
+  if (reason === "Due soon" || reason === "Ready to file") {
+    return "warning" as const;
+  }
+
+  return "neutral" as const;
+}
+
 export function OperationalDashboard({ data }: { data: DashboardPageData }) {
   if (!data.selectedAssessmentYear) {
     return (
@@ -117,10 +135,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
   const overdueMetric = metricMap.get("overdue");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-          <div className="space-y-3">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,1fr)] xl:items-start">
+          <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge variant="info">AY {data.selectedAssessmentYear.label}</StatusBadge>
               <StatusBadge variant={data.selectedAssessmentYear.isOpen ? "success" : "neutral"}>
@@ -136,29 +154,45 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                 Keep urgent filing work, payment exceptions, due follow-ups, and recent case movement visible without leaving the selected assessment year.
               </p>
             </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">Active cases</p>
+                <p className="mt-2 text-lg font-semibold text-text-primary">{data.activeCaseCount}</p>
+              </div>
+              <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">Urgent queue</p>
+                <p className="mt-2 text-lg font-semibold text-text-primary">{data.urgentCases.length}</p>
+              </div>
+              <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">Recent activity</p>
+                <p className="mt-2 text-lg font-semibold text-text-primary">{data.recentActivity.length}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="grid w-full gap-3 sm:grid-cols-2 xl:w-[28rem] xl:grid-cols-4">
+          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-2">
             {summaryMetrics.map((metric) => (
               <Link
                 key={metric.id}
                 href={metric.destination}
-                className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3 transition-colors hover:border-brand-200 hover:bg-brand-50/50"
+                className={compactMetricLinkClassName}
               >
                 <p className="text-xs font-medium uppercase tracking-wide text-text-muted">{metric.label}</p>
                 <p className="mt-2 text-2xl font-semibold text-text-primary">{metric.value}</p>
+                <p className="mt-1 text-xs text-text-secondary">{metric.description}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {attentionMetrics.map((metric) => (
           <Link
             key={metric.id}
             href={metric.destination}
-            className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 shadow-sm transition-colors hover:border-brand-200 hover:bg-brand-50/40"
+            className={interactivePanelClassName + " p-4"}
           >
             <div className={`flex items-center justify-between ${getMetricTone(metric.id)}`}>
               <span className="inline-flex items-center gap-2 text-sm font-medium">
@@ -173,7 +207,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
         ))}
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,2.05fr)_minmax(19rem,1fr)]">
         <div className="space-y-6">
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
             <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
@@ -190,10 +224,13 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                 <Link
                   key={statusGroup.status}
                   href={statusGroup.destination}
-                  className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3 transition-colors hover:border-brand-200 hover:bg-brand-50/50"
+                  className={compactMetricLinkClassName}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <StatusBadge variant={getCaseStatusVariant(statusGroup.status)}>{statusGroup.status}</StatusBadge>
+                    <div className="space-y-2">
+                      <StatusBadge variant={getCaseStatusVariant(statusGroup.status)}>{statusGroup.status}</StatusBadge>
+                      <p className="text-xs text-text-secondary">Open the matching filing queue records</p>
+                    </div>
                     <span className="text-xl font-semibold text-text-primary">{statusGroup.count}</span>
                   </div>
                 </Link>
@@ -209,7 +246,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                   Attention statuses, blockers, overdue dates, and filing-ready cases surface first so the next action is obvious.
                 </p>
               </div>
-              <Link href="/filing-queue?scope=attention" className="text-sm font-medium text-brand-700 hover:text-brand-800">
+              <Link
+                href="/filing-queue?scope=attention"
+                className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+              >
                 Open attention view
               </Link>
             </div>
@@ -226,8 +266,8 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
               <div className="divide-y divide-border-subtle">
                 {data.urgentCases.map((filingCase) => (
                   <article key={filingCase.id} className="px-5 py-4">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="space-y-2">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0 space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <StatusBadge variant={getCaseStatusVariant(filingCase.case_status)}>
                             {filingCase.case_status}
@@ -242,19 +282,29 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                           {filingCase.next_action ?? "No next action recorded"}
                         </p>
 
-                        <div className="flex flex-wrap gap-3 text-xs text-text-muted">
-                          <span>Due {filingCase.due_date ? formatInvoiceDate(filingCase.due_date) : "Not scheduled"}</span>
-                          <span>Expected {filingCase.expected_completion_date ? formatInvoiceDate(filingCase.expected_completion_date) : "Not recorded"}</span>
-                          <span>Last moved {formatDateTime(filingCase.updated_at)}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <StatusBadge variant={getCaseAttentionVariant(filingCase.blocker ?? "Needs review")}>
+                            {filingCase.blocker}
+                          </StatusBadge>
+                          <span className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-secondary">
+                            Due {filingCase.due_date ? formatInvoiceDate(filingCase.due_date) : "Not scheduled"}
+                          </span>
+                          <span className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-secondary">
+                            Expected {filingCase.expected_completion_date ? formatInvoiceDate(filingCase.expected_completion_date) : "Not recorded"}
+                          </span>
+                          <span className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-secondary">
+                            Last moved {formatDateTime(filingCase.updated_at)}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-start gap-2 lg:items-end">
-                        <div className="rounded-[var(--radius-input)] border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                          {filingCase.blocker}
-                        </div>
-                        <Link href={`/filing-queue/${filingCase.id}`} className="text-sm font-medium text-brand-700 hover:text-brand-800">
+                      <div className="flex items-start lg:items-center">
+                        <Link
+                          href={`/filing-queue/${filingCase.id}`}
+                          className="inline-flex items-center gap-2 rounded-[var(--radius-input)] border border-border-subtle px-3 py-2 text-sm font-medium text-brand-700 transition-colors hover:border-brand-200 hover:bg-brand-50/50 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                        >
                           Open case
+                          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                         </Link>
                       </div>
                     </div>
@@ -274,28 +324,28 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
               </p>
             </div>
             <div className="grid gap-3 p-5 sm:grid-cols-2">
-              <Link href={billedMetric?.destination ?? "/invoices?scope=billed"} className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3">
+              <Link href={billedMetric?.destination ?? "/invoices?scope=billed"} className={compactMetricLinkClassName}>
                 <p className="text-xs uppercase tracking-wide text-text-muted">Billed</p>
                 <div className="mt-2 flex items-center gap-2 text-text-primary">
                   <ReceiptIndianRupee className="h-4 w-4 text-text-muted" aria-hidden="true" />
                   <MoneyValue value={billedMetric?.value ?? 0} className="text-lg font-semibold" />
                 </div>
               </Link>
-              <Link href={receivedMetric?.destination ?? "/invoices?scope=received"} className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3">
+              <Link href={receivedMetric?.destination ?? "/invoices?scope=received"} className={compactMetricLinkClassName}>
                 <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
                 <div className="mt-2 flex items-center gap-2 text-text-primary">
                   <IndianRupee className="h-4 w-4 text-text-muted" aria-hidden="true" />
                   <MoneyValue value={receivedMetric?.value ?? 0} className="text-lg font-semibold" />
                 </div>
               </Link>
-              <Link href={outstandingMetric?.destination ?? "/invoices?scope=outstanding"} className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3">
+              <Link href={outstandingMetric?.destination ?? "/invoices?scope=outstanding"} className={compactMetricLinkClassName}>
                 <p className="text-xs uppercase tracking-wide text-text-muted">Outstanding</p>
                 <div className="mt-2 flex items-center gap-2 text-text-primary">
                   <IndianRupee className="h-4 w-4 text-text-muted" aria-hidden="true" />
                   <MoneyValue value={outstandingMetric?.value ?? 0} className="text-lg font-semibold" />
                 </div>
               </Link>
-              <Link href={overdueMetric?.destination ?? "/invoices?scope=overdue"} className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-3">
+              <Link href={overdueMetric?.destination ?? "/invoices?scope=overdue"} className={compactMetricLinkClassName}>
                 <p className="text-xs uppercase tracking-wide text-text-muted">Overdue</p>
                 <div className="mt-2 flex items-center gap-2 text-text-primary">
                   <AlertTriangle className="h-4 w-4 text-red-700" aria-hidden="true" />
@@ -330,6 +380,13 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                           <p className="mt-1 text-xs text-text-muted">
                             Received <MoneyValue value={invoice.paid_amount} className="text-xs text-text-muted" />
                           </p>
+                          <Link
+                            href={`/invoices/${invoice.id}`}
+                            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                          >
+                            Open invoice
+                            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                          </Link>
                         </div>
                       </div>
                     </article>
@@ -371,7 +428,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                             {formatRefundStatus(refund.status)} • Expected {formatRefundDate(refund.expected_date)}
                           </p>
                         </div>
-                        <Link href="/refunds?unresolvedOnly=true" className="text-sm font-medium text-brand-700 hover:text-brand-800">
+                        <Link
+                          href="/refunds?unresolvedOnly=true"
+                          className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                        >
                           Open
                         </Link>
                       </div>
@@ -395,7 +455,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                           </p>
                           <p className="text-xs text-text-muted">Response due {formatInvoiceDate(notice.response_due_date)}</p>
                         </div>
-                        <Link href="/notices?attentionOnly=true&unresolvedOnly=true" className="text-sm font-medium text-brand-700 hover:text-brand-800">
+                        <Link
+                          href="/notices?attentionOnly=true&unresolvedOnly=true"
+                          className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                        >
                           Open
                         </Link>
                       </div>
@@ -415,7 +478,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                   Due and overdue annual follow-ups stay separate from case workflow without leaving the selected year.
                 </p>
               </div>
-              <Link href="/follow-up?attentionOnly=true" className="text-sm font-medium text-brand-700 hover:text-brand-800">
+              <Link
+                href="/follow-up?attentionOnly=true"
+                className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+              >
                 Open queue
               </Link>
             </div>
@@ -443,7 +509,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                         <StatusBadge variant="info">{followUp.follow_up_type.replaceAll("_", " ")}</StatusBadge>
                         <Link
                           href={followUp.case_id ? `/filing-queue/${followUp.case_id}` : "/follow-up?attentionOnly=true"}
-                          className="text-sm font-medium text-brand-700 hover:text-brand-800"
+                          className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                         >
                           {followUp.case_id ? "Open case" : "Open follow-up"}
                         </Link>
@@ -480,7 +546,10 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
                         <p className="text-xs text-text-muted">{formatDateTime(activity.created_at)}</p>
                       </div>
                       {activity.case_id ? (
-                        <Link href={`/filing-queue/${activity.case_id}`} className="text-sm font-medium text-brand-700 hover:text-brand-800">
+                        <Link
+                          href={`/filing-queue/${activity.case_id}`}
+                          className="text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                        >
                           Open
                         </Link>
                       ) : null}
