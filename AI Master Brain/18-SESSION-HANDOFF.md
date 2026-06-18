@@ -4,28 +4,27 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Project phase: Phase 7 — Dashboard
+- Project phase: Phase 8 — Import, export, and recovery
 - Active task: none
-- Next READY task: G29 — Implement CSV import dry-run and commit
+- Next READY task: G30 — Implement business exports
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `770b4cc`
+- HEAD before this handoff update: `a6a1f19`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: documentation update pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
 
-- Complete the dashboard visual and interaction correction loop after G27.
-- Improve density, hierarchy, responsive behavior, and keyboard/accessibility details without changing the locked dashboard query contracts.
-- Preserve auth, Supabase policies, route names, workflow statuses, and module calculations.
+- Record completion evidence for G29 after the verified import implementation commit.
+- Keep the ledger and handoff aligned with the committed CSV import flow and the next dependency-satisfied task.
 
 ## Changed
 
-- Refined `src/components/dashboard/OperationalDashboard.tsx` to improve hierarchy and scanning density: summary metrics now include supporting labels, attention cards collapse more cleanly across breakpoints, urgent-case rows surface actionable chips instead of a generic red blocker box, and dashboard links now expose consistent keyboard-visible focus states.
-- Added `src/components/layout/navigation.ts` and updated `src/components/layout/SidebarNav.tsx` so desktop and mobile navigation share one route map and one active-state rule.
-- Replaced the dead mobile menu trigger in `src/components/layout/TopUtilityBar.tsx` with a working mobile navigation drawer that supports close controls, overlay dismissal, `Escape`, active-route highlighting, and access to Settings and Sign out.
-- Added `tests/dashboard-visual-contract.test.mjs` to lock the new dashboard focus treatment and prevent regression back to a stubbed mobile navigation control.
+- Added `src/app/(app)/settings/import/page.tsx`, `src/components/settings/ImportDryRunForm.tsx`, `src/components/settings/ImportCommitForm.tsx`, and `src/components/settings/ImportPageContent.tsx` to ship the real `/settings/import` route with the locked filing-case template, dry-run summary, recent jobs, and explicit commit affordance.
+- Added `src/lib/actions/imports.ts` and `src/lib/imports/csv.ts` to parse the CSV server-side, persist `import_jobs` plus row-level `import_rows` outcomes, keep repeat source rows idempotent through source keys, and commit approved rows into clients, filing cases, filing records, invoices, and optional single-payment history with activity evidence.
+- Added `supabase/migrations/20260618110000_add_import_rows_tracking.sql` to create the `import_rows` table, indexes, RLS policies, and grants required for auditable row-level import tracking.
+- Updated `src/components/settings/SettingsPageContent.tsx` to expose the import route from Settings and extended `tests/operational-extension-schema-contract.test.mjs` plus new `tests/import-module-contract.test.mjs` coverage to lock the import route, actions, and schema contract.
 
 ## Deferred work
 
@@ -33,15 +32,15 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `9b92172`, remote `origin`.
-- Required project-brain files reviewed for G28 scope: 00, 01, 02, 03, 08, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
-- `npm test`: passed, including new `dashboard-visual-contract` coverage.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `45cddd5`, remote `origin`.
+- Required project-brain files reviewed for G29 scope: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 15, 16, 17, 18, and 19.
 - `npm run typecheck`: passed.
-- `npm run lint`: passed with the pre-existing `src/components/clients/ClientForm.tsx` React Hook Form `watch()` warning only.
-- `npm run build`: passed.
+- `npm run lint`: passed.
+- `npm test`: passed, including new `import-module-contract` coverage.
+- `npm run build`: passed, and the generated route list now includes `/settings/import`.
 - `git diff --check`: passed with line-ending warnings only.
-- Live browser check: local route `/` redirected to `/login?next=%2F`, and the login page rendered correctly from the local dev server. The authenticated dashboard route could not be opened interactively because the repository does not contain owner login credentials.
+- Interactive authenticated browser verification was not run because the repository does not include owner login credentials; this task was verified through route compilation and contract tests.
 
 ## Exact next action
 
-Start G29 by locking the CSV import dry-run and commit flow against the approved client, case, and invoice contracts.
+Start G30 by implementing the authorised business export flow under Settings without weakening privacy, temporary file handling, or auditability.
