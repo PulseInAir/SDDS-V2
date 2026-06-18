@@ -15,11 +15,12 @@ export async function getFilingQueueCases(params: {
   search?: string;
   ay_label?: string;
   status?: string;
+  scope?: string;
   page?: number;
   pageSize?: number;
 }) {
   const supabase = await createSupabaseServerClient();
-  const { search, ay_label, status, page = 1, pageSize = 20 } = params;
+  const { search, ay_label, status, scope, page = 1, pageSize = 20 } = params;
 
   let query = supabase
     .from('filing_cases')
@@ -47,24 +48,43 @@ export async function getFilingQueueCases(params: {
     query = query.eq('case_status', status);
   }
 
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  query = query.range(from, to);
-
-  const { data, error, count } = await query;
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching filing queue cases:', error);
     throw new Error('Failed to fetch filing cases');
   }
 
+  const scopedCases = (data ?? []).filter((filingCase) => {
+    if (scope !== 'attention') {
+      return true;
+    }
+
+    const hasAttentionStatus =
+      filingCase.case_status === 'Rectification Required' ||
+      filingCase.case_status === 'Notice Received';
+    const hasBlocker = Boolean(filingCase.blocker?.trim());
+    const isOverdue =
+      filingCase.case_status !== 'Completed' &&
+      filingCase.case_status !== 'Cancelled' &&
+      Boolean(
+        filingCase.due_date &&
+          new Date(`${filingCase.due_date}T00:00:00`) < new Date(new Date().setHours(0, 0, 0, 0)),
+      );
+
+    return hasAttentionStatus || hasBlocker || isOverdue;
+  });
+
+  const from = (page - 1) * pageSize;
+  const paginatedCases = scopedCases.slice(from, from + pageSize);
+  const scopedCount = scopedCases.length;
+
   return {
-    cases: data,
-    count: count || 0,
+    cases: paginatedCases,
+    count: scopedCount,
     page,
     pageSize,
-    totalPages: Math.ceil((count || 0) / pageSize),
+    totalPages: Math.max(1, Math.ceil(scopedCount / pageSize)),
   };
 }
 

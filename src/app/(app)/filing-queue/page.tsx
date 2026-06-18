@@ -41,6 +41,7 @@ export default async function FilingQueuePage({
   const search = typeof params.search === 'string' ? params.search : '';
   const ay = typeof params.ay === 'string' ? params.ay : '';
   const status = typeof params.status === 'string' ? params.status : '';
+  const scope = typeof params.scope === 'string' ? params.scope : '';
   const requestedPage =
     typeof params.page === 'string' ? Number.parseInt(params.page, 10) : 1;
   const page = Number.isFinite(requestedPage) && requestedPage > 0
@@ -52,6 +53,7 @@ export default async function FilingQueuePage({
     search,
     ay_label: ay,
     status,
+    scope,
     page,
   });
   const cases = data.cases as unknown as FilingQueueCaseRow[];

@@ -23,6 +23,7 @@ export default async function InvoicesPage({
     clientId: typeof params.clientId === "string" ? params.clientId : "",
     assessmentYearId: typeof params.assessmentYearId === "string" ? params.assessmentYearId : "",
     status: typeof params.status === "string" ? params.status : "",
+    scope: typeof params.scope === "string" ? params.scope : "",
     overdueOnly: params.overdueOnly === "true",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   });

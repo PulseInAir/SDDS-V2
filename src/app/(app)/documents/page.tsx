@@ -22,6 +22,7 @@ export default async function DocumentsPage({
     search: typeof params.search === "string" ? params.search : "",
     assessmentYearId: typeof params.assessmentYearId === "string" ? params.assessmentYearId : "",
     checklistStatus: typeof params.checklistStatus === "string" ? params.checklistStatus : "",
+    scope: typeof params.scope === "string" ? params.scope : "",
     type: typeof params.type === "string" ? params.type : "",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   });

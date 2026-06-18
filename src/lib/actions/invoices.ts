@@ -26,6 +26,7 @@ type InvoiceFilters = {
   clientId?: string;
   assessmentYearId?: string;
   status?: string;
+  scope?: string;
   overdueOnly?: boolean;
   page?: number;
   pageSize?: number;
@@ -170,9 +171,20 @@ async function fetchInvoices(workspaceId: string, filters: InvoiceFilters) {
       ? filters.status === invoice.derivedStatus
       : true;
 
+    const matchesScope =
+      filters.scope === "billed"
+        ? !["draft", "cancelled"].includes(invoice.derivedStatus)
+        : filters.scope === "received"
+          ? invoice.paidAmount > 0
+          : filters.scope === "outstanding"
+            ? invoice.balanceAmount > 0
+            : filters.scope === "overdue"
+              ? invoice.derivedStatus === "overdue"
+              : true;
+
     const matchesOverdue = filters.overdueOnly ? invoice.derivedStatus === "overdue" : true;
 
-    return matchesSearch && matchesStatus && matchesOverdue;
+    return matchesSearch && matchesStatus && matchesScope && matchesOverdue;
   });
 }
 

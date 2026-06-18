@@ -21,6 +21,7 @@ type DocumentFilters = {
   clientId?: string;
   assessmentYearId?: string;
   checklistStatus?: string;
+  scope?: string;
   type?: string;
   page?: number;
   pageSize?: number;
@@ -194,9 +195,11 @@ export async function getDocumentsModuleData(filters: DocumentFilters = {}) {
   const { clients, assessmentYears } = await getWorkspaceReferenceData(session.workspace.id);
   const scopedDocuments = await fetchScopedDocuments(session.workspace.id, filters);
   const chains = groupDocumentVersions(scopedDocuments);
-  const visibleChains = filters.checklistStatus
-    ? chains.filter((chain) => chain.latest.checklist_status === filters.checklistStatus)
-    : chains;
+  const visibleChains = filters.scope === "exceptions"
+    ? chains.filter((chain) => DOCUMENT_EXCEPTION_STATUSES.has(chain.latest.checklist_status))
+    : filters.checklistStatus
+      ? chains.filter((chain) => chain.latest.checklist_status === filters.checklistStatus)
+      : chains;
 
   const caseIdsWithDocuments = new Set(
     chains.map((chain) => chain.latest.case_id).filter((caseId): caseId is string => Boolean(caseId))
