@@ -34,8 +34,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G25 | DONE | Implement global search | G14,G20,G16 | supported fields, typed results, privacy-safe | `4f92e69` |
 | G26 | DONE | Lock and test dashboard query contracts | G17,G19,G20,G21,G22,G23 | every metric reconciles and has destination | `af5734f` |
 | G27 | DONE | Build operational dashboard | G26,G13 | attention, workflow, queues, financial exceptions, activity | `ca00f98` |
-| G28 | READY | Run dashboard visual/interaction correction loop | G27 | desktop-first design compliance, responsive/accessibility evidence | — |
-| G29 | PENDING | Implement CSV import dry-run and commit | G14,G20,G16 | idempotent mapping, errors, audit, safe commit | — |
+| G28 | DONE | Run dashboard visual/interaction correction loop | G27 | desktop-first design compliance, responsive/accessibility evidence | `770b4cc` |
+| G29 | READY | Implement CSV import dry-run and commit | G14,G20,G16 | idempotent mapping, errors, audit, safe commit | — |
 | G30 | PENDING | Implement business exports | G19,G20,G21,G22,G23 | authorised practical exports, safe handling | — |
 | G31 | BLOCKED | Implement production backup destination and retention | OWNER DECISION | approved destination/retention/encryption + restore procedure | — |
 | G32 | PENDING | Performance and accessibility hardening | G28,G29,G30 | budgets, query review, keyboard/contrast/responsive | — |

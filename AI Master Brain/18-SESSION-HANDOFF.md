@@ -6,41 +6,42 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 7 — Dashboard
 - Active task: none
-- Next READY task: G28 — Run dashboard visual/interaction correction loop
+- Next READY task: G29 — Implement CSV import dry-run and commit
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `ca00f98`
+- HEAD before this handoff update: `770b4cc`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: documentation update pending commit
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
 
-- Replace placeholder dashboard content with a real operational dashboard.
-- Use the locked dashboard query contracts from G26.
+- Complete the dashboard visual and interaction correction loop after G27.
+- Improve density, hierarchy, responsive behavior, and keyboard/accessibility details without changing the locked dashboard query contracts.
 - Preserve auth, Supabase policies, route names, workflow statuses, and module calculations.
 
 ## Changed
 
-- Added `src/lib/actions/dashboard.ts` to assemble the selected-AY operational dashboard snapshot from real filing cases, document exceptions, invoices/payments, refunds, notices, follow-ups, and recent activity using the locked G26 contracts.
-- Added `src/components/dashboard/OperationalDashboard.tsx` to render the dashboard hierarchy: AY context, compact attention strip, workflow distribution, immediate work queue, financial exceptions, resolution watchlist, follow-ups due, and recent activity with privacy-safe PAN and money handling.
-- Replaced the placeholder `/` route with the real dashboard loader and added `tests/dashboard-page-contract.test.mjs` to prevent regression back to placeholder sections.
+- Refined `src/components/dashboard/OperationalDashboard.tsx` to improve hierarchy and scanning density: summary metrics now include supporting labels, attention cards collapse more cleanly across breakpoints, urgent-case rows surface actionable chips instead of a generic red blocker box, and dashboard links now expose consistent keyboard-visible focus states.
+- Added `src/components/layout/navigation.ts` and updated `src/components/layout/SidebarNav.tsx` so desktop and mobile navigation share one route map and one active-state rule.
+- Replaced the dead mobile menu trigger in `src/components/layout/TopUtilityBar.tsx` with a working mobile navigation drawer that supports close controls, overlay dismissal, `Escape`, active-route highlighting, and access to Settings and Sign out.
+- Added `tests/dashboard-visual-contract.test.mjs` to lock the new dashboard focus treatment and prevent regression back to a stubbed mobile navigation control.
 
 ## Deferred work
 
-- Visual/interaction correction loop remains G28 after G27 is functionally complete.
 - Backup destination remains blocked by owner decision G31.
 
 ## Verification
 
-- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `9fbe0ed`, remote `origin`.
-- Required project-brain files reviewed for G27 scope: 00, 01, 02, 03, 05, 08, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
+- Session-start repository checks passed: Git repo confirmed, clean `git status --short`, branch `master`, HEAD `9b92172`, remote `origin`.
+- Required project-brain files reviewed for G28 scope: 00, 01, 02, 03, 08, 09, 10, 11, 12, 15, 16, 17, 18, and 19.
+- `npm test`: passed, including new `dashboard-visual-contract` coverage.
 - `npm run typecheck`: passed.
-- `npm test`: passed, including new `dashboard-page-contract` coverage.
 - `npm run lint`: passed with the pre-existing `src/components/clients/ClientForm.tsx` React Hook Form `watch()` warning only.
 - `npm run build`: passed.
 - `git diff --check`: passed with line-ending warnings only.
+- Live browser check: local route `/` redirected to `/login?next=%2F`, and the login page rendered correctly from the local dev server. The authenticated dashboard route could not be opened interactively because the repository does not contain owner login credentials.
 
 ## Exact next action
 
-Run G28 to visually and interactively correct the dashboard across desktop, laptop, tablet, and mobile widths, with accessibility and route-behaviour evidence.
+Start G29 by locking the CSV import dry-run and commit flow against the approved client, case, and invoice contracts.
