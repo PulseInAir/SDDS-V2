@@ -84,7 +84,7 @@ export default async function HomePage() {
         </div>
         <Link
           href="/clients/new"
-          className="inline-flex items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-primary-dark"
+          className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
         >
           Add Client
         </Link>
@@ -112,7 +112,7 @@ export default async function HomePage() {
                 <h2 className="text-base font-semibold text-text-primary">Workflow Distribution</h2>
                 <p className="text-sm text-text-muted">Real filing cases grouped by controlled workflow status.</p>
               </div>
-              <div className="rounded-full bg-surface-subtle px-3 py-1 text-xs font-semibold text-text-secondary">
+              <div className="rounded-full bg-surface-muted px-3 py-1 text-xs font-semibold text-text-secondary">
                 {completionRate}% completed
               </div>
             </div>
@@ -124,13 +124,13 @@ export default async function HomePage() {
                     : 0;
 
                   return (
-                    <Link key={item.status} href={item.destination} className="block rounded-2xl p-2 transition hover:bg-surface-subtle">
+                    <Link key={item.status} href={item.destination} className="block rounded-2xl p-2 transition hover:bg-surface-hover">
                       <div className="flex items-center justify-between gap-4 text-sm">
                         <span className="font-medium text-text-primary">{item.status}</span>
                         <span className="font-semibold text-text-secondary">{item.count}</span>
                       </div>
-                      <div className="mt-2 h-2 rounded-full bg-surface-subtle">
-                        <div className="h-2 rounded-full bg-brand-primary" style={{ width: `${width}%` }} />
+                      <div className="mt-2 h-2 rounded-full bg-surface-muted">
+                        <div className="h-2 rounded-full bg-brand-600" style={{ width: `${width}%` }} />
                       </div>
                     </Link>
                   );
@@ -147,14 +147,14 @@ export default async function HomePage() {
                 <h2 className="text-base font-semibold text-text-primary">Urgent Work Queue</h2>
                 <p className="text-sm text-text-muted">Immediate blockers, overdue cases, notices, and rectifications.</p>
               </div>
-              <Link href="/filing-queue?scope=attention" className="text-sm font-semibold text-brand-primary hover:underline">
+              <Link href="/filing-queue?scope=attention" className="text-sm font-semibold text-brand-600 hover:underline">
                 View all
               </Link>
             </div>
             <div className="divide-y divide-border-subtle">
               {data.attentionQueue.length > 0 ? (
                 data.attentionQueue.map((item) => (
-                  <Link key={item.id} href={item.href} className="grid gap-2 px-5 py-4 transition hover:bg-surface-subtle sm:grid-cols-[1fr_auto] sm:items-center">
+                  <Link key={item.id} href={item.href} className="grid gap-2 px-5 py-4 transition hover:bg-surface-hover sm:grid-cols-[1fr_auto] sm:items-center">
                     <div>
                       <p className="font-semibold text-text-primary">{item.clientName}</p>
                       <p className="text-xs text-text-muted">{item.pan} · {item.status}</p>
@@ -186,19 +186,19 @@ export default async function HomePage() {
               <p className="text-sm text-text-muted">Billed, received, outstanding, overdue, refund and notice signals.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 p-5">
-              <Link href="/invoices?scope=billed" className="rounded-2xl bg-surface-subtle p-4">
+              <Link href="/invoices?scope=billed" className="rounded-2xl bg-surface-muted p-4">
                 <p className="text-xs font-medium text-text-muted">Billed</p>
                 <p className="mt-1 text-lg font-bold text-text-primary">{formatCurrency(metrics.billed)}</p>
               </Link>
-              <Link href="/invoices?scope=received" className="rounded-2xl bg-surface-subtle p-4">
+              <Link href="/invoices?scope=received" className="rounded-2xl bg-surface-muted p-4">
                 <p className="text-xs font-medium text-text-muted">Received</p>
                 <p className="mt-1 text-lg font-bold text-text-primary">{formatCurrency(metrics.received)}</p>
               </Link>
               {data.financialExceptions.map((item) => (
-                <Link key={item.label} href={item.href} className="rounded-2xl bg-surface-subtle p-4">
+                <Link key={item.label} href={item.href} className="rounded-2xl bg-surface-muted p-4">
                   <p className="text-xs font-medium text-text-muted">{item.label}</p>
                   <p className="mt-1 text-lg font-bold text-text-primary">
-                    {typeof item.value === "number" && item.label !== "Refunds pending" && item.label !== "Notices due"
+                    {item.label !== "Refunds pending" && item.label !== "Notices due"
                       ? formatCurrency(item.value)
                       : item.value}
                   </p>
@@ -210,12 +210,12 @@ export default async function HomePage() {
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
             <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
               <h2 className="text-base font-semibold text-text-primary">Filing Queue Snapshot</h2>
-              <Link href="/filing-queue" className="text-sm font-semibold text-brand-primary hover:underline">View all</Link>
+              <Link href="/filing-queue" className="text-sm font-semibold text-brand-600 hover:underline">View all</Link>
             </div>
             <div className="divide-y divide-border-subtle">
               {data.queueSnapshot.length > 0 ? (
                 data.queueSnapshot.map((item) => (
-                  <Link key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-surface-subtle">
+                  <Link key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-surface-hover">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-text-primary">{item.clientName}</p>
@@ -240,7 +240,7 @@ export default async function HomePage() {
             <div className="divide-y divide-border-subtle">
               {data.recentActivity.length > 0 ? (
                 data.recentActivity.map((item) => (
-                  <Link key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-surface-subtle">
+                  <Link key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-surface-hover">
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-sm font-semibold text-text-primary">{item.title}</p>
                       <span className="shrink-0 text-xs text-text-muted">{item.when}</span>
