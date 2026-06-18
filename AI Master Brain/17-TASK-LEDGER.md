@@ -36,7 +36,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G27 | DONE | Build operational dashboard | G26,G13 | attention, workflow, queues, financial exceptions, activity | `ca00f98` |
 | G28 | DONE | Run dashboard visual/interaction correction loop | G27 | desktop-first design compliance, responsive/accessibility evidence | `770b4cc` |
 | G29 | DONE | Implement CSV import dry-run and commit | G14,G20,G16 | idempotent mapping, errors, audit, safe commit | `a6a1f19b75b8aa7367e0e071acaab2c8e96a0651` |
-| G30 | READY | Implement business exports | G19,G20,G21,G22,G23 | authorised practical exports, safe handling | — |
+| G30 | IN_PROGRESS | Implement business exports | G19,G20,G21,G22,G23 | authorised practical exports, safe handling | — |
 | G31 | BLOCKED | Implement production backup destination and retention | OWNER DECISION | approved destination/retention/encryption + restore procedure | — |
 | G32 | PENDING | Performance and accessibility hardening | G28,G29,G30 | budgets, query review, keyboard/contrast/responsive | — |
 | G33 | PENDING | Full end-to-end regression | G32,G31 | all critical flows pass, restore tested | — |

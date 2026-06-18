@@ -5,26 +5,24 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 8 — Import, export, and recovery
-- Active task: none
+- Active task: G30 — Implement business exports
 - Next READY task: G30 — Implement business exports
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `a6a1f19`
+- HEAD before this handoff update: `0941483`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: documentation update pending commit
+- Working tree: clean at session start; G30 implementation in progress
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Scope
 
-- Record completion evidence for G29 after the verified import implementation commit.
-- Keep the ledger and handoff aligned with the committed CSV import flow and the next dependency-satisfied task.
+- Implement the `/settings/export` route for authorised business exports.
+- Keep export generation server-side, privacy-safe, auditable, and free of decrypted credential data or unsafe temporary file handling.
 
 ## Changed
 
-- Added `src/app/(app)/settings/import/page.tsx`, `src/components/settings/ImportDryRunForm.tsx`, `src/components/settings/ImportCommitForm.tsx`, and `src/components/settings/ImportPageContent.tsx` to ship the real `/settings/import` route with the locked filing-case template, dry-run summary, recent jobs, and explicit commit affordance.
-- Added `src/lib/actions/imports.ts` and `src/lib/imports/csv.ts` to parse the CSV server-side, persist `import_jobs` plus row-level `import_rows` outcomes, keep repeat source rows idempotent through source keys, and commit approved rows into clients, filing cases, filing records, invoices, and optional single-payment history with activity evidence.
-- Added `supabase/migrations/20260618110000_add_import_rows_tracking.sql` to create the `import_rows` table, indexes, RLS policies, and grants required for auditable row-level import tracking.
-- Updated `src/components/settings/SettingsPageContent.tsx` to expose the import route from Settings and extended `tests/operational-extension-schema-contract.test.mjs` plus new `tests/import-module-contract.test.mjs` coverage to lock the import route, actions, and schema contract.
+- Ledger and handoff advanced to start G30.
+- Implementation files are pending for the Settings export route, export actions, and verification coverage.
 
 ## Deferred work
 
@@ -43,4 +41,4 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Exact next action
 
-Start G30 by implementing the authorised business export flow under Settings without weakening privacy, temporary file handling, or auditability.
+Implement `/settings/export`, the server-side CSV export generator, and the matching contract checks before running the full verification set.
