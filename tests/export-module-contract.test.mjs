@@ -28,9 +28,17 @@ test("G30 generates audited server-side CSV exports", async () => {
 test("G30 exposes business exports from Settings and the dedicated export page", async () => {
   const settingsContent = await read("src/components/settings/SettingsPageContent.tsx");
   const exportContent = await read("src/components/settings/ExportPageContent.tsx");
+  const exportModule = await read("src/lib/exports/business.ts");
 
-  assert.match(settingsContent, /Open business exports/);
+  assert.match(settingsContent, /Open exports and backup/);
+  assert.match(settingsContent, /Google Drive backup policy/i);
+  assert.match(exportModule, /BACKUP_POLICY/);
+  assert.match(exportModule, /Private Google Drive folder/);
+  assert.match(exportModule, /30 days/);
   assert.match(exportContent, /decrypted portal passwords are excluded/i);
   assert.match(exportContent, /Document exports include metadata and storage inventory/i);
+  assert.match(exportContent, /Supabase private Storage[\s\S]*live document source of truth/i);
+  assert.match(exportContent, /Approved backup destination/i);
+  assert.match(exportContent, /Restore checklist/i);
   assert.match(exportContent, /Recent export activity/);
 });

@@ -22,6 +22,7 @@ Only the owner may change a LOCKED decision. Add a superseding decision; do not 
 | D-016 | LOCKED | Import is implemented after the production schema and validation rules are locked. | Avoid repeated import migrations. |
 | D-017 | LOCKED | One task per implementation iteration. | Agent updates ledger and handoff after each task. |
 | D-018 | LOCKED | User should need only the command `Continue SDDS.` | Agent obtains work from Git-tracked state. |
+| D-019 | LOCKED | Google Drive is approved as the off-platform encrypted backup destination, while Supabase private Storage remains the primary live document store. | Backup policy may use Google Drive for encrypted retention and restore evidence, but not as authoritative runtime storage. |
 
 ## Decision change template
 

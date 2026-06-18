@@ -197,9 +197,9 @@ export function SettingsPageContent({ data }: { data: SettingsPageData }) {
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-text-primary">Data export</h2>
+                <h2 className="text-base font-semibold text-text-primary">Data export and backup</h2>
                 <p className="mt-1 text-sm text-text-muted">
-                  Generate authorised CSV exports for business records without exposing credential plaintext, signed links, or unsafe temporary files.
+                  Generate authorised CSV exports for business records and follow the approved encrypted Google Drive backup policy without exposing credential plaintext, signed links, or unsafe temporary files.
                 </p>
               </div>
               <FileDown className="h-5 w-5 text-text-muted" aria-hidden="true" />
@@ -207,7 +207,7 @@ export function SettingsPageContent({ data }: { data: SettingsPageData }) {
 
             <div className="mt-4 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
               <p className="text-sm text-text-secondary">
-                Export clients, filing records, document metadata, invoices, payments, refunds, notices, follow-ups, and activity summaries through a server-side audited download flow.
+                Export clients, filing records, document metadata, invoices, payments, refunds, notices, follow-ups, and activity summaries through a server-side audited download flow, then retain daily encrypted backup packages for 30 days in the approved private Google Drive destination.
               </p>
             </div>
 
@@ -215,7 +215,7 @@ export function SettingsPageContent({ data }: { data: SettingsPageData }) {
               href="/settings/export"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-[var(--radius-input)] border border-border-subtle bg-white px-4 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
             >
-              Open business exports
+              Open exports and backup
             </Link>
           </section>
         </div>

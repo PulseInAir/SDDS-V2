@@ -117,6 +117,14 @@ type ReferenceMaps = {
 type ExportPageData = {
   workspaceName: string;
   exports: Array<BusinessExportDefinition & { rowCount: number }>;
+  backupPolicy: {
+    destination: string;
+    retention: string;
+    encryption: string;
+    primaryStore: string;
+    packageContents: readonly string[];
+    restoreChecklist: readonly string[];
+  };
   recentExports: Array<{
     id: string;
     createdAt: string;
@@ -132,6 +140,25 @@ type ExportPayload = {
   filename: string;
   rowCount: number;
 };
+
+export const BACKUP_POLICY = {
+  destination: "Private Google Drive folder",
+  retention: "Daily encrypted backup packages retained for 30 days",
+  encryption: "Encrypt each backup package before it leaves the trusted SDDS environment",
+  primaryStore: "Supabase private Storage remains the authoritative live document store",
+  packageContents: [
+    "Authorised SDDS CSV exports for clients, cases, filings, invoices, payments, refunds, notices, follow-ups, and activity.",
+    "Private document inventory plus the corresponding Supabase Storage object copies for recovery.",
+    "Restore notes covering backup date, operator, and package contents.",
+  ],
+  restoreChecklist: [
+    "Download the encrypted package from the approved private Google Drive folder.",
+    "Decrypt the package in a trusted non-production recovery environment.",
+    "Restore database data and document files into a non-production environment.",
+    "Verify row counts, critical relationships, document access, and credential decryption.",
+    "Run the critical SDDS workflow smoke tests and record the outcome.",
+  ],
+} as const;
 
 function isObject(value: Json | null | undefined): value is Record<string, Json> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -252,6 +279,7 @@ export async function getExportPageData(): Promise<ExportPageData> {
       ...definition,
       rowCount: countMap.get(definition.key) ?? 0,
     })),
+    backupPolicy: BACKUP_POLICY,
     recentExports: ((recentExportsResult.data ?? []) as ExportAuditRecord[]).map((event) => {
       const metadata = isObject(event.metadata) ? event.metadata : {};
       return {

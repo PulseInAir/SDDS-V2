@@ -13,10 +13,11 @@ export function ExportPageContent({ data }: { data: ExportPageData }) {
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Business exports</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Business exports and backup</h1>
             <p className="mt-1 max-w-3xl text-sm text-text-muted">
-              Generate server-side CSV exports for practical business recovery and offline review. Every export is audited,
-              decrypted portal passwords are excluded, and no temporary download files are stored in the application.
+              Generate server-side CSV exports for practical business recovery and manage the approved off-platform backup
+              procedure. Every export is audited, decrypted portal passwords are excluded, and Supabase private Storage
+              remains the live document source of truth.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -85,6 +86,44 @@ export function ExportPageContent({ data }: { data: ExportPageData }) {
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
             <div className="flex items-start justify-between gap-3 border-b border-border-subtle px-5 py-4">
               <div>
+                <h2 className="text-base font-semibold text-text-primary">Approved backup destination</h2>
+                <p className="mt-1 text-sm text-text-muted">
+                  The release backup policy is now locked for encrypted off-platform retention without changing the live
+                  storage architecture.
+                </p>
+              </div>
+              <DatabaseBackup className="h-5 w-5 text-text-muted" aria-hidden="true" />
+            </div>
+
+            <div className="space-y-4 px-5 py-4 text-sm">
+              <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+                <p className="font-medium text-text-primary">{data.backupPolicy.destination}</p>
+                <p className="mt-1 text-text-secondary">{data.backupPolicy.primaryStore}</p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+                  <p className="font-medium text-text-primary">Retention</p>
+                  <p className="mt-1 text-text-secondary">{data.backupPolicy.retention}</p>
+                </div>
+                <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+                  <p className="font-medium text-text-primary">Encryption rule</p>
+                  <p className="mt-1 text-text-secondary">{data.backupPolicy.encryption}</p>
+                </div>
+              </div>
+              <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+                <p className="font-medium text-text-primary">Backup package contents</p>
+                <ul className="mt-3 space-y-2 text-text-secondary">
+                  {data.backupPolicy.packageContents.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
+            <div className="flex items-start justify-between gap-3 border-b border-border-subtle px-5 py-4">
+              <div>
                 <h2 className="text-base font-semibold text-text-primary">Recent export activity</h2>
                 <p className="mt-1 text-sm text-text-muted">
                   The latest business-export downloads remain visible for audit review without exposing file contents here.
@@ -119,11 +158,12 @@ export function ExportPageContent({ data }: { data: ExportPageData }) {
             <div className="flex items-start gap-3">
               <DatabaseBackup className="mt-0.5 h-5 w-5 text-amber-700" aria-hidden="true" />
               <div>
-                <h2 className="text-base font-semibold text-text-primary">Backup destination decision</h2>
-                <p className="mt-2 text-sm text-text-secondary">
-                  Off-platform backup destination, retention, and encryption remain blocked by open decision O-004 and task
-                  G31. This page ships the authorised business exports without inventing a backup destination.
-                </p>
+                <h2 className="text-base font-semibold text-text-primary">Restore checklist</h2>
+                <ol className="mt-3 space-y-2 text-sm text-text-secondary">
+                  {data.backupPolicy.restoreChecklist.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ol>
                 <Link
                   href="/settings"
                   className="mt-4 inline-flex h-10 items-center justify-center rounded-[var(--radius-input)] border border-border-subtle bg-white px-4 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
