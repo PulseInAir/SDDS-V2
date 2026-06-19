@@ -351,12 +351,18 @@ export async function createInvoiceAction(
     }
   }
 
+  // Insert the invoice first with discount_amount=0 so the check constraint
+  // (discount_amount <= subtotal) is satisfied while subtotal is still 0.
+  // Items are inserted next — the invoice_items_recalculate trigger then
+  // recomputes subtotal and total_amount. Finally, if a discount was supplied,
+  // we update discount_amount to the real value so the recalculate_invoice_after_discount
+  // trigger can validate it against the now-populated subtotal.
   const invoiceInsert = {
     workspace_id: session.workspace.id,
     client_id: clientId,
     case_id: filingCase?.id ?? null,
     assessment_year_id: assessmentYearId,
-    discount_amount: discountAmount,
+    discount_amount: 0,
     notes: notes || null,
   };
 
@@ -383,6 +389,19 @@ export async function createInvoiceAction(
 
   if (itemsError) {
     return { error: `Invoice draft was created, but its items failed to save: ${itemsError.message}` };
+  }
+
+  // Apply discount after items are inserted so subtotal is already computed.
+  if (discountAmount > 0) {
+    const { error: discountError } = await supabase
+      .from("invoices")
+      .update({ discount_amount: discountAmount })
+      .eq("workspace_id", session.workspace.id)
+      .eq("id", invoice.id);
+
+    if (discountError) {
+      return { error: `Invoice and items were saved, but the discount could not be applied: ${discountError.message}` };
+    }
   }
 
   await supabase.from("activity_events").insert({
