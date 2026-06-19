@@ -5,47 +5,39 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Project phase: Phase 9 — Hardening and release
-- Active task: G33 — Full end-to-end regression
+- Active task: G33 — Full end-to-end regression (IN_PROGRESS)
 - Next READY task: G34 — Vercel Preview and release audit (after G33 completes)
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `502dc67`
+- HEAD: `a0ac952`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean (after this commit)
+- Working tree: clean (brain file updates pending commit)
 - Supabase project: `vorcxrxggfybhucpimfx`
 
-## Blocker resolved
+## O-009 resolved
 
-The `/settings` page crash (`permission denied for table invoice_sequences`) is now fixed. Three migrations have been applied to the remote Supabase project:
+Owner confirmed: use existing Supabase owner account for regression testing. No seed script required. Decision recorded in `19-OPEN-DECISIONS.md`.
 
-1. `20260617050050_fix_import_jobs_unique_constraint.sql` — adds `unique (workspace_id, id)` to `import_jobs`, required by the `import_rows` FK.
-2. `20260618110000_add_import_rows_tracking.sql` — creates `import_rows` table with RLS and grants.
-3. `20260619100000_allow_reading_invoice_sequences.sql` — creates the `SECURITY DEFINER` function `get_workspace_invoice_sequences()` that allows authenticated users to read invoice sequence data safely without direct table access (Option B fix).
+## Automated checks passed
 
-The `invoice_sequences` table remains locked to `service_role` only. No direct `authenticated` access was granted. The existing `rpc("get_workspace_invoice_sequences")` call in `settings.ts` now resolves correctly.
+- `npm run typecheck`: ✅ PASS
+- `npm run lint`: ✅ PASS
+- `git diff --check HEAD`: ✅ PASS (no whitespace issues)
 
-## Remaining G33 blocker
+## G33 current status
 
-Open decision O-009 is still unresolved: owner must provide test credentials (Supabase auth account) or a `seed.sql` for local regression execution.
+Regression matrix created. All 17 critical flows are documented for manual execution.
 
-## Scope
+**Browser regression requires owner login.** The automated browser agent cannot authenticate without credentials. Owner must:
 
-- Applied Option B fix for G33 blocker: push three pending migrations to remote Supabase, keeping the security lock intact.
-- Discarded the previously staged Option A change (direct `authenticated` grant) which would have weakened the hardened schema.
+1. Open http://localhost:3000 in their browser.
+2. Sign in with their Supabase email + password.
+3. Execute each of the 17 flows in the regression matrix.
+4. Mark each row PASS or FAIL.
+5. Report results so the commit can be made.
 
-## Changed
-
-- `supabase/migrations/20260617050050_fix_import_jobs_unique_constraint.sql` — NEW: repair migration adding composite unique constraint to `import_jobs`.
-- `AI Master Brain/17-TASK-LEDGER.md` — G33 status set to `IN_PROGRESS`.
-- `AI Master Brain/18-SESSION-HANDOFF.md` — this update.
-
-## Verification
-
-- `npm run typecheck`: passed.
-- `npm run lint`: passed.
-- `npx supabase db push --linked --include-all --yes`: all 3 migrations applied successfully.
-- `git diff --check`: passed with line-ending warnings only.
+Regression matrix location: artifact `g33_regression_matrix.md`.
 
 ## Exact next action
 
-Resolve O-009: owner to confirm a Supabase test account or provide seed credentials, then execute full G33 regression across all critical flows.
+Owner executes the 17-flow browser regression at http://localhost:3000 and reports results. Upon all-PASS confirmation, G33 is marked DONE and G34 becomes READY.

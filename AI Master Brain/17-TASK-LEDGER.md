@@ -39,7 +39,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G30 | DONE | Implement business exports | G19,G20,G21,G22,G23 | authorised practical exports, safe handling | `23b0f6eb35adebe0ca61a320a416b7ee46f65f91` |
 | G31 | DONE | Implement production backup destination and retention | OWNER DECISION | approved destination/retention/encryption + restore procedure | `e0d5cd9` |
 | G32 | DONE | Performance and accessibility hardening | G28,G29,G30 | budgets, query review, keyboard/contrast/responsive | `59cbe78781e7514b428446519520bc4ba524fa9e` |
-| G33 | BLOCKED | Full end-to-end regression | G32,G31 | all critical flows pass, restore tested | — |
+| G33 | IN_PROGRESS | Full end-to-end regression | G32,G31 | all critical flows pass, restore tested | — |
 | G34 | PENDING | Vercel Preview and release audit | G33 | preview smoke, logs, policy/security audit, rollback | — |
 | G35 | PENDING | Production release and post-release smoke test | G34 | production healthy, evidence and rollback retained | — |
 
