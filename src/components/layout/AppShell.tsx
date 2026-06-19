@@ -9,12 +9,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         Skip to main content
       </a>
       <SidebarNav className="print:hidden" />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden print:overflow-visible">
         <TopUtilityBar className="print:hidden" />
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6"
+          className="flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 print:overflow-visible print:p-0"
         >
           <div className="mx-auto max-w-7xl">
             {children}
