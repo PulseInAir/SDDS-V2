@@ -17,7 +17,7 @@ import {
   settingsNavigationItem,
 } from "@/components/layout/navigation";
 
-export function TopUtilityBar() {
+export function TopUtilityBar({ className }: { className?: string }) {
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +76,7 @@ export function TopUtilityBar() {
 
   return (
     <>
-      <header className="flex min-h-[60px] flex-shrink-0 items-center justify-between gap-3 border-b border-border-subtle bg-surface-panel px-4 py-3 sm:px-6">
+      <header className={classNames("flex min-h-[60px] flex-shrink-0 items-center justify-between gap-3 border-b border-border-subtle bg-surface-panel px-4 py-3 sm:px-6", className)}>
         <div className="flex min-w-0 flex-1 items-center gap-x-4">
           <div className="md:hidden">
             <IconButton

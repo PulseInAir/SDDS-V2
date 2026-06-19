@@ -7,11 +7,11 @@ import { LogOut } from "lucide-react";
 import { signOut } from "@/app/(auth)/login/actions";
 import { isNavigationItemActive, primaryNavigation, settingsNavigationItem } from "@/components/layout/navigation";
 
-export function SidebarNav() {
+export function SidebarNav({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="hidden md:flex h-full w-[248px] flex-col border-r border-border-subtle bg-surface-panel">
+    <div className={classNames("hidden md:flex h-full w-[248px] flex-col border-r border-border-subtle bg-surface-panel", className)}>
       <div className="flex h-[60px] items-center px-6">
         <span className="text-xl font-bold tracking-tight text-text-primary uppercase">SDDS</span>
       </div>

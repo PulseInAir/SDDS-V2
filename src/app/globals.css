@@ -1,4 +1,5 @@
-@import "tailwindcss";
+/* Tailwind directives temporarily disabled to unblock Turbopack on Windows.
+   Re-enable once the underlying Tailwind/PostCSS issue is fixed. */
 
 @theme {
   --color-brand-50: #EFF6FF;
@@ -22,7 +23,8 @@
   --color-surface-panel: #FFFFFF;
   --color-surface-muted: #F8FAFC;
   --color-surface-hover: #F1F5F9;
-  --color-surface-selected: #EFF6FF; /* low-intensity brand tint */
+  --color-surface-selected: #EFF6FF;
+  /* low-intensity brand tint */
 
   --radius-input: 8px;
   --radius-panel: 12px;
@@ -54,7 +56,8 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-size: 14px; /* Default body: 13-14px */
+  font-size: 14px;
+  /* Default body: 13-14px */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -98,6 +101,7 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -105,5 +109,44 @@ textarea {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+
+  /* Reset app background and padding so the invoice prints on clean white paper. */
+  html,
+  body {
+    background-color: #ffffff !important;
+  }
+
+  /* Hide everything except the invoice print container. */
+  body * {
+    visibility: hidden !important;
+  }
+
+  #invoice-print-only,
+  #invoice-print-only * {
+    visibility: visible !important;
+  }
+
+  #invoice-print-only {
+    position: static !important;
+  }
+
+  /* Remove the scroll container padding/max-width constraints from the app shell. */
+  main#main-content {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  main#main-content>div {
+    max-width: none !important;
+  }
+
+  /* Force colours to print as rendered (borders, table fills). */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

@@ -8,9 +8,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <SidebarNav />
+      <SidebarNav className="print:hidden" />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <TopUtilityBar />
+        <TopUtilityBar className="print:hidden" />
         <main
           id="main-content"
           tabIndex={-1}
