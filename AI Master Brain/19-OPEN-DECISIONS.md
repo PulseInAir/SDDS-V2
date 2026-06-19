@@ -11,6 +11,7 @@ Agents must not invent these answers. Most do not block early development.
 | O-006 | Final notice/intimation/refund taxonomy beyond minimum contract | Start with minimum controlled values and approve additions before migration lock | G21/G22 |
 | O-007 | Production sender/email notification service | None for MVP unless a real workflow requires it | future |
 | O-008 | Future staff roles | Keep owner membership only; define roles only when staff are actually added | future |
+| O-009 | Seed data and test credentials for local testing | Owner to provide a test account in Supabase or a `seed.sql` script. | G33 regression execution |
 
 ## Decision protocol
 

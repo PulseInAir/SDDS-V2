@@ -6,13 +6,17 @@ This file is rewritten after every task. Keep it compact and factual.
 
 - Project phase: Phase 9 — Hardening and release
 - Active task: none
-- Next READY task: G33 — Full end-to-end regression
+- Next READY task: none
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - HEAD before this handoff update: `e0d5cd9`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: documentation closeout pending commit
+- Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
+
+## Blocker
+
+Task G33 is blocked because there is no seed data or test user credentials available to log into the application locally. Local `http://localhost:3000` redirects to `/login` but there is no sign-up flow, and dummy credentials fail.
 
 ## Scope
 
@@ -43,4 +47,4 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Exact next action
 
-Resume with G33 full end-to-end regression, including the restore test against the approved Google Drive encrypted backup workflow.
+Resolve missing test credentials / seed data to unblock G33 testing.
