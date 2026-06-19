@@ -4,8 +4,9 @@ import { CaseDetailsPanel } from '@/components/cases/CaseDetailsPanel';
 import { CaseTransitionMenu } from '@/components/cases/CaseTransitionMenu';
 import Link from 'next/link';
 
-export default async function FilingCaseDetailPage({ params }: { params: { caseId: string } }) {
-  const filingCase = await getFilingCase(params.caseId);
+export default async function FilingCaseDetailPage({ params }: { params: Promise<{ caseId: string }> }) {
+  const resolvedParams = await params;
+  const filingCase = await getFilingCase(resolvedParams.caseId);
 
   if (!filingCase) {
     notFound();

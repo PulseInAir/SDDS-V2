@@ -71,10 +71,9 @@ export async function getSettingsPageData() {
 
   const [{ data: invoiceSequences, error: invoiceSequencesError }, { count: invoiceCount, error: invoiceCountError }] =
     await Promise.all([
-      supabase
-        .from("invoice_sequences")
-        .select("assessment_year_id, next_serial")
-        .eq("workspace_id", session.workspace.id),
+      supabase.rpc("get_workspace_invoice_sequences", {
+        target_workspace_id: session.workspace.id,
+      }),
       supabase
         .from("invoices")
         .select("id", { count: "exact", head: true })
@@ -91,7 +90,10 @@ export async function getSettingsPageData() {
   }
 
   const sequenceMap = new Map(
-    (invoiceSequences ?? []).map((row) => [row.assessment_year_id, row.next_serial]),
+    ((invoiceSequences as { assessment_year_id: string; next_serial: number }[]) ?? []).map((row) => [
+      row.assessment_year_id,
+      row.next_serial,
+    ]),
   );
 
   return {

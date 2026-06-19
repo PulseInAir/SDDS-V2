@@ -2,8 +2,9 @@ import { getClientFilingCases } from '@/lib/actions/cases';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import Link from 'next/link';
 
-export default async function FilingsPage({ params }: { params: { clientId: string } }) {
-  const cases = await getClientFilingCases(params.clientId);
+export default async function FilingsPage({ params }: { params: Promise<{ clientId: string }> }) {
+  const resolvedParams = await params;
+  const cases = await getClientFilingCases(resolvedParams.clientId);
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,5 @@
 # SDDS Session Handoff
+# SDDS Session Handoff
 
 This file is rewritten after every task. Keep it compact and factual.
 
@@ -9,14 +10,14 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: none
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD before this handoff update: `e0d5cd9`
+- HEAD before this handoff update: `a8144e3`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 
 ## Blocker
 
-Task G33 is blocked because there is no seed data or test user credentials available to log into the application locally. Local `http://localhost:3000` redirects to `/login` but there is no sign-up flow, and dummy credentials fail.
+Task G33 is blocked because `/settings` and its sub-pages crash with `Failed to load invoice sequencing data: permission denied for table invoice_sequences`. The `authenticated` role was revoked from `invoice_sequences` in migration `20260617040200_secure_invoice_payment_schema.sql`, breaking `getSettingsPageData` in `settings.ts`. This prevents creating an Assessment Year, which in turn blocks the creation of Filing Cases and all subsequent tests.
 
 ## Scope
 
@@ -47,4 +48,4 @@ Task G33 is blocked because there is no seed data or test user credentials avail
 
 ## Exact next action
 
-Resolve missing test credentials / seed data to unblock G33 testing.
+Owner decision required: Fix the RLS policy for `invoice_sequences` or update `getSettingsPageData` to use a service role client so that Assessment Years can be configured.
