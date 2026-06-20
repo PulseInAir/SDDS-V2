@@ -48,7 +48,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G38 | DONE | Enhance invoice design with premium aesthetics | G37 | Apply sophisticated color blocks, grid alignments, spacing, and micro-shadows | `c2181ab` |
 | G39 | DONE | Resize and match invoice layout spacing | G38 | Match proportions, column widths, and spacing of Invoice Format.png | `e700f27` |
 | G40 | DONE | Fix print layout page height spacing | G39 | Eliminate white space at the bottom of the page in print preview | `c6952b3` |
-| G41 | IN_PROGRESS | Implement fixed full-page print overlay | G40 | Position print layout fixed at 100% width and height to remove white space offsets | |
+| G41 | DONE | Implement fixed full-page print overlay | G40 | Position print layout fixed at 100% width and height to remove white space offsets | `1616b3f` |
 
 ## Task update protocol
 
