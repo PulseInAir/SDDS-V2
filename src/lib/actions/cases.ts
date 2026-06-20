@@ -216,6 +216,8 @@ export async function updateFilingCaseDetails(
     return { error: 'Failed to update case details' };
   }
 
+  revalidatePath('/');
+  revalidatePath('/filing-queue');
   revalidatePath(`/filing-queue/${caseId}`);
   revalidatePath(`/clients/${currentCase.client_id}`);
   return { success: true };
@@ -301,6 +303,8 @@ export async function transitionFilingCase(
     console.error('Failed to insert status history:', historyError);
   }
 
+  revalidatePath('/');
+  revalidatePath('/filing-queue');
   revalidatePath(`/filing-queue/${caseId}`);
   revalidatePath(`/clients/${currentCase.client_id}`);
   revalidatePath('/follow-up');
@@ -443,6 +447,7 @@ export async function createFilingCaseAction(
     message: `Filing case for ${ay.label} created.`,
   });
 
+  revalidatePath('/');
   revalidatePath(`/clients/${clientId}`);
   revalidatePath(`/clients/${clientId}/assessment-years`);
   revalidatePath(`/clients/${clientId}/filings`);
