@@ -1,7 +1,7 @@
 "use client";
-
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, FileText, Landmark, Receipt, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Landmark, Receipt, TriangleAlert } from "lucide-react";
 
 import type { getInvoiceDetail } from "@/lib/actions/invoices";
 import {
@@ -19,7 +19,139 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 
 type InvoiceDetail = NonNullable<Awaited<ReturnType<typeof getInvoiceDetail>>>;
 
+function BrandedInvoiceLayout({ invoice }: { invoice: InvoiceDetail }) {
+  const items = invoice.invoice_items ?? [];
+  const minRows = 5;
+  const emptyRowCount = Math.max(0, minRows - items.length);
+
+  return (
+    <div className="flex flex-col sm:flex-row min-h-[297mm] bg-[#FFF2D3] text-black font-sans shadow-none">
+      {/* Left Column: Olive Green */}
+      <div className="w-full sm:w-[30%] bg-[#476A30] text-white p-6 flex flex-col items-center border-b sm:border-b-0 sm:border-r border-gray-300">
+        <h1 className="text-3xl font-extrabold tracking-[0.2em] uppercase text-center mt-4">
+          INVOICE
+        </h1>
+        
+        {/* Logo Container */}
+        <div className="mt-8 bg-[#D5AD4E] p-3 rounded-lg border-4 border-[#610B35] flex items-center justify-center w-36 h-36">
+          <img src="/Logo.png" alt="SDDS Logo" className="object-contain w-full h-full" />
+        </div>
+
+        {/* Issuer Details */}
+        <div className="mt-12 text-center text-sm font-semibold leading-relaxed space-y-1">
+          <p className="font-bold text-base text-white">Single Digit Data Solutions</p>
+          <p className="text-white/90">Duliajan</p>
+          <p className="text-white/90">Dibrugarh, Assam</p>
+        </div>
+      </div>
+
+      {/* Right Column: Cream */}
+      <div className="w-full sm:w-[70%] p-8 flex flex-col justify-between">
+        <div>
+          {/* Client and Invoice Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold">Bill To :-</h3>
+              <p className="text-lg font-bold text-gray-900">{invoice.clients?.full_name ?? "Unknown client"}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{invoice.clients?.address ?? "Address not recorded"}</p>
+            </div>
+            <div className="space-y-1 text-left sm:text-right">
+              <div className="flex sm:justify-end gap-2 text-sm">
+                <span className="font-bold text-gray-700">Date :-</span>
+                <span className="text-gray-900">{formatInvoiceDate(invoice.issue_date ?? invoice.created_at)}</span>
+              </div>
+              <div className="flex sm:justify-end gap-2 text-sm">
+                <span className="font-bold text-gray-700">Invoice No. :-</span>
+                <span className="font-mono text-gray-900">{invoice.invoice_number}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Line Items Table */}
+          <div className="mt-8 overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300 text-sm min-w-[500px]">
+              <thead>
+                <tr className="bg-gray-100/50">
+                  <th className="border border-gray-300 px-3 py-2 text-left font-bold text-gray-700 w-16">Sl. No.</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left font-bold text-gray-700 font-sans">DESCRIPTION</th>
+                  <th className="border border-gray-300 px-3 py-2 text-right font-bold text-gray-700 w-32 font-sans">TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={item.id}>
+                    <td className="border border-gray-300 px-3 py-2 text-center text-gray-900">{index + 1}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-gray-900">{item.description}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right font-mono text-gray-900">
+                      <MoneyValue value={Number(item.line_amount ?? 0)} forceVisible={true} />
+                    </td>
+                  </tr>
+                ))}
+                {Array.from({ length: emptyRowCount }).map((_, i) => (
+                  <tr key={`empty-${i}`} className="h-9">
+                    <td className="border border-gray-300 px-3 py-2 text-center text-gray-400">&nbsp;</td>
+                    <td className="border border-gray-300 px-3 py-2 text-gray-400">&nbsp;</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right font-mono text-gray-400">&nbsp;</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Calculations */}
+          <div className="mt-6 ml-auto max-w-xs space-y-2 text-sm text-gray-800">
+            <div className="flex justify-between font-bold font-sans">
+              <span>SUBTOTAL</span>
+              <span><MoneyValue value={Number(invoice.subtotal ?? 0)} forceVisible={true} /></span>
+            </div>
+            <div className="flex justify-between font-bold font-sans">
+              <span>DISCOUNT</span>
+              <span><MoneyValue value={Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
+            </div>
+            <div className="flex justify-between font-bold font-sans">
+              <span>SUBTOTAL LESS DISCOUNT</span>
+              <span><MoneyValue value={Number(invoice.subtotal ?? 0) - Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
+            </div>
+            <div className="flex justify-between font-bold font-sans">
+              <span>Advance Paid</span>
+              <span><MoneyValue value={invoice.paidAmount} forceVisible={true} /></span>
+            </div>
+            <div className="flex justify-between font-bold text-base border-b-4 border-double border-gray-900 pb-1 font-sans">
+              <span>Balance Due</span>
+              <span><MoneyValue value={invoice.balanceAmount} forceVisible={true} /></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer: Payment Details & QR Code */}
+        <div className="mt-8 flex justify-between items-end border-t border-gray-300 pt-6">
+          <div className="space-y-2 text-sm">
+            <h4 className="font-bold text-gray-700 font-sans">Payment Details :-</h4>
+            <div className="flex gap-2">
+              <span className="font-bold text-gray-600">UPI ID -</span>
+              <a href="upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions" className="text-blue-600 font-bold underline">8011626740@ybl</a>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-gray-600">UPI No. -</span>
+              <span className="text-gray-900 font-bold">8011626740</span>
+            </div>
+          </div>
+
+          <div>
+            <img 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions&am=${invoice.balanceAmount}&cu=INR`)}`} 
+              alt="Payment QR Code" 
+              className="w-28 h-28 border border-gray-300 p-1 bg-white object-contain"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
+  const [viewMode, setViewMode] = useState<"admin" | "preview">("admin");
   const canIssue = invoice.derivedStatus === "draft";
   const canRecordPayment = ["issued", "partially_paid", "overdue"].includes(invoice.derivedStatus) && invoice.balanceAmount > 0;
 
@@ -47,6 +179,30 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-1 mr-2">
+              <button
+                type="button"
+                onClick={() => setViewMode("admin")}
+                className={`rounded-[var(--radius-input)] px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === "admin"
+                    ? "bg-white text-text-primary shadow-sm"
+                    : "text-text-muted hover:text-text-secondary"
+                }`}
+              >
+                Admin View
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("preview")}
+                className={`rounded-[var(--radius-input)] px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === "preview"
+                    ? "bg-white text-text-primary shadow-sm"
+                    : "text-text-muted hover:text-text-secondary"
+                }`}
+              >
+                Client Preview
+              </button>
+            </div>
             <Link
               href={`/clients/${invoice.client_id}/invoices`}
               className="inline-flex items-center rounded-[var(--radius-input)] border border-border-subtle px-3 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
@@ -57,7 +213,9 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
           </div>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_360px]">
+        {viewMode === "admin" ? (
+          <>
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_360px]">
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
@@ -244,90 +402,16 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
             </div>
           )}
         </section>
+          </>
+        ) : (
+          <div className="max-w-[850px] mx-auto rounded-[var(--radius-panel)] border border-border-subtle bg-[#FFF2D3] shadow-md overflow-hidden my-6">
+            <BrandedInvoiceLayout invoice={invoice} />
+          </div>
+        )}
       </div>
 
-      <section id="invoice-print-only" className="hidden rounded-[var(--radius-panel)] border border-border-subtle bg-white p-8 text-black shadow-none print:block">
-        <div className="flex items-start justify-between gap-6 border-b border-slate-300 pb-6">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Single Digit Data Solutions</p>
-            <h2 className="mt-2 text-3xl font-semibold">Invoice</h2>
-            <p className="mt-2 text-sm text-slate-600">Legal identity, address, and GST treatment remain pending workspace configuration (O-002).</p>
-          </div>
-
-          <div className="text-right text-sm">
-            <p className="font-mono text-base font-semibold">{invoice.invoice_number}</p>
-            <p className="mt-2 text-slate-600">Issue date: {formatInvoiceDate(invoice.issue_date)}</p>
-            <p className="text-slate-600">Due date: {formatInvoiceDate(invoice.due_date)}</p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Bill to</p>
-            <p className="mt-2 text-lg font-semibold">{invoice.clients?.full_name ?? "Unknown client"}</p>
-            <p className="mt-1 text-sm text-slate-600">{invoice.clients?.email ?? "Email not recorded"}</p>
-            <p className="text-sm text-slate-600">{invoice.clients?.address ?? "Address not recorded"}</p>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Assessment year context</p>
-            <p className="mt-2 text-lg font-semibold">{invoice.assessment_years?.label ?? "No AY"}</p>
-            <p className="mt-1 text-sm text-slate-600">Workspace: {invoice.workspaceName}</p>
-            <p className="text-sm text-slate-600">Case status: {invoice.filing_cases?.case_status ?? "No linked case"}</p>
-          </div>
-        </div>
-
-        <div className="mt-8 overflow-hidden rounded-xl border border-slate-300">
-          <table className="min-w-full divide-y divide-slate-300 text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium">Description</th>
-                <th className="px-4 py-3 text-left font-medium">Qty</th>
-                <th className="px-4 py-3 text-left font-medium">Unit amount</th>
-                <th className="px-4 py-3 text-left font-medium">Line amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {invoice.invoice_items?.map((item) => (
-                <tr key={item.id}>
-                  <td className="px-4 py-3">{item.description}</td>
-                  <td className="px-4 py-3 font-mono">{item.quantity}</td>
-                  <td className="px-4 py-3 font-mono">
-                    <MoneyValue value={Number(item.unit_amount ?? 0)} forceVisible={true} />
-                  </td>
-                  <td className="px-4 py-3 font-mono">
-                    <MoneyValue value={Number(item.line_amount ?? 0)} forceVisible={true} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-6 ml-auto max-w-sm space-y-2 text-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-600">Subtotal</span>
-            <MoneyValue value={Number(invoice.subtotal ?? 0)} forceVisible={true} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-slate-600">Discount</span>
-            <MoneyValue value={Number(invoice.discount_amount ?? 0)} forceVisible={true} />
-          </div>
-          <div className="flex items-center justify-between border-t border-slate-300 pt-2 text-base font-semibold">
-            <span>Total</span>
-            <MoneyValue value={Number(invoice.total_amount ?? 0)} forceVisible={true} />
-          </div>
-        </div>
-
-        {invoice.notes ? (
-          <div className="mt-8 rounded-xl border border-slate-300 p-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <FileText className="h-4 w-4" aria-hidden="true" />
-              Notes
-            </div>
-            <p className="mt-2 text-sm text-slate-700">{invoice.notes}</p>
-          </div>
-        ) : null}
+      <section id="invoice-print-only" className="hidden print:block w-full text-black bg-[#FFF2D3]">
+        <BrandedInvoiceLayout invoice={invoice} />
       </section>
     </>
   );

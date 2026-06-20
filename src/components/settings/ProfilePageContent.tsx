@@ -43,11 +43,11 @@ export function ProfilePageContent({
   const [base64Data, setBase64Data] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Track success to refresh layout
   useEffect(() => {
     if (detailsState.success || imageState.success) {
       router.refresh();
       if (imageState.success) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBase64Data(null);
       }
     }

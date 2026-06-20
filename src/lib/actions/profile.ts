@@ -56,8 +56,9 @@ export async function updateProfileDetailsAction(
 
     revalidatePath("/", "layout");
     return { success: "Profile details updated successfully." };
-  } catch (err: any) {
-    return { error: err.message || "An unexpected error occurred." };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+    return { error: errorMsg };
   }
 }
 
@@ -93,8 +94,9 @@ export async function updateProfilePasswordAction(
     }
 
     return { success: "Password changed successfully." };
-  } catch (err: any) {
-    return { error: err.message || "An unexpected error occurred." };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+    return { error: errorMsg };
   }
 }
 
@@ -124,7 +126,8 @@ export async function updateProfileImageAction(
 
     revalidatePath("/", "layout");
     return { success: "Profile image updated successfully." };
-  } catch (err: any) {
-    return { error: err.message || "An unexpected error occurred." };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+    return { error: errorMsg };
   }
 }

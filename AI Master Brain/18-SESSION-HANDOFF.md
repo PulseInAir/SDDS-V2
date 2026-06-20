@@ -4,7 +4,7 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: SHELL-USER-MENU-01 — User menu relocation and profile-management entry point (DONE)
+- Active task: G37 — Resolve O-002 invoice layout and branding (IN_PROGRESS)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
