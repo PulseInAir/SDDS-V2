@@ -1,5 +1,4 @@
-/* Tailwind directives temporarily disabled to unblock Turbopack on Windows.
-   Re-enable once the underlying Tailwind/PostCSS issue is fixed. */
+@import "tailwindcss";
 
 @theme {
   --color-brand-50: #EFF6FF;
