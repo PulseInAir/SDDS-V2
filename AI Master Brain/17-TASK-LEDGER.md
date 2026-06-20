@@ -41,7 +41,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G32 | DONE | Performance and accessibility hardening | G28,G29,G30 | budgets, query review, keyboard/contrast/responsive | `59cbe78781e7514b428446519520bc4ba524fa9e` |
 | G33 | DONE | Full end-to-end regression | G32,G31 | all critical flows pass, restore tested | `d7f737d` (code) / `dbdcd62` (docs) — owner-confirmed PASS (2026-06-20); caveats deferred to G36 |
 | G34 | DONE | Vercel Preview and release audit | G33 | preview smoke, logs, policy/security audit, rollback | `7a84429` |
-| G35 | DONE | Production release and post-release smoke test | G34 | production healthy, evidence and rollback retained | `e78463d` |
+| G35 | DONE | Production release and post-release smoke test | G34 | production healthy, evidence and rollback retained | `ebc6636` |
 | G36 | READY | Post-production live-data iteration triage | G35 | real-usage issues catalogued, prioritised, and resolved; no speculative pre-production work | — |
 
 ## Task update protocol
