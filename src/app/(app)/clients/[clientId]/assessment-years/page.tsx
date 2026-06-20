@@ -32,10 +32,10 @@ export default async function ClientAssessmentYearsPage({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900">
             Assessment Years
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500">
             One filing case per assessment year. Use the Filing Queue to work the case.
           </p>
         </div>
@@ -43,15 +43,15 @@ export default async function ClientAssessmentYearsPage({
 
       {/* Create new case */}
       {openYearsWithoutCase.length > 0 && (
-        <div className="rounded-lg border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-4">
+        <div className="rounded-lg border border-brand-200 bg-brand-50 p-4">
           <CreateCaseForm clientId={clientId} openYears={openYearsWithoutCase} />
         </div>
       )}
 
       {/* AY grid */}
       {years.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg bg-gray-50 dark:bg-gray-800/50">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-center py-12 border border-gray-200 rounded-lg bg-gray-50">
+          <p className="text-sm text-gray-500">
             No assessment years configured yet.{' '}
             <Link href="/settings" className="text-brand-600 hover:underline">
               Add one in Settings.
@@ -60,30 +60,30 @@ export default async function ClientAssessmentYearsPage({
         </div>
       ) : (
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+          <table className="min-w-full divide-y divide-gray-300">
+            <thead className="bg-gray-50">
               <tr>
                 <th
                   scope="col"
-                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-6"
+                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
                 >
                   Assessment Year
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
                   AY State
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
                   Case Status
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
                   Next Action
                 </th>
@@ -92,49 +92,49 @@ export default async function ClientAssessmentYearsPage({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+            <tbody className="divide-y divide-gray-200 bg-white">
               {years.map((ay) => {
                 const filingCase = caseByAy.get(ay.id);
                 return (
                   <tr key={ay.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                       {ay.label}
                       {ay.is_current && (
-                        <span className="ml-2 inline-flex items-center rounded-full bg-brand-100 dark:bg-brand-900 px-2 py-0.5 text-xs font-medium text-brand-800 dark:text-brand-200">
+                        <span className="ml-2 inline-flex items-center rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-800">
                           Current
                         </span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {ay.is_open ? (
                         <StatusBadge variant="success">Open</StatusBadge>
                       ) : (
                         <StatusBadge variant="neutral">Closed</StatusBadge>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {filingCase ? (
                         <StatusBadge>{filingCase.case_status}</StatusBadge>
                       ) : (
-                        <span className="text-gray-400 dark:text-gray-600 italic text-xs">
+                        <span className="text-gray-400 italic text-xs">
                           No case
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                    <td className="px-3 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {filingCase?.next_action ?? '—'}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       {filingCase ? (
                         <Link
                           href={`/filing-queue/${filingCase.id}`}
-                          className="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300"
+                          className="text-brand-600 hover:text-brand-900"
                         >
                           Open case
                           <span className="sr-only">, {ay.label}</span>
                         </Link>
                       ) : (
-                        <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
+                        <span className="text-gray-300 text-xs">—</span>
                       )}
                     </td>
                   </tr>
