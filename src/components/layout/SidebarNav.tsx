@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { classNames } from "@/lib/utils/styles";
-import { LogOut } from "lucide-react";
-import { signOut } from "@/app/(auth)/login/actions";
 import { isNavigationItemActive, primaryNavigation, settingsNavigationItem } from "@/components/layout/navigation";
 
 export function SidebarNav({ className }: { className?: string }) {
@@ -69,18 +67,6 @@ export function SidebarNav({ className }: { className?: string }) {
           />
           {settingsNavigationItem.name}
         </Link>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
-          >
-            <LogOut
-              className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary"
-              aria-hidden="true"
-            />
-            Sign out
-          </button>
-        </form>
       </div>
     </div>
   );

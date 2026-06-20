@@ -17,12 +17,41 @@ import {
   settingsNavigationItem,
 } from "@/components/layout/navigation";
 
-export function TopUtilityBar({ className }: { className?: string }) {
+export function TopUtilityBar({
+  className,
+  user,
+}: {
+  className?: string;
+  user: {
+    id: string;
+    email: string | null;
+    fullName: string | null;
+    avatarUrl: string | null;
+  };
+}) {
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsDropdownOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const triggerButton = triggerButtonRef.current;
@@ -35,6 +64,7 @@ export function TopUtilityBar({ className }: { className?: string }) {
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
 
+    // Rest of the existing keydown and listener logic
     function handleKeydown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsMobileNavOpen(false);
@@ -101,13 +131,65 @@ export function TopUtilityBar({ className }: { className?: string }) {
           <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
           <PrivacyToggle />
           <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
-          <button
-            type="button"
-            className="rounded-full text-text-muted hover:text-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
-            aria-label="Account menu"
+
+          <div
+            className="relative"
+            ref={dropdownRef}
+            onMouseEnter={() => setIsDropdownOpen(true)}
+            onMouseLeave={() => setIsDropdownOpen(false)}
           >
-            <UserCircle className="h-7 w-7" aria-hidden="true" />
-          </button>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              className="flex items-center rounded-full text-text-muted hover:text-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+              aria-label="Account menu"
+              aria-expanded={isDropdownOpen}
+              aria-haspopup="true"
+            >
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt="User avatar"
+                  className="h-7 w-7 rounded-full object-cover border border-border-subtle"
+                />
+              ) : (
+                <UserCircle className="h-7 w-7" aria-hidden="true" />
+              )}
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-[var(--radius-input)] bg-surface-panel shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 border border-border-subtle">
+                <div className="py-1">
+                  <div className="px-4 py-2 border-b border-border-subtle">
+                    <p className="text-sm font-semibold text-text-primary truncate">
+                      {user.fullName || "User"}
+                    </p>
+                    <p className="text-xs text-text-muted truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <Link
+                    href="/settings/profile"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex w-full items-center px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+                  >
+                    <UserCircle className="mr-3 h-4 w-4 text-text-muted" />
+                    Admin Profile
+                  </Link>
+                  <form action={signOut}>
+                    <button
+                      type="submit"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex w-full items-center px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover hover:text-text-primary text-left"
+                    >
+                      <LogOut className="mr-3 h-4 w-4 text-text-muted" />
+                      Log Out
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 

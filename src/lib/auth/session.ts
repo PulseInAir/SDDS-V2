@@ -8,6 +8,8 @@ export type AuthenticatedWorkspaceSession = {
   user: {
     id: string;
     email: string | null;
+    fullName: string | null;
+    avatarUrl: string | null;
   };
   workspace: {
     id: string;
@@ -52,6 +54,8 @@ export async function getAuthenticatedWorkspaceSession(): Promise<AuthenticatedW
     user: {
       id: user.id,
       email: user.email ?? null,
+      fullName: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
+      avatarUrl: user.user_metadata?.avatar_url ?? null,
     },
     workspace: {
       id: workspace.id,

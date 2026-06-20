@@ -2,7 +2,18 @@ import { ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { TopUtilityBar } from "./TopUtilityBar";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: {
+    id: string;
+    email: string | null;
+    fullName: string | null;
+    avatarUrl: string | null;
+  };
+}) {
   return (
     <div className="flex min-h-dvh w-full bg-surface-app">
       <a href="#main-content" className="skip-link">
@@ -10,7 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
       <SidebarNav className="print:hidden" />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden print:overflow-visible">
-        <TopUtilityBar className="print:hidden" />
+        <TopUtilityBar user={user} className="print:hidden" />
         <main
           id="main-content"
           tabIndex={-1}

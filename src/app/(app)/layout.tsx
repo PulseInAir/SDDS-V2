@@ -17,7 +17,7 @@ export default async function AppLayout({
       initialAssessmentYearId={shellContext.selectedAssessmentYearId}
       initialPrivacyMode={shellContext.isPrivacyMode}
     >
-      <AppShell>
+      <AppShell user={session.user}>
         {children}
       </AppShell>
     </AppContextProvider>
