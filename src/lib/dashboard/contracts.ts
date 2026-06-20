@@ -164,35 +164,13 @@ function isOverdueDate(value: string | null) {
   return new Date(`${value}T00:00:00`) < today;
 }
 
-function countDocumentsPendingCases(cases: DashboardCaseSnapshot[], documents: DashboardDocumentSnapshot[]) {
-  const impactedCaseIds = new Set<string>();
-
-  for (const filingCase of cases) {
-    if (filingCase.case_status === "Documents Pending") {
-      impactedCaseIds.add(filingCase.id);
-    }
-  }
-
-  for (const document of documents) {
-    if (document.case_id && DOCUMENT_EXCEPTION_STATUSES.has(document.checklist_status)) {
-      impactedCaseIds.add(document.case_id);
-    }
-  }
-
-  return impactedCaseIds.size;
-}
-
 function countAttentionCases(cases: DashboardCaseSnapshot[]) {
   return cases.filter((filingCase) => {
-    if (filingCase.case_status === "Rectification Required" || filingCase.case_status === "Notice Received") {
-      return true;
-    }
-
     if (filingCase.blocker?.trim()) {
       return true;
     }
 
-    if (filingCase.case_status === "Completed" || filingCase.case_status === "Cancelled") {
+    if (filingCase.case_status === "Filed" || filingCase.case_status === "Cancelled") {
       return false;
     }
 
