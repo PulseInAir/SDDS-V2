@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G39 — Resize and match invoice layout spacing (DONE)
+- Active task: G40 — Fix print layout page height spacing (IN_PROGRESS)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `e700f27`
+- HEAD: `e3a9edd`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`

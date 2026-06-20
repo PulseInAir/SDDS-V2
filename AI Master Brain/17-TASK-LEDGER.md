@@ -47,6 +47,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G37 | DONE | Resolve O-002 invoice layout and branding | SHELL-USER-MENU-01 | Replicate Invoice Format.png layout, configure logo, and payment details | `1f31b6f` |
 | G38 | DONE | Enhance invoice design with premium aesthetics | G37 | Apply sophisticated color blocks, grid alignments, spacing, and micro-shadows | `c2181ab` |
 | G39 | DONE | Resize and match invoice layout spacing | G38 | Match proportions, column widths, and spacing of Invoice Format.png | `e700f27` |
+| G40 | IN_PROGRESS | Fix print layout page height spacing | G39 | Eliminate white space at the bottom of the page in print preview | |
 
 ## Task update protocol
 
