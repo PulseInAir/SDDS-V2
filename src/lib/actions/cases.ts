@@ -10,6 +10,7 @@ import {
 } from '@/lib/validations/cases';
 import { VALID_TRANSITIONS, CaseStatus } from '@/lib/constants/workflows';
 import { ensureNextYearFollowUpForCase } from '@/lib/actions/follow-ups';
+import { getAuthenticatedWorkspaceSession } from '@/lib/auth/session';
 
 type FilingQueueQueryRow = {
   id: string;
@@ -301,4 +302,147 @@ export async function transitionFilingCase(
   revalidatePath('/follow-up');
 
   return { success: true };
+}
+
+// ── Assessment years with case state ──────────────────────────────────────────
+
+export async function getClientAssessmentYearsWithCases(clientId: string) {
+  const supabase = await createSupabaseServerClient();
+
+  // Fetch all workspace assessment years
+  const { data: years, error: yearsError } = await supabase
+    .from('assessment_years')
+    .select('id, label, start_date, end_date, is_current, is_open')
+    .order('start_date', { ascending: false });
+
+  if (yearsError) {
+    console.error('Error fetching assessment years:', yearsError);
+    return { years: [], cases: [] };
+  }
+
+  // Fetch existing cases for this client
+  const { data: cases, error: casesError } = await supabase
+    .from('filing_cases')
+    .select('id, assessment_year_id, case_status, next_action, due_date, updated_at')
+    .eq('client_id', clientId)
+    .is('archived_at', null);
+
+  if (casesError) {
+    console.error('Error fetching client cases:', casesError);
+    return { years: years ?? [], cases: [] };
+  }
+
+  return {
+    years: years ?? [],
+    cases: cases ?? [],
+  };
+}
+
+export type CreateCaseActionState = {
+  error?: string;
+  success?: string;
+  caseId?: string;
+};
+
+export async function createFilingCaseAction(
+  clientId: string,
+  assessmentYearId: string,
+): Promise<CreateCaseActionState> {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  if (!clientId || !assessmentYearId) {
+    return { error: 'Client and assessment year are required.' };
+  }
+
+  // Verify client belongs to this workspace
+  const { data: client, error: clientError } = await supabase
+    .from('clients')
+    .select('id')
+    .eq('workspace_id', session.workspace.id)
+    .eq('id', clientId)
+    .is('archived_at', null)
+    .single();
+
+  if (clientError || !client) {
+    return { error: 'Client not found in the active workspace.' };
+  }
+
+  // Verify AY belongs to this workspace
+  const { data: ay, error: ayError } = await supabase
+    .from('assessment_years')
+    .select('id, label')
+    .eq('workspace_id', session.workspace.id)
+    .eq('id', assessmentYearId)
+    .single();
+
+  if (ayError || !ay) {
+    return { error: 'Assessment year not found in the active workspace.' };
+  }
+
+  // Enforce one-case-per-client-per-AY
+  const { data: existing, error: existingError } = await supabase
+    .from('filing_cases')
+    .select('id')
+    .eq('workspace_id', session.workspace.id)
+    .eq('client_id', clientId)
+    .eq('assessment_year_id', assessmentYearId)
+    .is('archived_at', null)
+    .maybeSingle();
+
+  if (existingError) {
+    return { error: 'Could not check for existing cases. Please try again.' };
+  }
+
+  if (existing) {
+    return { error: `A filing case for ${ay.label} already exists for this client.` };
+  }
+
+  // Create case at initial status
+  const initialStatus: CaseStatus = 'New Client';
+
+  const { data: newCase, error: insertError } = await supabase
+    .from('filing_cases')
+    .insert({
+      workspace_id: session.workspace.id,
+      client_id: clientId,
+      assessment_year_id: assessmentYearId,
+      case_status: initialStatus,
+    })
+    .select('id')
+    .single();
+
+  if (insertError || !newCase) {
+    console.error('Error creating filing case:', insertError);
+    return { error: `Failed to create the filing case: ${insertError?.message ?? 'Unknown error'}` };
+  }
+
+  // Insert initial status history
+  await supabase.from('case_status_history').insert({
+    workspace_id: session.workspace.id,
+    case_id: newCase.id,
+    from_status: null,
+    to_status: initialStatus,
+    reason: 'Case created.',
+    changed_by: session.user.id,
+  });
+
+  // Record activity
+  await supabase.from('activity_events').insert({
+    workspace_id: session.workspace.id,
+    actor_id: session.user.id,
+    client_id: clientId,
+    case_id: newCase.id,
+    entity_type: 'filing_case',
+    entity_id: newCase.id,
+    action: 'case_created',
+    message: `Filing case for ${ay.label} created.`,
+  });
+
+  revalidatePath(`/clients/${clientId}`);
+  revalidatePath(`/clients/${clientId}/assessment-years`);
+  revalidatePath(`/clients/${clientId}/filings`);
+  revalidatePath('/filing-queue');
+
+  return { success: `Filing case for ${ay.label} created.`, caseId: newCase.id };
 }
