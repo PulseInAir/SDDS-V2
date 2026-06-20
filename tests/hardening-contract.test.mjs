@@ -37,7 +37,7 @@ test("G32 filing queue query paginates at the database layer and keeps attention
 
   assert.match(casesAction, /\.range\(from, to\)/);
   assert.match(casesAction, /blocker_note/);
-  assert.match(casesAction, /case_status\.eq\.Rectification Required/);
+  assert.match(casesAction, /case_status\.not\.in\.\(Filed,Cancelled\)/);
   assert.doesNotMatch(filingQueueFunction, /\.select\(`\s*\*,/);
   assert.match(caseBoard, /useMemo/);
   assert.match(caseTable, /focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2/);

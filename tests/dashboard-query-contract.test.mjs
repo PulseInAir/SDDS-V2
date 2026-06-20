@@ -12,13 +12,7 @@ test("G26 dashboard contract defines every locked metric with a concrete destina
   for (const metricId of [
     "active_clients",
     "new_yet_to_start",
-    "documents_pending",
-    "verification_pending",
-    "computation_in_progress",
-    "approval_pending",
-    "ready_to_file",
-    "filed_not_complete",
-    "completed",
+    "filed",
     "attention_cases",
     "refunds_pending",
     "notices_due",
@@ -31,7 +25,6 @@ test("G26 dashboard contract defines every locked metric with a concrete destina
     assert.match(contracts, new RegExp(`id: "${metricId}"`));
   }
 
-  assert.match(contracts, /destination: "\/documents\?scope=exceptions"/);
   assert.match(contracts, /destination: "\/filing-queue\?scope=attention"/);
   assert.match(contracts, /destination: "\/invoices\?scope=billed"/);
   assert.match(contracts, /destination: "\/invoices\?scope=received"/);
@@ -45,7 +38,6 @@ test("G26 dashboard contract defines every locked metric with a concrete destina
 test("G26 dashboard metric helpers reconcile workflow, document, financial, refund, notice, and follow-up sources", async () => {
   const contracts = await read("src/lib/dashboard/contracts.ts");
 
-  assert.match(contracts, /countDocumentsPendingCases/);
   assert.match(contracts, /countAttentionCases/);
   assert.match(contracts, /summarizeInvoices/);
   assert.match(contracts, /deriveRefundAttention/);

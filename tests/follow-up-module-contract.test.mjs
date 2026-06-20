@@ -27,7 +27,7 @@ test("G23 case completion requires next-year follow-up creation before closing",
   const casesAction = await read("src/lib/actions/cases.ts");
 
   assert.match(casesAction, /ensureNextYearFollowUpForCase/);
-  assert.match(casesAction, /toStatus === 'Completed'/);
+  assert.match(casesAction, /toStatus === 'Filed'/);
 });
 
 test("G23 follow-up content exposes exclusion, reactivation, WhatsApp launch, and contact logging", async () => {
