@@ -101,8 +101,12 @@ export async function getFilingQueueCases(params: {
     next_action: filingCase.next_action,
     due_date: filingCase.due_date,
     updated_at: filingCase.updated_at,
-    clients: filingCase.clients[0] ?? null,
-    assessment_years: filingCase.assessment_years[0] ?? null,
+    clients: Array.isArray(filingCase.clients) 
+      ? (filingCase.clients[0] ?? null) 
+      : (filingCase.clients ?? null),
+    assessment_years: Array.isArray(filingCase.assessment_years)
+      ? (filingCase.assessment_years[0] ?? null)
+      : (filingCase.assessment_years ?? null),
     blocker: filingCase.blocker_note?.trim() || filingCase.blocker_code?.trim() || null,
   }));
   const scopedCount = count ?? cases.length;
