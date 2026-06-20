@@ -4,25 +4,25 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G38 — Enhance invoice design with premium aesthetics (IN_PROGRESS)
+- Active task: G38 — Enhance invoice design with premium aesthetics (DONE)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `3d186f2`
+- HEAD: `c2181ab`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## G37 result (2026-06-20)
+## G38 result (2026-06-20)
 
-**Status: DONE — resolved O-002 invoice layout and branding.**
+**Status: DONE — enhanced invoice design with premium award-winning aesthetics.**
 
 ### Verification steps completed:
-1. **Invoice Spec Layout**: Implemented the two-column olive/cream design matching `Invoice Format.png` exactly, with Single Digit Data Solutions issuer details, GST fields omitted, and signature block excluded.
-2. **Client Preview**: Embedded a client preview view toggled via header tabs so admins can see exactly how the client gets the invoice directly on screen, plus print styling mapping directly to the new specification.
-3. **Dynamic QR Code**: Added a dynamic UPI payment QR code generated from payment data and the CSP allowed domain.
-4. **Decisions Logs & Verification**: Logged D-020, closed O-002, and ran the validation check ensuring all 77 checks pass.
+1. **Premium Palette & Canvas**: Applied deep forest green (`#23381B`) and warm sand-cream (`#FAF7F0`) backgrounds with sand-gold dividers (`#E5DFD3`) for a high-end minimalist appearance.
+2. **Refined Typography**: Overhauled spacing, scale, and layout utilizing clean letter-spaced headings (`tracking-[0.35em]`) and a neat layout grid.
+3. **Enhanced Component Layout**: Added luxury logo cards, borderless rows with elegant cell spacing, a double-underlined balance summary, a dedicated payment details card, and a scan-to-pay QR block.
+4. **Gates & Verification**: Ran the full test check pipeline, ensuring all 77 checks pass.
 
 ## Exact next action
 
