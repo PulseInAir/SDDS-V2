@@ -235,24 +235,12 @@ function daysUntil(value: string | null) {
 }
 
 function getCaseAttentionReason(filingCase: DashboardCaseRecord) {
-  if (filingCase.case_status === "Rectification Required") {
-    return "Rectification required";
-  }
-
-  if (filingCase.case_status === "Notice Received") {
-    return "Notice received";
-  }
-
   if (filingCase.blocker) {
     return filingCase.blocker;
   }
 
   if (isOverdueDate(filingCase.due_date)) {
     return "Case due date has passed";
-  }
-
-  if (filingCase.case_status === "Ready To File") {
-    return "Ready to file";
   }
 
   if (daysUntil(filingCase.due_date) <= 2) {
@@ -263,20 +251,12 @@ function getCaseAttentionReason(filingCase: DashboardCaseRecord) {
 }
 
 function getUrgencyScore(filingCase: DashboardCaseRecord) {
-  if (filingCase.case_status === "Rectification Required" || filingCase.case_status === "Notice Received") {
-    return 0;
-  }
-
   if (filingCase.blocker) {
     return 1;
   }
 
   if (isOverdueDate(filingCase.due_date)) {
     return 2;
-  }
-
-  if (filingCase.case_status === "Ready To File") {
-    return 3;
   }
 
   if (daysUntil(filingCase.due_date) <= 2) {
