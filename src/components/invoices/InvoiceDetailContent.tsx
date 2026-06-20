@@ -25,123 +25,133 @@ function BrandedInvoiceLayout({ invoice }: { invoice: InvoiceDetail }) {
   const emptyRowCount = Math.max(0, minRows - items.length);
 
   return (
-    <div className="flex flex-col sm:flex-row min-h-[297mm] bg-[#FFF2D3] text-black font-sans shadow-none">
-      {/* Left Column: Olive Green */}
-      <div className="w-full sm:w-[30%] bg-[#476A30] text-white p-6 flex flex-col items-center border-b sm:border-b-0 sm:border-r border-gray-300">
-        <h1 className="text-3xl font-extrabold tracking-[0.2em] uppercase text-center mt-4">
-          INVOICE
-        </h1>
-        
-        {/* Logo Container */}
-        <div className="mt-8 bg-[#D5AD4E] p-3 rounded-lg border-4 border-[#610B35] flex items-center justify-center w-36 h-36">
-          <img src="/Logo.png" alt="SDDS Logo" className="object-contain w-full h-full" />
+    <div className="flex flex-col sm:flex-row min-h-[297mm] bg-[#FAF7F0] text-neutral-900 font-sans shadow-none">
+      {/* Left Column: Forest Green (Branding & Identity) */}
+      <div className="w-full sm:w-[32%] bg-[#23381B] text-white p-8 flex flex-col items-center justify-between border-b sm:border-b-0 sm:border-r border-[#E5DFD3]">
+        <div className="flex flex-col items-center w-full">
+          <h1 className="text-2xl font-black tracking-[0.35em] text-[#D5AD4E] uppercase text-center mt-6">
+            INVOICE
+          </h1>
+          <div className="h-0.5 w-12 bg-[#D5AD4E] mt-4 opacity-75"></div>
+          
+          {/* Logo Container: Luxury card styling */}
+          <div className="mt-10 bg-[#D5AD4E] p-3.5 rounded-2xl border-[3px] border-[#4A102A] flex items-center justify-center w-36 h-36 shadow-lg transform transition-transform hover:scale-102">
+            <img src="/Logo.png" alt="SDDS Logo" className="object-contain w-full h-full" />
+          </div>
         </div>
 
-        {/* Issuer Details */}
-        <div className="mt-12 text-center text-sm font-semibold leading-relaxed space-y-1">
-          <p className="font-bold text-base text-white">Single Digit Data Solutions</p>
-          <p className="text-white/90">Duliajan</p>
-          <p className="text-white/90">Dibrugarh, Assam</p>
+        {/* Issuer Details: Clean, structured modern block */}
+        <div className="mt-16 sm:mt-0 mb-6 text-center text-xs tracking-wide leading-relaxed space-y-1.5 w-full">
+          <div className="h-px w-full bg-white/10 my-4 sm:hidden"></div>
+          <p className="font-bold text-sm text-[#D5AD4E]">Single Digit Data Solutions</p>
+          <p className="text-white/80">Duliajan</p>
+          <p className="text-white/80">Dibrugarh, Assam</p>
         </div>
       </div>
 
-      {/* Right Column: Cream */}
-      <div className="w-full sm:w-[70%] p-8 flex flex-col justify-between">
+      {/* Right Column: Warm Sand-Cream (Details, Table, Financials) */}
+      <div className="w-full sm:w-[68%] p-8 sm:p-10 flex flex-col justify-between">
         <div>
-          {/* Client and Invoice Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold">Bill To :-</h3>
-              <p className="text-lg font-bold text-gray-900">{invoice.clients?.full_name ?? "Unknown client"}</p>
-              <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{invoice.clients?.address ?? "Address not recorded"}</p>
+          {/* Header Block: Client & Invoice Info */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-[#E5DFD3] pb-8">
+            <div className="space-y-2">
+              <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-extrabold">Bill To :-</h3>
+              <p className="text-xl font-bold text-neutral-900 leading-tight">{invoice.clients?.full_name ?? "Unknown client"}</p>
+              <p className="text-sm text-neutral-600 whitespace-pre-line leading-relaxed max-w-sm">{invoice.clients?.address ?? "Address not recorded"}</p>
             </div>
-            <div className="space-y-1 text-left sm:text-right">
-              <div className="flex sm:justify-end gap-2 text-sm">
-                <span className="font-bold text-gray-700">Date :-</span>
-                <span className="text-gray-900">{formatInvoiceDate(invoice.issue_date ?? invoice.created_at)}</span>
+            <div className="space-y-2.5 text-left sm:text-right min-w-[200px]">
+              <div className="flex sm:justify-end items-baseline gap-2.5">
+                <span className="text-xs uppercase tracking-[0.1em] text-neutral-400 font-bold">Date :-</span>
+                <span className="text-sm font-semibold text-neutral-800">{formatInvoiceDate(invoice.issue_date ?? invoice.created_at)}</span>
               </div>
-              <div className="flex sm:justify-end gap-2 text-sm">
-                <span className="font-bold text-gray-700">Invoice No. :-</span>
-                <span className="font-mono text-gray-900">{invoice.invoice_number}</span>
+              <div className="flex sm:justify-end items-baseline gap-2.5">
+                <span className="text-xs uppercase tracking-[0.1em] text-neutral-400 font-bold">Invoice No. :-</span>
+                <span className="text-sm font-bold font-mono text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">{invoice.invoice_number}</span>
               </div>
             </div>
           </div>
 
-          {/* Line Items Table */}
+          {/* Line Items Table: Minimalist award-winning grid */}
           <div className="mt-8 overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 text-sm min-w-[500px]">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
-                <tr className="bg-gray-100/50">
-                  <th className="border border-gray-300 px-3 py-2 text-left font-bold text-gray-700 w-16">Sl. No.</th>
-                  <th className="border border-gray-300 px-3 py-2 text-left font-bold text-gray-700 font-sans">DESCRIPTION</th>
-                  <th className="border border-gray-300 px-3 py-2 text-right font-bold text-gray-700 w-32 font-sans">TOTAL</th>
+                <tr className="border-b-2 border-[#E5DFD3] text-left">
+                  <th className="py-3.5 text-xs uppercase tracking-[0.15em] text-neutral-400 font-extrabold w-16">Sl. No.</th>
+                  <th className="py-3.5 text-xs uppercase tracking-[0.15em] text-neutral-400 font-extrabold">DESCRIPTION</th>
+                  <th className="py-3.5 text-xs uppercase tracking-[0.15em] text-neutral-400 font-extrabold text-right w-36">TOTAL</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-[#E5DFD3]/40">
                 {items.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className="border border-gray-300 px-3 py-2 text-center text-gray-900">{index + 1}</td>
-                    <td className="border border-gray-300 px-3 py-2 text-gray-900">{item.description}</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right font-mono text-gray-900">
+                  <tr key={item.id} className="hover:bg-neutral-50/50 transition-colors">
+                    <td className="py-4 font-mono text-xs text-neutral-500 font-semibold">{index + 1}</td>
+                    <td className="py-4 text-neutral-800 font-medium">{item.description}</td>
+                    <td className="py-4 text-right font-bold text-neutral-950 font-mono">
                       <MoneyValue value={Number(item.line_amount ?? 0)} forceVisible={true} />
                     </td>
                   </tr>
                 ))}
                 {Array.from({ length: emptyRowCount }).map((_, i) => (
-                  <tr key={`empty-${i}`} className="h-9">
-                    <td className="border border-gray-300 px-3 py-2 text-center text-gray-400">&nbsp;</td>
-                    <td className="border border-gray-300 px-3 py-2 text-gray-400">&nbsp;</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right font-mono text-gray-400">&nbsp;</td>
+                  <tr key={`empty-${i}`} className="h-12 opacity-35">
+                    <td className="py-4 font-mono text-xs text-neutral-300">&nbsp;</td>
+                    <td className="py-4 text-neutral-300 font-light">&nbsp;</td>
+                    <td className="py-4 text-right text-neutral-300 font-mono">&nbsp;</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* Calculations */}
-          <div className="mt-6 ml-auto max-w-xs space-y-2 text-sm text-gray-800">
-            <div className="flex justify-between font-bold font-sans">
-              <span>SUBTOTAL</span>
-              <span><MoneyValue value={Number(invoice.subtotal ?? 0)} forceVisible={true} /></span>
+          {/* Calculations Block */}
+          <div className="mt-8 ml-auto max-w-sm border-t-2 border-[#E5DFD3] pt-6 space-y-2.5 text-sm text-neutral-700">
+            <div className="flex justify-between items-center font-medium">
+              <span className="text-neutral-500 uppercase tracking-wider text-xs">SUBTOTAL</span>
+              <span className="font-mono text-neutral-900"><MoneyValue value={Number(invoice.subtotal ?? 0)} forceVisible={true} /></span>
             </div>
-            <div className="flex justify-between font-bold font-sans">
-              <span>DISCOUNT</span>
-              <span><MoneyValue value={Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
+            <div className="flex justify-between items-center font-medium">
+              <span className="text-neutral-500 uppercase tracking-wider text-xs">DISCOUNT</span>
+              <span className="font-mono text-[#A13A3A] font-semibold">-<MoneyValue value={Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
             </div>
-            <div className="flex justify-between font-bold font-sans">
-              <span>SUBTOTAL LESS DISCOUNT</span>
-              <span><MoneyValue value={Number(invoice.subtotal ?? 0) - Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
+            <div className="flex justify-between items-center font-medium">
+              <span className="text-neutral-500 uppercase tracking-wider text-xs">SUBTOTAL LESS DISCOUNT</span>
+              <span className="font-mono text-neutral-900 font-semibold"><MoneyValue value={Number(invoice.subtotal ?? 0) - Number(invoice.discount_amount ?? 0)} forceVisible={true} /></span>
             </div>
-            <div className="flex justify-between font-bold font-sans">
-              <span>Advance Paid</span>
-              <span><MoneyValue value={invoice.paidAmount} forceVisible={true} /></span>
+            <div className="flex justify-between items-center font-medium">
+              <span className="text-neutral-500 uppercase tracking-wider text-xs">Advance Paid</span>
+              <span className="font-mono text-neutral-900"><MoneyValue value={invoice.paidAmount} forceVisible={true} /></span>
             </div>
-            <div className="flex justify-between font-bold text-base border-b-4 border-double border-gray-900 pb-1 font-sans">
-              <span>Balance Due</span>
-              <span><MoneyValue value={invoice.balanceAmount} forceVisible={true} /></span>
+            <div className="flex justify-between items-center font-bold text-base border-t border-b-4 border-double border-neutral-900 py-3.5 my-2">
+              <span className="tracking-wide text-neutral-900">Balance Due</span>
+              <span className="font-mono text-[#23381B] text-lg font-black"><MoneyValue value={invoice.balanceAmount} forceVisible={true} /></span>
             </div>
           </div>
         </div>
 
-        {/* Footer: Payment Details & QR Code */}
-        <div className="mt-8 flex justify-between items-end border-t border-gray-300 pt-6">
-          <div className="space-y-2 text-sm">
-            <h4 className="font-bold text-gray-700 font-sans">Payment Details :-</h4>
-            <div className="flex gap-2">
-              <span className="font-bold text-gray-600">UPI ID -</span>
-              <a href="upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions" className="text-blue-600 font-bold underline">8011626740@ybl</a>
-            </div>
-            <div className="flex gap-2">
-              <span className="font-bold text-gray-600">UPI No. -</span>
-              <span className="text-gray-900 font-bold">8011626740</span>
+        {/* Footer Details: UPI Info & QR Code Card */}
+        <div className="mt-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 border-t border-[#E5DFD3] pt-8">
+          <div className="space-y-3 bg-[#F3ECE0] border border-[#E5DFD3]/60 p-5 rounded-2xl w-full sm:max-w-xs shadow-sm">
+            <h4 className="font-black text-xs uppercase tracking-[0.15em] text-[#23381B] border-b border-[#E5DFD3]/80 pb-2">
+              Payment Details :-
+            </h4>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between items-baseline">
+                <span className="text-neutral-500 font-semibold uppercase tracking-wider">UPI ID</span>
+                <a href="upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions" className="text-blue-600 font-bold hover:underline transition-colors">
+                  8011626740@ybl
+                </a>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-neutral-500 font-semibold uppercase tracking-wider">UPI No.</span>
+                <span className="text-neutral-900 font-bold font-mono">8011626740</span>
+              </div>
             </div>
           </div>
 
-          <div>
+          <div className="bg-white border border-[#E5DFD3] p-3 rounded-2xl shadow-md self-center sm:self-auto hover:shadow-lg transition-shadow">
             <img 
               src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions&am=${invoice.balanceAmount}&cu=INR`)}`} 
               alt="Payment QR Code" 
-              className="w-28 h-28 border border-gray-300 p-1 bg-white object-contain"
+              className="w-28 h-28 object-contain"
             />
           </div>
         </div>

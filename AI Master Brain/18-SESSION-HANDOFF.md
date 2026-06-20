@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G37 — Resolve O-002 invoice layout and branding (DONE)
+- Active task: G38 — Enhance invoice design with premium aesthetics (IN_PROGRESS)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `1f31b6f`
+- HEAD: `3d186f2`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
