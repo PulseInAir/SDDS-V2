@@ -46,6 +46,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | SHELL-USER-MENU-01 | DONE | User menu relocation and profile-management entry point | G36 | Sidebar no longer contains Sign Out, top-right avatar opens menu with Admin Profile and Log Out, Profile image and password updates work | `e1a8462a1865be4cda7be4ad0eff23ff01b126d0` |
 | G37 | DONE | Resolve O-002 invoice layout and branding | SHELL-USER-MENU-01 | Replicate Invoice Format.png layout, configure logo, and payment details | `1f31b6f` |
 | G38 | DONE | Enhance invoice design with premium aesthetics | G37 | Apply sophisticated color blocks, grid alignments, spacing, and micro-shadows | `c2181ab` |
+| G39 | IN_PROGRESS | Resize and match invoice layout spacing | G38 | Match proportions, column widths, and spacing of Invoice Format.png | |
 
 ## Task update protocol
 

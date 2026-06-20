@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G38 — Enhance invoice design with premium aesthetics (DONE)
+- Active task: G39 — Resize and match invoice layout spacing (IN_PROGRESS)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `c2181ab`
+- HEAD: `dbfcddd`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
