@@ -4,25 +4,25 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G37 — Resolve O-002 invoice layout and branding (IN_PROGRESS)
+- Active task: G37 — Resolve O-002 invoice layout and branding (DONE)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `e1a8462a1865be4cda7be4ad0eff23ff01b126d0`
+- HEAD: `1f31b6f`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## SHELL-USER-MENU-01 result (2026-06-20)
+## G37 result (2026-06-20)
 
-**Status: DONE — relocated user menu trigger and implemented admin profile page.**
+**Status: DONE — resolved O-002 invoice layout and branding.**
 
 ### Verification steps completed:
-1. **Sidebar Navigation**: Removed "Sign out" button from sidebar.
-2. **User Menu Dropdown**: Top-right User icon opens dropdown on hover/click with Admin Profile link and Log Out action. Dropdown closes on outside click or nav selection.
-3. **Admin Profile Page**: Created `/settings/profile` featuring Edit Profile, Password Change, base64 Avatar Image Upload, and User Management grid placeholder with warning alert documenting blocker D-012.
-4. **Build & Quality Gates**: Verified clean typescript check and production Turbopack build.
+1. **Invoice Spec Layout**: Implemented the two-column olive/cream design matching `Invoice Format.png` exactly, with Single Digit Data Solutions issuer details, GST fields omitted, and signature block excluded.
+2. **Client Preview**: Embedded a client preview view toggled via header tabs so admins can see exactly how the client gets the invoice directly on screen, plus print styling mapping directly to the new specification.
+3. **Dynamic QR Code**: Added a dynamic UPI payment QR code generated from payment data and the CSP allowed domain.
+4. **Decisions Logs & Verification**: Logged D-020, closed O-002, and ran the validation check ensuring all 77 checks pass.
 
 ## Exact next action
 

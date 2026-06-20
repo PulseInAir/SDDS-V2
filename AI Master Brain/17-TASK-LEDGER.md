@@ -44,7 +44,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G35 | DONE | Production release and post-release smoke test | G34 | production healthy, evidence and rollback retained | `ebc6636` |
 | G36 | DONE | Post-production live-data iteration triage | G35 | real-usage issues catalogued, prioritised, and resolved; no speculative pre-production work | `5a12053` |
 | SHELL-USER-MENU-01 | DONE | User menu relocation and profile-management entry point | G36 | Sidebar no longer contains Sign Out, top-right avatar opens menu with Admin Profile and Log Out, Profile image and password updates work | `e1a8462a1865be4cda7be4ad0eff23ff01b126d0` |
-| G37 | IN_PROGRESS | Resolve O-002 invoice layout and branding | SHELL-USER-MENU-01 | Replicate Invoice Format.png layout, configure logo, and payment details | |
+| G37 | DONE | Resolve O-002 invoice layout and branding | SHELL-USER-MENU-01 | Replicate Invoice Format.png layout, configure logo, and payment details | `1f31b6f` |
 
 ## Task update protocol
 
