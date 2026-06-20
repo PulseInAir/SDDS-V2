@@ -65,8 +65,12 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {clients.map((client) => (
-              <tr key={client.id} className="hover:bg-gray-50 transition-colors">
+             {clients.map((client) => (
+              <tr
+                key={client.id}
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => router.push(`/clients/${client.id}`)}
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="font-medium text-gray-900">{client.full_name}</div>
                 </td>
@@ -83,7 +87,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                     {client.active ? 'Active' : 'Inactive'}
                   </StatusBadge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                   <Link href={`/clients/${client.id}`} className="inline-flex items-center text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors">
                     <Edit className="w-4 h-4 mr-1.5" />
                     Edit
