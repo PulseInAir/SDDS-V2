@@ -4,25 +4,26 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G41 — Implement fixed full-page print overlay (DONE)
+- Active task: G42 — Fix profile avatar JWT cookie size bloat (DONE)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `1616b3f`
+- HEAD: `e700492`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## G41 result (2026-06-20)
+## G42 result (2026-06-20)
 
-**Status: DONE — implemented fixed full-page print overlay layout.**
+**Status: DONE — resolved profile avatar JWT size bloat.**
 
 ### Verification steps completed:
-1. **Fixed Position Overlay**: Updated the media print stylesheet to position `#invoice-print-only` as a fixed overlay at (0,0) spanning `100%` width and height.
-2. **Child Height Stretch**: Set the inner invoice element to render with `className="h-full"` to occupy the complete viewport height and remove blank lower page spaces.
-3. **Gates & Verification**: Ran the full type-check and check pipeline, ensuring all 77 checks pass and build compiles cleanly.
+1. **Migration Applied**: Added migration `20260620160000_profile_avatars_storage.sql` to configure the public `sdds-avatars` bucket and policies. Applied successfully.
+2. **Server Action Refactored**: Updated `updateProfileImageAction` in `src/lib/actions/profile.ts` to decode base64, save to the storage bucket, and write the public storage URL to `user_metadata.avatar_url`.
+3. **Quality Gates & Tests**: Ran `npm run check` successfully. All 77 unit tests passed.
 
 ## Exact next action
 
 None. All scheduled release tasks and post-production triage in the ledger are complete.
+

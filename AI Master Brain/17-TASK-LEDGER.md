@@ -49,6 +49,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G39 | DONE | Resize and match invoice layout spacing | G38 | Match proportions, column widths, and spacing of Invoice Format.png | `e700f27` |
 | G40 | DONE | Fix print layout page height spacing | G39 | Eliminate white space at the bottom of the page in print preview | `c6952b3` |
 | G41 | DONE | Implement fixed full-page print overlay | G40 | Position print layout fixed at 100% width and height to remove white space offsets | `1616b3f` |
+| G42 | DONE | Fix profile avatar JWT cookie size bloat | SHELL-USER-MENU-01 | Migrate profile avatars out of auth metadata JWT into public storage bucket | `e700492` |
+
 
 ## Task update protocol
 
