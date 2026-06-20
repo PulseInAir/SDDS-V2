@@ -177,7 +177,6 @@ export function TopUtilityBar({
                   <form action={signOut}>
                     <button
                       type="submit"
-                      onClick={() => setIsDropdownOpen(false)}
                       className="flex w-full items-center px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover hover:text-text-primary text-left"
                     >
                       <LogOut className="mr-3 h-4 w-4 text-text-muted" />
