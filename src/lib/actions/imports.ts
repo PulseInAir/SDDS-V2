@@ -6,49 +6,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { getAuthenticatedWorkspaceSession } from "@/lib/auth/session";
-import { parseCsv } from "@/lib/imports/csv";
+import { parseCsv, CSV_HEADERS } from "@/lib/imports/csv";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MAX_IMPORT_SIZE_BYTES = 1024 * 1024;
-
-const CSV_HEADERS = [
-  "client_full_name",
-  "pan",
-  "date_of_birth",
-  "mobile",
-  "email",
-  "address",
-  "family_group",
-  "assessment_year",
-  "case_status",
-  "return_category",
-  "next_action",
-  "due_date",
-  "expected_completion_date",
-  "blocker_code",
-  "blocker_note",
-  "follow_up_excluded",
-  "filing_kind",
-  "filing_date",
-  "acknowledgement_number",
-  "verification_status",
-  "verification_date",
-  "processing_status",
-  "filing_notes",
-  "source_invoice_reference",
-  "invoice_issue_date",
-  "invoice_due_date",
-  "invoice_item_description",
-  "invoice_item_quantity",
-  "invoice_item_unit_amount",
-  "invoice_discount_amount",
-  "invoice_notes",
-  "payment_date",
-  "payment_amount",
-  "payment_mode",
-  "payment_reference",
-  "payment_note",
-] as const;
 
 const CASE_STATUSES = new Set([
   "New Client",

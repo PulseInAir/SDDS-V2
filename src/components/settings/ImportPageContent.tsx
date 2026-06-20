@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, FileSpreadsheet, History, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Download, FileSpreadsheet, History, TriangleAlert } from "lucide-react";
 
 import type { getImportPageData } from "@/lib/actions/imports";
 import { ImportCommitForm } from "@/components/settings/ImportCommitForm";
@@ -73,10 +73,24 @@ export function ImportPageContent({ data }: { data: ImportPageData }) {
 
             <div className="space-y-4 px-5 py-4">
               <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-                <p className="text-sm font-medium text-text-primary">Headers</p>
-                <p className="mt-2 break-words font-mono text-xs leading-6 text-text-secondary">
-                  {data.templateHeaders.join(", ")}
-                </p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-text-primary">Headers</p>
+                    <p className="mt-2 break-words font-mono text-xs leading-6 text-text-secondary">
+                      {data.templateHeaders.join(", ")}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 self-start sm:self-center">
+                    <a
+                      href="/api/settings/import/template"
+                      download="sdds-import-template.csv"
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-[var(--radius-input)] border border-border-subtle bg-white px-3.5 text-sm font-medium text-text-primary shadow-sm transition-colors hover:bg-surface-hover"
+                    >
+                      <Download className="h-4 w-4 text-text-secondary" />
+                      Download template
+                    </a>
+                  </div>
+                </div>
               </div>
 
               <ul className="space-y-2 text-sm text-text-secondary">
