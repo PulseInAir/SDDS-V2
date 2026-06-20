@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          case_id: string | null
+          client_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          message: string
+          metadata: Json
+          workspace_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          case_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          message: string
+          metadata?: Json
+          workspace_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          case_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_events_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "activity_events_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "activity_events_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessment_years: {
         Row: {
           created_at: string
@@ -202,6 +266,66 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      communications: {
+        Row: {
+          archived_at: string | null
+          case_id: string | null
+          channel: string
+          client_id: string
+          communication_at: string
+          created_at: string
+          direction: string
+          id: string
+          recorded_by: string
+          subject: string | null
+          summary: string
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          case_id?: string | null
+          channel: string
+          client_id: string
+          communication_at?: string
+          created_at?: string
+          direction: string
+          id?: string
+          recorded_by: string
+          subject?: string | null
+          summary: string
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          case_id?: string | null
+          channel?: string
+          client_id?: string
+          communication_at?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          recorded_by?: string
+          subject?: string | null
+          summary?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communications_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "communications_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
           },
         ]
       }
@@ -463,6 +587,213 @@ export type Database = {
           },
         ]
       }
+      follow_ups: {
+        Row: {
+          archived_at: string | null
+          assessment_year_id: string | null
+          case_id: string | null
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          due_date: string
+          excluded_at: string | null
+          exclusion_reason: string | null
+          follow_up_type: string
+          id: string
+          next_action: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          assessment_year_id?: string | null
+          case_id?: string | null
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          due_date: string
+          excluded_at?: string | null
+          exclusion_reason?: string | null
+          follow_up_type: string
+          id?: string
+          next_action?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          assessment_year_id?: string | null
+          case_id?: string | null
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string
+          excluded_at?: string | null
+          exclusion_reason?: string | null
+          follow_up_type?: string
+          id?: string
+          next_action?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_ups_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "follow_ups_case_workspace_fk"
+            columns: ["workspace_id", "case_id"]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "follow_ups_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+        ]
+      }
+      import_jobs: {
+        Row: {
+          archived_at: string | null
+          committed_rows: number
+          completed_at: string | null
+          created_at: string
+          error_summary: Json
+          id: string
+          import_type: string
+          invalid_rows: number
+          source_filename: string
+          started_at: string
+          started_by: string
+          status: string
+          total_rows: number
+          valid_rows: number
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          committed_rows?: number
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: Json
+          id?: string
+          import_type: string
+          invalid_rows?: number
+          source_filename: string
+          started_at?: string
+          started_by: string
+          status?: string
+          total_rows?: number
+          valid_rows?: number
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          committed_rows?: number
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: Json
+          id?: string
+          import_type?: string
+          invalid_rows?: number
+          source_filename?: string
+          started_at?: string
+          started_by?: string
+          status?: string
+          total_rows?: number
+          valid_rows?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_jobs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_rows: {
+        Row: {
+          action: string
+          archived_at: string | null
+          committed_at: string | null
+          created_at: string
+          errors: Json
+          id: string
+          import_job_id: string
+          normalized_row: Json
+          outcome: Json
+          row_number: number
+          row_status: string
+          source_key: string
+          source_row: Json
+          workspace_id: string
+        }
+        Insert: {
+          action?: string
+          archived_at?: string | null
+          committed_at?: string | null
+          created_at?: string
+          errors?: Json
+          id?: string
+          import_job_id: string
+          normalized_row?: Json
+          outcome?: Json
+          row_number: number
+          row_status?: string
+          source_key: string
+          source_row?: Json
+          workspace_id: string
+        }
+        Update: {
+          action?: string
+          archived_at?: string | null
+          committed_at?: string | null
+          created_at?: string
+          errors?: Json
+          id?: string
+          import_job_id?: string
+          normalized_row?: Json
+          outcome?: Json
+          row_number?: number
+          row_status?: string
+          source_key?: string
+          source_row?: Json
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_rows_job_workspace_fk"
+            columns: ["workspace_id", "import_job_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "import_rows_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -694,6 +1025,216 @@ export type Database = {
           },
         ]
       }
+      refunds: {
+        Row: {
+          archived_at: string | null
+          assessment_year_id: string
+          case_id: string
+          client_id: string
+          created_at: string
+          expected_amount: number | null
+          expected_date: string | null
+          filing_record_id: string | null
+          id: string
+          last_checked_at: string | null
+          next_action: string | null
+          notes: string | null
+          received_amount: number | null
+          received_date: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          assessment_year_id: string
+          case_id: string
+          client_id: string
+          created_at?: string
+          expected_amount?: number | null
+          expected_date?: string | null
+          filing_record_id?: string | null
+          id?: string
+          last_checked_at?: string | null
+          next_action?: string | null
+          notes?: string | null
+          received_amount?: number | null
+          received_date?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          assessment_year_id?: string
+          case_id?: string
+          client_id?: string
+          created_at?: string
+          expected_amount?: number | null
+          expected_date?: string | null
+          filing_record_id?: string | null
+          id?: string
+          last_checked_at?: string | null
+          next_action?: string | null
+          notes?: string | null
+          received_amount?: number | null
+          received_date?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refunds_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "refunds_case_context_fk"
+            columns: [
+              "workspace_id",
+              "case_id",
+              "client_id",
+              "assessment_year_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: [
+              "workspace_id",
+              "id",
+              "client_id",
+              "assessment_year_id",
+            ]
+          },
+          {
+            foreignKeyName: "refunds_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "refunds_filing_record_workspace_fk"
+            columns: ["workspace_id", "case_id", "filing_record_id"]
+            isOneToOne: false
+            referencedRelation: "filing_records"
+            referencedColumns: ["workspace_id", "case_id", "id"]
+          },
+        ]
+      }
+      tax_events: {
+        Row: {
+          amount: number | null
+          archived_at: string | null
+          assessment_year_id: string
+          case_id: string
+          category: string
+          client_id: string
+          closure_date: string | null
+          created_at: string
+          event_type: string
+          filing_record_id: string | null
+          id: string
+          issue_date: string | null
+          next_action: string | null
+          notes: string | null
+          received_date: string | null
+          reference_number: string | null
+          response_due_date: string | null
+          status: string
+          submission_date: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          amount?: number | null
+          archived_at?: string | null
+          assessment_year_id: string
+          case_id: string
+          category: string
+          client_id: string
+          closure_date?: string | null
+          created_at?: string
+          event_type: string
+          filing_record_id?: string | null
+          id?: string
+          issue_date?: string | null
+          next_action?: string | null
+          notes?: string | null
+          received_date?: string | null
+          reference_number?: string | null
+          response_due_date?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          amount?: number | null
+          archived_at?: string | null
+          assessment_year_id?: string
+          case_id?: string
+          category?: string
+          client_id?: string
+          closure_date?: string | null
+          created_at?: string
+          event_type?: string
+          filing_record_id?: string | null
+          id?: string
+          issue_date?: string | null
+          next_action?: string | null
+          notes?: string | null
+          received_date?: string | null
+          reference_number?: string | null
+          response_due_date?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_events_assessment_year_workspace_fk"
+            columns: ["workspace_id", "assessment_year_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_years"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "tax_events_case_context_fk"
+            columns: [
+              "workspace_id",
+              "case_id",
+              "client_id",
+              "assessment_year_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "filing_cases"
+            referencedColumns: [
+              "workspace_id",
+              "id",
+              "client_id",
+              "assessment_year_id",
+            ]
+          },
+          {
+            foreignKeyName: "tax_events_client_workspace_fk"
+            columns: ["workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "tax_events_filing_record_workspace_fk"
+            columns: ["workspace_id", "case_id", "filing_record_id"]
+            isOneToOne: false
+            referencedRelation: "filing_records"
+            referencedColumns: ["workspace_id", "case_id", "id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           active: boolean
@@ -758,7 +1299,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_workspace_invoice_sequences: {
+        Args: { target_workspace_id: string }
+        Returns: {
+          assessment_year_id: string
+          next_serial: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
