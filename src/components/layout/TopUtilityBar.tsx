@@ -135,8 +135,6 @@ export function TopUtilityBar({
           <div
             className="relative"
             ref={dropdownRef}
-            onMouseEnter={() => setIsDropdownOpen(true)}
-            onMouseLeave={() => setIsDropdownOpen(false)}
           >
             <button
               type="button"
