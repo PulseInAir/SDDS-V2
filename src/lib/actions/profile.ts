@@ -105,7 +105,7 @@ export async function updateProfileImageAction(
   formData: FormData
 ): Promise<ProfileActionState> {
   try {
-    await getAuthenticatedWorkspaceSession();
+    const session = await getAuthenticatedWorkspaceSession();
     const supabase = await createSupabaseServerClient();
 
     const avatarUrl = String(formData.get("avatarUrl") ?? "").trim();
@@ -114,9 +114,55 @@ export async function updateProfileImageAction(
       return { error: "No profile image provided." };
     }
 
+    // Decode base64 image data url
+    const matches = avatarUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return { error: "Invalid image format." };
+    }
+
+    const contentType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, "base64");
+
+    // Determine extension
+    let extension = "png";
+    if (contentType.includes("jpeg") || contentType.includes("jpg")) {
+      extension = "jpg";
+    } else if (contentType.includes("gif")) {
+      extension = "gif";
+    } else if (contentType.includes("webp")) {
+      extension = "webp";
+    }
+
+    const userId = session.user.id;
+    const storagePath = `${userId}/avatar.${extension}`;
+
+    // Upload to sdds-avatars storage bucket
+    const { error: uploadError } = await supabase.storage
+      .from("sdds-avatars")
+      .upload(storagePath, buffer, {
+        contentType,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { error: `Failed to upload avatar: ${uploadError.message}` };
+    }
+
+    // Retrieve public URL
+    const { data: publicUrlData } = supabase.storage
+      .from("sdds-avatars")
+      .getPublicUrl(storagePath);
+
+    if (!publicUrlData || !publicUrlData.publicUrl) {
+      return { error: "Failed to generate public URL for avatar." };
+    }
+
+    const finalAvatarUrl = publicUrlData.publicUrl;
+
     const { error } = await supabase.auth.updateUser({
       data: {
-        avatar_url: avatarUrl,
+        avatar_url: finalAvatarUrl,
       },
     });
 
