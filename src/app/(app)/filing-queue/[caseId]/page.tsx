@@ -48,7 +48,7 @@ export default async function FilingCaseDetailPage({ params }: { params: Promise
         </nav>
         <div className="mt-4 md:flex md:items-center md:justify-between">
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+            <h2 className="text-2xl font-bold leading-normal text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
               {filingCase.clients?.full_name} - {filingCase.assessment_years?.label}
             </h2>
           </div>
