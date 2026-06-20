@@ -81,13 +81,13 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
             {cases.map((c) => (
               <tr key={c.id} className="hover:bg-surface-hover transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="font-medium text-text-primary">{c.clients.full_name}</div>
+                  <div className="font-medium text-text-primary">{c.clients?.full_name || 'Unknown Client'}</div>
                   <div className="text-sm text-text-muted mt-0.5">
-                    <MaskedValue value={c.clients.pan_uppercase} isPrivacyMode={isPrivacyMode} />
+                    <MaskedValue value={c.clients?.pan_uppercase || ''} isPrivacyMode={isPrivacyMode} />
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
-                  {c.assessment_years.label}
+                  {c.assessment_years?.label || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StatusBadge 
