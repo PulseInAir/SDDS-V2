@@ -85,7 +85,7 @@ export async function getFilingQueueCases(params: {
     // Non-attention scopes keep the canonical filing queue dataset and pagination.
   } else {
     query = query.or(
-      `case_status.eq.Rectification Required,case_status.eq.Notice Received,blocker_code.not.is.null,blocker_note.not.is.null,and(due_date.lt.${today},case_status.not.in.(Completed,Cancelled))`,
+      `blocker_code.not.is.null,blocker_note.not.is.null,and(due_date.lt.${today},case_status.not.in.(Filed,Cancelled))`
     );
   }
 
@@ -252,7 +252,7 @@ export async function transitionFilingCase(
     return { error: `Invalid transition from ${currentStatus} to ${toStatus}` };
   }
 
-  if (toStatus === 'Completed') {
+  if (toStatus === 'Filed') {
     const followUpResult = await ensureNextYearFollowUpForCase(caseId);
     if (!followUpResult.ok) {
       return { error: followUpResult.error };
@@ -272,7 +272,7 @@ export async function transitionFilingCase(
     .from('filing_cases')
     .update({
       case_status: toStatus,
-      completed_at: toStatus === 'Completed' ? new Date().toISOString() : null,
+      completed_at: toStatus === 'Filed' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', caseId);

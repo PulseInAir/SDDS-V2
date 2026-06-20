@@ -29,7 +29,6 @@ interface CaseBoardProps {
 const REASON_REQUIRED_STATUSES: CaseStatus[] = [
   'On Hold',
   'Cancelled',
-  'Rectification Required',
 ];
 
 function isCaseStatus(value: string): value is CaseStatus {

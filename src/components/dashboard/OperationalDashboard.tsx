@@ -24,8 +24,6 @@ type DashboardPageData = Awaited<ReturnType<typeof getOperationalDashboardData>>
 
 const ATTENTION_METRIC_IDS = [
   "attention_cases",
-  "documents_pending",
-  "ready_to_file",
   "refunds_pending",
   "notices_due",
   "follow_ups_due",
@@ -34,8 +32,7 @@ const ATTENTION_METRIC_IDS = [
 const SUMMARY_METRIC_IDS = [
   "active_clients",
   "new_yet_to_start",
-  "filed_not_complete",
-  "completed",
+  "filed",
 ] as const;
 
 const interactivePanelClassName =

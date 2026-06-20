@@ -14,13 +14,7 @@ import { deriveFollowUpAttention } from "@/lib/utils/follow-ups";
 export type DashboardMetricId =
   | "active_clients"
   | "new_yet_to_start"
-  | "documents_pending"
-  | "verification_pending"
-  | "computation_in_progress"
-  | "approval_pending"
-  | "ready_to_file"
-  | "filed_not_complete"
-  | "completed"
+  | "filed"
   | "attention_cases"
   | "refunds_pending"
   | "notices_due"
@@ -92,51 +86,15 @@ export const DASHBOARD_METRIC_DEFINITIONS: readonly DashboardMetricDefinition[] 
     destination: "/filing-queue?status=New+Client",
   },
   {
-    id: "documents_pending",
-    label: "Documents pending",
-    description: "Cases blocked on missing, requested, rejected, or replacement-needed documents.",
-    destination: "/documents?scope=exceptions",
-  },
-  {
-    id: "verification_pending",
-    label: "Verification pending",
-    description: "Cases in Verification Pending.",
-    destination: "/filing-queue?status=Verification+Pending",
-  },
-  {
-    id: "computation_in_progress",
-    label: "Computation in progress",
-    description: "Cases in Computation In Progress.",
-    destination: "/filing-queue?status=Computation+In+Progress",
-  },
-  {
-    id: "approval_pending",
-    label: "Approval pending",
-    description: "Cases in Client Approval Pending.",
-    destination: "/filing-queue?status=Client+Approval+Pending",
-  },
-  {
-    id: "ready_to_file",
-    label: "Ready to file",
-    description: "Cases ready for filing.",
-    destination: "/filing-queue?status=Ready+To+File",
-  },
-  {
-    id: "filed_not_complete",
-    label: "Filed, not complete",
-    description: "Cases filed but not yet completed.",
+    id: "filed",
+    label: "Filed",
+    description: "Cases successfully filed.",
     destination: "/filing-queue?status=Filed",
-  },
-  {
-    id: "completed",
-    label: "Completed",
-    description: "Cases fully completed.",
-    destination: "/filing-queue?status=Completed",
   },
   {
     id: "attention_cases",
     label: "Attention cases",
-    description: "Rectification, notice, blocked, or overdue filing cases.",
+    description: "Blocked or overdue filing cases.",
     destination: "/filing-queue?scope=attention",
   },
   {
@@ -278,13 +236,7 @@ export function deriveDashboardMetrics(snapshot: DashboardMetricsSnapshot) {
   return {
     active_clients: snapshot.cases.length,
     new_yet_to_start: snapshot.cases.filter((filingCase) => filingCase.case_status === "New Client").length,
-    documents_pending: countDocumentsPendingCases(snapshot.cases, snapshot.documents),
-    verification_pending: snapshot.cases.filter((filingCase) => filingCase.case_status === "Verification Pending").length,
-    computation_in_progress: snapshot.cases.filter((filingCase) => filingCase.case_status === "Computation In Progress").length,
-    approval_pending: snapshot.cases.filter((filingCase) => filingCase.case_status === "Client Approval Pending").length,
-    ready_to_file: snapshot.cases.filter((filingCase) => filingCase.case_status === "Ready To File").length,
-    filed_not_complete: snapshot.cases.filter((filingCase) => filingCase.case_status === "Filed").length,
-    completed: snapshot.cases.filter((filingCase) => filingCase.case_status === "Completed").length,
+    filed: snapshot.cases.filter((filingCase) => filingCase.case_status === "Filed").length,
     attention_cases: countAttentionCases(snapshot.cases),
     refunds_pending: snapshot.refunds.filter((refund) => deriveRefundAttention(refund) !== "resolved").length,
     notices_due: snapshot.notices.filter((event) => {
