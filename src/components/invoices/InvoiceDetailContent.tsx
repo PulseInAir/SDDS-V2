@@ -417,7 +417,7 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
       </div>
 
       <section id="invoice-print-only" className="hidden print:block w-full text-black bg-[#FFF2D3]">
-        <BrandedInvoiceLayout invoice={invoice} className="min-h-[297mm]" />
+        <BrandedInvoiceLayout invoice={invoice} className="h-full" />
       </section>
     </>
   );

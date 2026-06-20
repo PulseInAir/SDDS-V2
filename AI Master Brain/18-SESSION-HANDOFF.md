@@ -4,7 +4,7 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G40 — Fix print layout page height spacing (DONE)
+- Active task: G41 — Implement fixed full-page print overlay (IN_PROGRESS)
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
