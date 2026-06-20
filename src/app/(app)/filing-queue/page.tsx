@@ -40,7 +40,6 @@ export default async function FilingQueuePage({
   const params = await searchParams;
   const search = typeof params.search === 'string' ? params.search : '';
   const ay = typeof params.ay === 'string' ? params.ay : '';
-  const status = typeof params.status === 'string' ? params.status : '';
   const scope = typeof params.scope === 'string' ? params.scope : '';
   const requestedPage =
     typeof params.page === 'string' ? Number.parseInt(params.page, 10) : 1;
@@ -48,6 +47,10 @@ export default async function FilingQueuePage({
     ? requestedPage
     : 1;
   const view = params.view === 'board' ? 'board' : 'table';
+  const statusParam = typeof params.status === 'string' ? params.status : '';
+  const status = statusParam === 'all'
+    ? ''
+    : (statusParam || (view === 'table' ? 'Filing Queue' : ''));
 
   const data = await getFilingQueueCases({
     search,

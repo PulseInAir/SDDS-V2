@@ -88,12 +88,12 @@ export function FilingQueueFilters({ initialSearch, initialStatus, initialAy }: 
 
         <div className="relative">
           <select
-            value={initialStatus}
+            value={initialStatus || 'all'}
             onChange={(e) => handleFilterChange('status', e.target.value)}
             className="h-9 cursor-pointer appearance-none rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel py-1.5 pl-3 pr-8 text-sm font-medium text-text-primary shadow-sm outline-none transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600 w-full"
             aria-label="Filter by Status"
           >
-            <option value="">All Statuses</option>
+            <option value="all">All Statuses</option>
             {CASE_STATUSES.map((status) => (
               <option key={status} value={status}>
                 {status}
