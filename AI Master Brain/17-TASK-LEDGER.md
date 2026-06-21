@@ -55,7 +55,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DB-PURGE-01 | DONE | Purge test data for production go-live | CLIENT-ENH-01 | Truncate all client operational tables, reset sequence starting at 1, retain owner account | `2a3b56bbfc3e1a80da8d071f7a606db180204413` |
 | CLIENT-AUTO-ARCHIVE-01 | DONE | Mark client inactive and archive starting from AY 2026-27 if case not opened for straight three AYs | DB-PURGE-01 | Database trigger automatically archives inactive clients on current AY rollover; test validation passes | `e1acb64` |
 | CLIENT-UX-01 | DONE | Relocate Add Client button, make metric cards clickable for filtering, and add sorting to client list column headers | CLIENT-AUTO-ARCHIVE-01 | Filters removed, global Add Client button added, metrics filter list correctly, sorting working | `77bec92` |
-| INVOICE-SETTINGS-01 | DONE | Add workspace default invoice settings, rate cards, refund parsing patterns, and auto-population logic | CLIENT-UX-01 | Settings form implemented, API updated, rate card and refund charges populate dynamically | {commit_hash} |
+| INVOICE-SETTINGS-01 | DONE | Add workspace default invoice settings, rate cards, refund parsing patterns, and auto-population logic | CLIENT-UX-01 | Settings form implemented, API updated, rate card and refund charges populate dynamically | `296c41b` |
 
 
 
