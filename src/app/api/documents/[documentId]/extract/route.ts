@@ -32,26 +32,31 @@ async function extractWithGemini(
     // (gemini-1.5-flash was removed from the v1beta endpoint)
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const prompt = `You are an expert at reading Indian Income Tax Return (ITR) documents and acknowledgement forms (ITR-V).
+    const prompt = `You are an expert at reading Indian Income Tax Return (ITR) acknowledgement forms (ITR-V) issued by the Income Tax Department of India.
 
-Extract the following fields from this PDF document and return ONLY a valid JSON object — no markdown, no explanation, just JSON.
+Extract the following fields from this PDF document and return ONLY a valid JSON object — no markdown, no explanation, just raw JSON.
 
 Fields to extract:
-1. pan          — PAN number (format: 5 uppercase letters, 4 digits, 1 uppercase letter; e.g. AEDPH9905C)
-2. assessmentYear — Assessment year in "YYYY-YY" format (e.g. "2026-27")
-3. itrForm      — ITR form type (e.g. "ITR-1", "ITR-2", "ITR-4", "ITR-V")
-4. clientName   — Full name of the taxpayer as shown on the form
-5. totalIncome  — Total income as a plain integer in Rupees (no commas, no symbols). Null if not present.
-6. refundAmount — Net tax refund due as a plain integer (positive number). Null if not a refund case.
-7. taxPayable   — Net tax payable as a plain integer (positive number). Null if not a tax-payable case.
+1. pan            — PAN number (format: 5 uppercase letters, 4 digits, 1 uppercase letter; e.g. AEDPH9905C)
+2. assessmentYear — Assessment year in "YYYY-YY" format (e.g. "2026-27"). Found near the top of the acknowledgement.
+3. itrForm        — ITR form type filed (e.g. "ITR-1", "ITR-2", "ITR-3", "ITR-4"). This is the form the taxpayer filed, NOT "ITR-V" (which is just the acknowledgement wrapper).
+4. clientName     — The FULL NAME of the individual taxpayer. This appears as a proper noun name (e.g. "RAMESH KUMAR SHARMA").
+                    CRITICAL: Do NOT use any of the following as the clientName:
+                    - Form titles or headings like "Where the data of the Return of Income in Form ITR-1..."
+                    - Legal/statutory descriptions
+                    - Any text that starts with "Where" or describes the form itself
+                    - Department names or addresses
+                    The taxpayer name is typically a short line with only capital letters near the PAN number or in the acknowledgement details section.
+5. totalIncome    — Total income chargeable to tax as a plain integer in Rupees. Look for a row labelled "Total Income" or "Gross Total Income". Null if not present.
+6. refundAmount   — Net tax refund due as a plain positive integer. Look for a row labelled "(+) Tax Payable / (-) Refundable" where the value is negative (refund). Null if it is a tax-payable case.
+7. taxPayable     — Net tax payable as a plain positive integer. Look for a row labelled "(+) Tax Payable / (-) Refundable" where the value is positive (payable). Null if it is a refund case.
 
 Rules:
-- refundAmount and taxPayable are mutually exclusive — only one can be non-null.
-- A row labelled "(+) Tax Payable /(-) Refundable" is the authoritative source for refundAmount/taxPayable.
-- All amounts must be plain integers (no ₹, no commas, no decimals unless meaningful).
-- If a field cannot be found, set it to null.
+- refundAmount and taxPayable are mutually exclusive — only one can be non-null at a time.
+- All amounts must be plain integers (no ₹, no commas, no decimals).
+- If a field genuinely cannot be found in the document, set it to null — do not guess or hallucinate.
 
-Return exactly:
+Return exactly this JSON structure (no extra keys, no markdown fences):
 {"pan":..., "assessmentYear":..., "itrForm":..., "clientName":..., "totalIncome":..., "refundAmount":..., "taxPayable":...}`;
 
     const result = await model.generateContent([
