@@ -1,4 +1,4 @@
-import { PDFParse } from "pdf-parse";
+import pdfParse from "pdf-parse";
 
 export type ExtractedPdfData = {
   pan: string | null;
@@ -19,14 +19,7 @@ export async function parsePdfBuffer(
     refund_amount_pattern?: string;
   }
 ): Promise<ExtractedPdfData> {
-  const parser = new PDFParse({ data: new Uint8Array(buffer) });
-  let text = "";
-  try {
-    const data = await parser.getText();
-    text = data.text;
-  } finally {
-    await parser.destroy();
-  }
+  const { text } = await pdfParse(buffer);
 
   // 1. Determine search space based on page scope settings
   let searchSpace = text;
