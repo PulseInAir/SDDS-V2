@@ -4,23 +4,25 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: None
-- Next READY task: None (awaiting next task assignment)
+- Active task: CLIENT-UX-01
+- Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `685bbfb`
+- HEAD: `pending`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## PDF Data Extraction & Invoice Autofill result (2026-06-21)
+## Clients Page UX Enhancements & Relocations (2026-06-21)
 
-**Status: DONE — implemented PDF extraction and invoice autofill.**
+**Status: DONE — implemented client page enhancements.**
 
 ### Verification steps completed:
-1. **API & Utility Implementation**: Added `src/lib/utils/pdf.ts` and `src/app/api/documents/[documentId]/extract/route.ts` API.
-2. **Form Integration**: Integrated a document dropdown and auto-extraction mechanism in `src/components/invoices/InvoiceCreateForm.tsx`.
-3. **Type and Test Suite Check**: Verified that the app builds/typechecks successfully and all 78 tests pass.
+1. **Add Client Button Relocation**: Moved the Add Client button from the page layout to the top navigation utility bar right before the Assessment Year selector.
+2. **Remove Filtering Dropdowns**: Removed the two legacy dropdown filter menus from the Clients page header.
+3. **Clickable Metric Cards**: Made the 4 stats tiles ("Total Clients", "Active Clients", "Inactive Clients", "Excluded Clients") clickable. Clicking them sets the corresponding `status` query param to filter the client list, and highlights the active tile.
+4. **Header Column Sorting**: Added interactive sorting to "Client ID", "Client Name", and "Status" table headers with stateful arrows/icons that toggle ascending/descending states.
+
 
 

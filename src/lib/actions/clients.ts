@@ -76,6 +76,10 @@ export async function getClients(params: {
     query = query.order('client_id_code', { ascending: true })
   } else if (sortBy === 'client_id_desc') {
     query = query.order('client_id_code', { ascending: false })
+  } else if (sortBy === 'status_active_first') {
+    query = query.order('active', { ascending: false }).order('full_name', { ascending: true })
+  } else if (sortBy === 'status_inactive_first') {
+    query = query.order('active', { ascending: true }).order('full_name', { ascending: true })
   } else {
     query = query.order('full_name', { ascending: true })
   }

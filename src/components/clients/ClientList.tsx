@@ -4,7 +4,7 @@ import { useAppContext } from '@/contexts/AppContext'
 import Link from 'next/link'
 import { StatusBadge } from '../ui/StatusBadge'
 import { MaskedValue } from '@/components/ui/MaskedValue'
-import { Edit, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Edit, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
@@ -23,6 +23,41 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
+  const currentSort = searchParams.get('sortBy') || 'name_asc'
+
+  const handleSort = (field: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    let nextSort = ''
+
+    if (field === 'client_id') {
+      nextSort = currentSort === 'client_id_asc' ? 'client_id_desc' : 'client_id_asc'
+    } else if (field === 'name') {
+      nextSort = currentSort === 'name_asc' ? 'name_desc' : 'name_asc'
+    } else if (field === 'status') {
+      nextSort = currentSort === 'status_active_first' ? 'status_inactive_first' : 'status_active_first'
+    }
+
+    if (nextSort) {
+      params.set('sortBy', nextSort)
+      params.set('page', '1') // Reset page on sort change
+      router.push(`${pathname}?${params.toString()}`)
+    }
+  }
+
+  const renderSortIcon = (field: string) => {
+    if (field === 'client_id') {
+      if (currentSort === 'client_id_asc') return <ArrowUp className="inline-block w-4 h-4 ml-1 text-brand-600" />
+      if (currentSort === 'client_id_desc') return <ArrowDown className="inline-block w-4 h-4 ml-1 text-brand-600" />
+    } else if (field === 'name') {
+      if (currentSort === 'name_asc') return <ArrowUp className="inline-block w-4 h-4 ml-1 text-brand-600" />
+      if (currentSort === 'name_desc') return <ArrowDown className="inline-block w-4 h-4 ml-1 text-brand-600" />
+    } else if (field === 'status') {
+      if (currentSort === 'status_active_first') return <ArrowUp className="inline-block w-4 h-4 ml-1 text-brand-600" />
+      if (currentSort === 'status_inactive_first') return <ArrowDown className="inline-block w-4 h-4 ml-1 text-brand-600" />
+    }
+    return <ArrowUpDown className="inline-block w-3.5 h-3.5 ml-1 text-gray-400 group-hover:text-gray-600" />
+  }
 
   const navigateToPage = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -47,11 +82,25 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client ID
+              <th
+                scope="col"
+                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                onClick={() => handleSort('client_id')}
+              >
+                <div className="flex items-center">
+                  Client ID
+                  {renderSortIcon('client_id')}
+                </div>
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client Name
+              <th
+                scope="col"
+                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center">
+                  Client Name
+                  {renderSortIcon('name')}
+                </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 PAN
@@ -59,8 +108,15 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Mobile
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+              <th
+                scope="col"
+                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                onClick={() => handleSort('status')}
+              >
+                <div className="flex items-center">
+                  Status
+                  {renderSortIcon('status')}
+                </div>
               </th>
               <th scope="col" className="relative px-6 py-3">
                 <span className="sr-only">Actions</span>

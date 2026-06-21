@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { LogOut, Menu, UserCircle, X } from "lucide-react";
+import { LogOut, Menu, UserCircle, X, Plus } from "lucide-react";
 
 import { PrivacyToggle } from "@/components/ui/PrivacyToggle";
 import { AssessmentYearSelect } from "@/components/ui/AssessmentYearSelect";
@@ -128,6 +128,14 @@ export function TopUtilityBar({
         </div>
 
         <div className="flex items-center gap-x-3 sm:gap-x-4">
+          <Link
+            href="/clients/new"
+            className="inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-input)] bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 border border-transparent px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
+          >
+            <Plus className="mr-1.5 h-4 w-4 flex-shrink-0" />
+            <span>Add Client</span>
+          </Link>
+          <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
           <AssessmentYearSelect />
           <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
           <PrivacyToggle />
