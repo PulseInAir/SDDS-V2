@@ -132,25 +132,33 @@ export function DocumentsPageContent({
           </form>
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <p className="text-xs uppercase tracking-wide text-text-muted">Exceptions</p>
-              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.exceptionCount}</p>
-              <p className="mt-1 text-sm text-text-secondary">Missing, requested, rejected, or replacement-needed work.</p>
+            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Exceptions</p>
+                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.exceptionCount}</p>
+              </div>
+              <p className="mt-3 text-sm text-text-secondary">Missing, requested, rejected, or replacement-needed work.</p>
             </div>
-            <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <p className="text-xs uppercase tracking-wide text-text-muted">Verified</p>
-              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.verifiedCount}</p>
-              <p className="mt-1 text-sm text-text-secondary">Latest checklist records already verified.</p>
+            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Verified</p>
+                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.verifiedCount}</p>
+              </div>
+              <p className="mt-3 text-sm text-text-secondary">Latest checklist records already verified.</p>
             </div>
-            <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
-              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.receivedCount}</p>
-              <p className="mt-1 text-sm text-text-secondary">Files uploaded and waiting for further review.</p>
+            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
+                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.receivedCount}</p>
+              </div>
+              <p className="mt-3 text-sm text-text-secondary">Files uploaded and waiting for further review.</p>
             </div>
-            <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <p className="text-xs uppercase tracking-wide text-text-muted">Versioned</p>
-              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.versionedCount}</p>
-              <p className="mt-1 text-sm text-text-secondary">Document chains that already preserve replacement history.</p>
+            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Versioned</p>
+                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.versionedCount}</p>
+              </div>
+              <p className="mt-3 text-sm text-text-secondary">Document chains that already preserve replacement history.</p>
             </div>
           </div>
         </section>
