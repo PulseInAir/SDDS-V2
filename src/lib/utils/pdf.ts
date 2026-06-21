@@ -169,14 +169,36 @@ export async function parsePdfBuffer(
     ]);
   }
 
+  // ── Mutual exclusivity enforcement ───────────────────────────────────────
+  // refundAmount and taxPayable cannot both be non-null.
+  // The summary-row parse (Strategy 1) is authoritative; if refundAmount was
+  // set there, any taxPayable found by Strategy 3 is a false positive.
+  if (refundAmount !== null && taxPayable !== null) {
+    taxPayable = null; // refund case — discard the taxPayable false positive
+  }
+
   // ── Client Name ───────────────────────────────────────────────────────────
   const lines = searchSpace
     .split("\n")
     .map((l: string) => l.trim())
     .filter(Boolean);
 
+  // Patterns that indicate a line is NOT a person's name (used in fallback)
+  const nonNamePatterns = [
+    /acknowledgement/i,
+    /^\d{10,}/, // pure numeric (ack number)
+    /[A-Z]{5}\d{4}[A-Z]/, // PAN on its own
+    /date\s+of\s+filing/i,
+    /income\s+tax/i,
+    /assessment\s+year/i,
+    /form\s+number/i,
+    /e-filing/i,
+    /^\d{2}[-/]\w{3}[-/]\d{4}/, // date string
+  ];
+
   let clientName: string | null = null;
   for (const line of lines) {
+    // Explicit "Name:" or "Name of assessee:" label
     if (/^name\s*:/i.test(line)) {
       clientName = line.replace(/^name\s*:\s*/i, "").trim();
       break;
@@ -191,9 +213,18 @@ export async function parsePdfBuffer(
       break;
     }
   }
-  // Final fallback: first non-empty line
-  if (!clientName && lines.length > 0) clientName = lines[0];
 
+  // Final fallback: first non-empty line that doesn't look like metadata
+  if (!clientName) {
+    for (const line of lines) {
+      const isNonName = nonNamePatterns.some((p) => p.test(line));
+      // Must contain at least two word characters (a real name has letters)
+      if (!isNonName && /[A-Za-z]{2,}/.test(line)) {
+        clientName = line;
+        break;
+      }
+    }
+  }
   return {
     pan,
     assessmentYear,
