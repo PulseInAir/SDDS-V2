@@ -4,13 +4,13 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: DB-PURGE-01 — Purge test data for production go-live (DONE)
-- Next READY task: None (awaiting next task assignment)
+- Active task: CLIENT-AUTO-ARCHIVE-01 — Auto-archive inactive clients (IN_PROGRESS)
+- Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `b5f5da8`
+- HEAD: `2a3b56bbfc3e1a80da8d071f7a606db180204413`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean
+- Working tree: clean (with brain edits)
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 

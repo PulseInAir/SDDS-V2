@@ -52,7 +52,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G42 | DONE | Fix profile avatar JWT cookie size bloat | SHELL-USER-MENU-01 | Migrate profile avatars out of auth metadata JWT into public storage bucket | `e700492` |
 | G43 | DONE | Fix dark mode styling glitches on filing queue and client details | G42 | Configure Tailwind CSS v4 class-based dark mode and remove dark: classes to prevent layout glitches under dark theme preferences | `c1b91a0` |
 | CLIENT-ENH-01 | DONE | Implement Client ID system, metric cards header, and filtering/sorting system | G43 | Client ID assigned sequentially (existing and new), stats cards visible, filters and sorting work | `48e7f41` |
-| DB-PURGE-01 | DONE | Purge test data for production go-live | CLIENT-ENH-01 | Truncate all client operational tables, reset sequence starting at 1, retain owner account | — |
+| DB-PURGE-01 | DONE | Purge test data for production go-live | CLIENT-ENH-01 | Truncate all client operational tables, reset sequence starting at 1, retain owner account | `2a3b56bbfc3e1a80da8d071f7a606db180204413` |
+| CLIENT-AUTO-ARCHIVE-01 | IN_PROGRESS | Mark client inactive and archive starting from AY 2026-27 if case not opened for straight three AYs | DB-PURGE-01 | Database trigger automatically archives inactive clients on current AY rollover; test validation passes | — |
 
 
 ## Task update protocol
