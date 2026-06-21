@@ -158,8 +158,51 @@ function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; 
 
 export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
   const [viewMode, setViewMode] = useState<"admin" | "preview">("admin");
+  const [isDownloading, setIsDownloading] = useState(false);
   const canIssue = invoice.derivedStatus === "draft";
   const canRecordPayment = ["issued", "partially_paid", "overdue"].includes(invoice.derivedStatus) && invoice.balanceAmount > 0;
+
+  const handleDownloadJPEG = async () => {
+    try {
+      setIsDownloading(true);
+      const { default: html2canvas } = await import("html2canvas");
+      const element = document.getElementById("invoice-print-only");
+      if (!element) return;
+
+      // Temporarily show it off-screen for html2canvas
+      element.classList.remove("hidden");
+      element.style.position = "absolute";
+      element.style.left = "-9999px";
+      element.style.top = "-9999px";
+      element.style.display = "block";
+      element.style.width = "850px";
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#FFF2D3",
+      });
+
+      // Restore original state
+      element.style.position = "";
+      element.style.left = "";
+      element.style.top = "";
+      element.style.display = "";
+      element.style.width = "";
+      element.classList.add("hidden");
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+      const link = document.createElement("a");
+      link.download = `Invoice_${invoice.invoice_number.replace(/\//g, "-")}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error("Failed to generate invoice image", error);
+      alert("Failed to download invoice image. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <>
@@ -215,7 +258,7 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
             >
               Client view
             </Link>
-            <PrintInvoiceButton />
+            <PrintInvoiceButton onClick={handleDownloadJPEG} isPending={isDownloading} />
           </div>
         </div>
 
