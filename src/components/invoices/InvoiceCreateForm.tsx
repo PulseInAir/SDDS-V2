@@ -146,14 +146,16 @@ export function InvoiceCreateForm({
             unitAmount: String(fee),
           },
         ]);
-        // Reset details and calculator when switching clients or AYs
-        setItrvDetails(null);
-        setRefundableAmount("");
+        // Reset details and calculator when switching clients or AYs, unless we are currently running extraction
+        if (!isExtracting) {
+          setItrvDetails(null);
+          setRefundableAmount("");
+        }
       })
       .catch((err) => {
         console.error("Failed to fetch client case for auto-populate:", err);
       });
-  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears]);
+  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears, isExtracting]);
 
   // Calculate Refund Claim Charges Amount in real-time
   const calculatedRefundChargesAmount = useMemo(() => {
