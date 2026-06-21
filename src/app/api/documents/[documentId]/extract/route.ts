@@ -54,6 +54,20 @@ export async function POST(
 
     const parsedData = await parsePdfBuffer(buffer, extractionSettings);
 
+    // Diagnostic log — visible in Vercel function logs.
+    // Shows the first 1500 chars of extracted text and all parsed fields so
+    // regex patterns can be tuned against real PDF content.
+    console.log("[PDF Extract] raw text (first 1500 chars):\n", parsedData.rawText.slice(0, 1500));
+    console.log("[PDF Extract] parsed fields:", {
+      pan: parsedData.pan,
+      assessmentYear: parsedData.assessmentYear,
+      itrForm: parsedData.itrForm,
+      clientName: parsedData.clientName,
+      refundAmount: parsedData.refundAmount,
+      totalIncome: parsedData.totalIncome,
+      taxPayable: parsedData.taxPayable,
+    });
+
     return NextResponse.json({
       success: true,
       data: {

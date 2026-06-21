@@ -11,6 +11,36 @@ export type ExtractedPdfData = {
   rawText: string;
 };
 
+/**
+ * Parse a comma-formatted Indian number string (e.g. "8,40,000") to a number.
+ * Returns null if the string is empty, zero, or unparseable.
+ */
+function toNumber(s: string): number | null {
+  if (!s) return null;
+  const v = parseFloat(s.replace(/,/g, "").trim());
+  return isNaN(v) || v <= 0 ? null : v;
+}
+
+/**
+ * Try an ordered list of RegExp patterns against the text.
+ * Returns the first successfully parsed number from the specified capture group.
+ */
+function firstNumericMatch(
+  text: string,
+  patterns: RegExp[],
+  groupIndex = 1
+): number | null {
+  for (const p of patterns) {
+    const m = text.match(p);
+    const raw = m?.[groupIndex];
+    if (raw) {
+      const v = toNumber(raw);
+      if (v !== null) return v;
+    }
+  }
+  return null;
+}
+
 export async function parsePdfBuffer(
   buffer: Buffer,
   settings?: {
@@ -21,115 +51,132 @@ export async function parsePdfBuffer(
 ): Promise<ExtractedPdfData> {
   const { text } = await pdfParse(buffer);
 
-  // 1. Determine search space based on page scope settings
+  // Determine search scope
   let searchSpace = text;
   if (settings?.page_scope === "first_page") {
     const pages = text.split("\f");
-    if (pages.length > 0) {
-      searchSpace = pages[0];
-    }
+    if (pages.length > 0) searchSpace = pages[0];
   }
 
-  // Regex to extract PAN: 5 uppercase letters, 4 digits, 1 uppercase letter
-  const panRegex = /[A-Z]{5}[0-9]{4}[A-Z]{1}/;
-  const panMatch = searchSpace.match(panRegex);
-  const pan = panMatch ? panMatch[0] : null;
+  // ── PAN ──────────────────────────────────────────────────────────────────
+  // Standard PAN: 5 uppercase, 4 digits, 1 uppercase
+  const pan = searchSpace.match(/[A-Z]{5}[0-9]{4}[A-Z]/)?.[0] ?? null;
 
-  // Regex to extract Assessment Year (e.g. 2026-27 or 2026-2027)
-  const ayRegex = /(20\d{2})[-/](\d{2,4})/;
-  const ayMatch = searchSpace.match(ayRegex);
-  let assessmentYear = null;
+  // ── Assessment Year ───────────────────────────────────────────────────────
+  // Matches: "2026-27", "2026/27", "2026-2027"
+  let assessmentYear: string | null = null;
+  const ayMatch = searchSpace.match(/(20\d{2})[-/](\d{2,4})/);
   if (ayMatch) {
-    const startYear = ayMatch[1];
-    let endYear = ayMatch[2];
-    if (endYear.length === 4) {
-      endYear = endYear.slice(2);
-    }
-    assessmentYear = `${startYear}-${endYear}`;
+    const end = ayMatch[2].length === 4 ? ayMatch[2].slice(2) : ayMatch[2];
+    assessmentYear = `${ayMatch[1]}-${end}`;
   }
 
-  // Find ITR Form type — prefer the explicit "Form Number \tITR-x" field on the acknowledgement
-  // e.g. "Status \tIndividual \tForm Number \tITR-1"
-  const formNumberFieldRegex = /Form\s+Number\s+(?:[^\n\t]+\t)?\s*(ITR-\d[A-Z]?)/i;
-  const formNumberFieldMatch = searchSpace.match(formNumberFieldRegex);
-  let itrForm: string | null = formNumberFieldMatch
-    ? formNumberFieldMatch[1].toUpperCase()
-    : null;
+  // ── ITR Form ─────────────────────────────────────────────────────────────
+  // Primary: dedicated "Form Number" field (ITR-V acknowledgement header)
+  // e.g. "Form Number  ITR-1" or "Form Number \tITR-1\t"
+  let itrForm: string | null =
+    searchSpace
+      .match(/Form\s+Number\s+(?:[^\n\t]+\t)?\s*(ITR-\d[A-Z]?)/i)?.[1]
+      ?.toUpperCase() ?? null;
 
-  // Fallback: use the settings-derived pattern if the dedicated field wasn't found
+  // Fallback: any ITR-x mention (ITR-1 through ITR-7, ITR-V, etc.)
   if (!itrForm) {
-    const itrFormPattern = settings?.itr_form_pattern || "ITR-\\d[A-Z]?|ITR-V";
-    const itrFormRegex = new RegExp(`\\b(${itrFormPattern})\\b`, "i");
-    const itrFormMatch = searchSpace.match(itrFormRegex);
-    itrForm = itrFormMatch ? itrFormMatch[0].toUpperCase() : null;
+    const pat = settings?.itr_form_pattern ?? "ITR-\\d[A-Z]?|ITR-V";
+    itrForm =
+      searchSpace
+        .match(new RegExp(`\\b(${pat})\\b`, "i"))?.[1]
+        ?.toUpperCase() ?? null;
   }
 
-  // Attempt to extract Refund amount using settings-derived pattern
-  const refundAmountPattern = settings?.refund_amount_pattern || "refund\\s*due|refund|refundable";
-  const refundRegex = new RegExp(`(?:${refundAmountPattern})\\b\\s*[:\\-]?\\s*([\\d,]+(?:\\.\\d+)?)`, "i");
-  const refundMatch = searchSpace.match(refundRegex);
-  let refundAmount: number | null = null;
-  if (refundMatch && refundMatch[1]) {
-    const cleanAmt = refundMatch[1].replace(/,/g, "");
-    const parsedAmt = parseFloat(cleanAmt);
-    if (!isNaN(parsedAmt)) {
-      refundAmount = parsedAmt;
-    }
-  }
+  // ── Total Income ─────────────────────────────────────────────────────────
+  // ITR-V PDFs may use tabs, 2+ spaces, or colons between label and value.
+  // The label may be followed by an optional field code like "(1A)" or "1A".
+  const totalIncome = firstNumericMatch(searchSpace, [
+    // Tab-separated with optional row code: "Total Income \t 1A \t 8,40,000"
+    /total\s+income\s*(?:\([^)]*\))?\s*[\t]+\s*(?:[A-Z0-9]{1,4}\s*[\t]+\s*)?([\d,]{4,}(?:\.\d+)?)/i,
+    // Multi-space-separated with optional row code
+    /total\s+income\s*(?:\([^)]*\))?\s{2,}(?:[A-Z0-9]{1,4}\s{2,})?\s*([\d,]{4,}(?:\.\d+)?)/i,
+    // Colon or dash separator
+    /total\s+income\s*[:\-]\s*([\d,]{4,}(?:\.\d+)?)/i,
+    // Most permissive: any non-digit non-newline chars between label and amount
+    // Require >=4 chars in the number to avoid row codes like "1A" or "18"
+    /total\s+income[^\d\n\r]{0,40}([\d]{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d{5,}(?:\.\d+)?)/i,
+  ]);
 
-  // Attempt to extract Total Income
-  // Matches "Total Income" followed by optional code (like 1A or 1) and tabs/spaces, then the amount
-  const totalIncomeRegex = /total\s+income\s*(?:\t\s*\w+\s*)?\t\s*([\d,]+(?:\.\d+)?)/i;
-  const totalIncomeMatch = searchSpace.match(totalIncomeRegex);
-  let totalIncome: number | null = null;
-  if (totalIncomeMatch && totalIncomeMatch[1]) {
-    const cleanAmt = totalIncomeMatch[1].replace(/,/g, "");
-    const parsedAmt = parseFloat(cleanAmt);
-    if (!isNaN(parsedAmt)) {
-      totalIncome = parsedAmt;
-    }
-  }
-
-  // Attempt to extract Tax Payable / Refundable
-  // Example matches: "(+) Tax Payable /(-) Refundable (6-7) \t8 \t(-) 60,570"
-  // Let's capture the sign (+ or -) and the amount.
-  const taxPayableRefundableRegex = /\(\+\)\s*Tax\s+Payable\s*\/[-\(]*\)\s*Refundable\s*(?:\([^\)]+\))?\s*(?:\t\s*\w+\s*)?\t\s*(\([+-]?\))?\s*([\d,]+(?:\.\d+)?)/i;
-  const taxPayableRefundableMatch = searchSpace.match(taxPayableRefundableRegex);
+  // ── Tax Payable / Refundable ──────────────────────────────────────────────
   let taxPayable: number | null = null;
+  let refundAmount: number | null = null;
 
-  if (taxPayableRefundableMatch) {
-    const isRefund = taxPayableRefundableMatch[1]?.includes("-");
-    const cleanAmt = taxPayableRefundableMatch[2].replace(/,/g, "");
-    const parsedAmt = parseFloat(cleanAmt);
-    // Only update if the amount is non-zero (skip the summary row which may be 0)
-    if (!isNaN(parsedAmt) && parsedAmt > 0) {
-      if (isRefund) {
-        refundAmount = parsedAmt;
-      } else {
-        taxPayable = parsedAmt;
+  // Strategy 1: Parse the ITR-V summary row
+  // "(+) Tax Payable /(-) Refundable (6-7)  8  (-) 60,570"
+  // OR "(+) Tax Payable /(-) Refundable  (+) 45,000"
+  const summaryLine = searchSpace.match(
+    /\(\+\)\s*Tax\s+Payable\s*\/\s*\(-\)\s*Refundable[^\n]*/i
+  )?.[0];
+
+  if (summaryLine) {
+    // Collect all (sign)number pairs on this line
+    const pairs = [...summaryLine.matchAll(/\(([+\-])\)\s*([\d,]+(?:\.\d+)?)/g)];
+    if (pairs.length > 0) {
+      // The LAST pair is the net figure (earlier ones are intermediate calculations)
+      const last = pairs[pairs.length - 1];
+      const sign = last[1];
+      const val = toNumber(last[2]);
+      if (val !== null) {
+        if (sign === "-") refundAmount = val;
+        else taxPayable = val;
       }
-    }
-  } else {
-    // Fallback simple regexes if the complex line isn't present
-    const taxPayableRegex = /(?:net\s+)?tax\s+payable\b\s*(?:\t\s*\w+\s*)?\t\s*([\d,]+(?:\.\d+)?)/i;
-    const taxPayableMatch = searchSpace.match(taxPayableRegex);
-    if (taxPayableMatch && taxPayableMatch[1]) {
-      const cleanAmt = taxPayableMatch[1].replace(/,/g, "");
-      const parsedAmt = parseFloat(cleanAmt);
-      if (!isNaN(parsedAmt)) {
-        taxPayable = parsedAmt;
+    } else {
+      // No (sign) pairs — find the last number on the line
+      const nums = [...summaryLine.matchAll(/([\d,]{3,}(?:\.\d+)?)/g)];
+      if (nums.length > 0) {
+        const val = toNumber(nums[nums.length - 1][1]);
+        // Determine sign by checking for a bare minus before the last number
+        const tail = summaryLine.split(/Refundable/i).pop() ?? "";
+        if (/\(\-\)|[\-]\s+[\d]/.test(tail) && val !== null) refundAmount = val;
+        else if (val !== null) taxPayable = val;
       }
     }
   }
 
-  // Attempt to extract client name
-  // Usually, in ITR-V it's preceded by "Name:" or "Received from" or at the top.
-  // Let's do a simple extraction from the first few lines of the searchSpace.
-  const lines = searchSpace.split("\n").map((l: string) => l.trim()).filter(Boolean);
+  // Strategy 2: Explicit refund lines
+  if (refundAmount === null) {
+    const customPat = settings?.refund_amount_pattern;
+    const extraPatterns: RegExp[] = customPat
+      ? [new RegExp(`(?:${customPat})[^0-9\\n\\r]*(\\d[\\d,]*(?:\\.\\d+)?)`, "i")]
+      : [];
+
+    refundAmount = firstNumericMatch(searchSpace, [
+      ...extraPatterns,
+      /refund\s+due\s*[:\-]?\s*([\d,]{3,}(?:\.\d+)?)/i,
+      /net\s+refund(?:able)?\s*[:\-]?\s*([\d,]{3,}(?:\.\d+)?)/i,
+      /refundable\s+amount\s*[:\-]?\s*([\d,]{3,}(?:\.\d+)?)/i,
+      /\brefund\b[^0-9\n\r]{0,20}([\d,]{4,}(?:\.\d+)?)/i,
+    ]);
+  }
+
+  // Strategy 3: Explicit tax payable lines (only if the summary row didn't resolve it)
+  if (taxPayable === null) {
+    taxPayable = firstNumericMatch(searchSpace, [
+      // Tab-separated with optional row code
+      /(?:net\s+)?tax\s+payable\s*(?:\([^)]*\))?\s*[\t]+\s*(?:[A-Z0-9]{1,4}\s*[\t]+\s*)?([\d,]{4,}(?:\.\d+)?)/i,
+      // Multi-space
+      /(?:net\s+)?tax\s+payable\s*(?:\([^)]*\))?\s{2,}(?:[A-Z0-9]{1,4}\s{2,})?\s*([\d,]{4,}(?:\.\d+)?)/i,
+      // Colon/dash
+      /(?:net\s+)?tax\s+payable\s*[:\-]\s*([\d,]{3,}(?:\.\d+)?)/i,
+      // Most permissive
+      /(?:net\s+)?tax\s+payable[^\d\n\r]{0,40}([\d]{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d{5,}(?:\.\d+)?)/i,
+    ]);
+  }
+
+  // ── Client Name ───────────────────────────────────────────────────────────
+  const lines = searchSpace
+    .split("\n")
+    .map((l: string) => l.trim())
+    .filter(Boolean);
+
   let clientName: string | null = null;
-  
   for (const line of lines) {
-    // Match "Name: Value" (colon-separated) or "Name \tValue" (tab-separated, ITR-V style)
     if (/^name\s*:/i.test(line)) {
       clientName = line.replace(/^name\s*:\s*/i, "").trim();
       break;
@@ -138,18 +185,14 @@ export async function parsePdfBuffer(
       clientName = line.replace(/^name\s+of[^:]*:\s*/i, "").trim();
       break;
     }
-    // ITR-V acknowledgement: "Name \tFIRST \tLAST" — starts with "Name" followed by any whitespace
+    // ITR-V acknowledgement: "Name  FIRST LAST" or "Name\tFIRST\tLAST"
     if (/^name[\s\t]/i.test(line)) {
       clientName = line.replace(/^name\s*/i, "").replace(/\t/g, " ").trim();
       break;
     }
   }
-
-  // Fallback for clientName: if we didn't find "Name:", look for lines containing PAN or near the top
-  if (!clientName && lines.length > 0) {
-    // Commonly the first 1-3 lines might contain client name.
-    clientName = lines[0];
-  }
+  // Final fallback: first non-empty line
+  if (!clientName && lines.length > 0) clientName = lines[0];
 
   return {
     pan,
