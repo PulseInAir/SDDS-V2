@@ -199,8 +199,9 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
       element.style.width = "";
       element.classList.add("hidden");
 
+      const clientNameForFile = (invoice.clients?.full_name ?? "Unknown_Client").replace(/[^a-zA-Z0-9\s-]/g, "").trim().replace(/\s+/g, "_");
       const link = document.createElement("a");
-      link.download = `Invoice_${invoice.invoice_number.replace(/\//g, "-")}.jpg`;
+      link.download = `Invoice_${clientNameForFile}_${invoice.invoice_number.replace(/\//g, "-")}.jpg`;
       link.href = dataUrl;
       link.click();
     } catch (error) {
