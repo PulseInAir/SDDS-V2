@@ -55,11 +55,21 @@ export async function parsePdfBuffer(
     assessmentYear = `${startYear}-${endYear}`;
   }
 
-  // Find ITR Form type using settings-derived pattern
-  const itrFormPattern = settings?.itr_form_pattern || "ITR-\\d[A-Z]?|ITR-V";
-  const itrFormRegex = new RegExp(`\\b(${itrFormPattern})\\b`, "i");
-  const itrFormMatch = searchSpace.match(itrFormRegex);
-  const itrForm = itrFormMatch ? itrFormMatch[0].toUpperCase() : null;
+  // Find ITR Form type — prefer the explicit "Form Number \tITR-x" field on the acknowledgement
+  // e.g. "Status \tIndividual \tForm Number \tITR-1"
+  const formNumberFieldRegex = /Form\s+Number\s+(?:[^\n\t]+\t)?\s*(ITR-\d[A-Z]?)/i;
+  const formNumberFieldMatch = searchSpace.match(formNumberFieldRegex);
+  let itrForm: string | null = formNumberFieldMatch
+    ? formNumberFieldMatch[1].toUpperCase()
+    : null;
+
+  // Fallback: use the settings-derived pattern if the dedicated field wasn't found
+  if (!itrForm) {
+    const itrFormPattern = settings?.itr_form_pattern || "ITR-\\d[A-Z]?|ITR-V";
+    const itrFormRegex = new RegExp(`\\b(${itrFormPattern})\\b`, "i");
+    const itrFormMatch = searchSpace.match(itrFormRegex);
+    itrForm = itrFormMatch ? itrFormMatch[0].toUpperCase() : null;
+  }
 
   // Attempt to extract Refund amount using settings-derived pattern
   const refundAmountPattern = settings?.refund_amount_pattern || "refund\\s*due|refund|refundable";
@@ -98,7 +108,8 @@ export async function parsePdfBuffer(
     const isRefund = taxPayableRefundableMatch[1]?.includes("-");
     const cleanAmt = taxPayableRefundableMatch[2].replace(/,/g, "");
     const parsedAmt = parseFloat(cleanAmt);
-    if (!isNaN(parsedAmt)) {
+    // Only update if the amount is non-zero (skip the summary row which may be 0)
+    if (!isNaN(parsedAmt) && parsedAmt > 0) {
       if (isRefund) {
         refundAmount = parsedAmt;
       } else {
@@ -125,8 +136,18 @@ export async function parsePdfBuffer(
   let clientName: string | null = null;
   
   for (const line of lines) {
-    if (line.toLowerCase().startsWith("name:") || line.toLowerCase().startsWith("name of")) {
-      clientName = line.replace(/^(name:|name of[^:]*:)/i, "").trim();
+    // Match "Name: Value" (colon-separated) or "Name \tValue" (tab-separated, ITR-V style)
+    if (/^name\s*:/i.test(line)) {
+      clientName = line.replace(/^name\s*:\s*/i, "").trim();
+      break;
+    }
+    if (/^name\s+of/i.test(line)) {
+      clientName = line.replace(/^name\s+of[^:]*:\s*/i, "").trim();
+      break;
+    }
+    // ITR-V acknowledgement: "Name \tFIRST \tLAST" — starts with "Name" followed by any whitespace
+    if (/^name[\s\t]/i.test(line)) {
+      clientName = line.replace(/^name\s*/i, "").replace(/\t/g, " ").trim();
       break;
     }
   }

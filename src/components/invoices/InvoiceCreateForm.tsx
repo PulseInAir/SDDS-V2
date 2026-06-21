@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState, useEffect } from "react";
+import { useActionState, useMemo, useState, useEffect, useRef } from "react";
 import { Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 
 import { createInvoiceAction, type InvoiceActionState } from "@/lib/actions/invoices";
@@ -87,6 +87,9 @@ export function InvoiceCreateForm({
     taxPayable: number | null;
   } | null>(null);
 
+  // Guard ref: when extraction sets the AY programmatically, suppress the useEffect reset
+  const suppressNextAyReset = useRef(false);
+
   // Calculator inputs
   const [refundableAmount, setRefundableAmount] = useState("");
   const [refundPercentage, setRefundPercentage] = useState(
@@ -115,6 +118,10 @@ export function InvoiceCreateForm({
       Promise.resolve().then(() => setClientDocuments((prev) => (prev.length === 0 ? prev : [])));
       return;
     }
+    // Reset extraction state when client changes
+    setSelectedDocId("");
+    setItrvDetails(null);
+    setRefundableAmount("");
     getClientDocumentsModuleData(selectedClientId)
       .then((res) => {
         const docs = res.chains
@@ -127,9 +134,15 @@ export function InvoiceCreateForm({
       });
   }, [selectedClientId]);
 
-  // Autofill flat ITR fee dynamically when Client or AY changes, based on active filing case's ITR return category
+
   useEffect(() => {
     if (!selectedClientId || !selectedAyId) return;
+
+    // If this AY change was triggered by PDF extraction, skip the state reset
+    if (suppressNextAyReset.current) {
+      suppressNextAyReset.current = false;
+      return;
+    }
 
     getClientFilingCaseByAY(selectedClientId, selectedAyId)
       .then((filingCase) => {
@@ -146,16 +159,14 @@ export function InvoiceCreateForm({
             unitAmount: String(fee),
           },
         ]);
-        // Reset details and calculator when switching clients or AYs, unless we are currently running extraction
-        if (!isExtracting) {
-          setItrvDetails(null);
-          setRefundableAmount("");
-        }
+        // Reset extracted details and calculator when AY changes (user-driven, not extraction-driven)
+        setItrvDetails(null);
+        setRefundableAmount("");
       })
       .catch((err) => {
         console.error("Failed to fetch client case for auto-populate:", err);
       });
-  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears, isExtracting]);
+  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears]);
 
   // Calculate Refund Claim Charges Amount in real-time
   const calculatedRefundChargesAmount = useMemo(() => {
@@ -220,10 +231,14 @@ export function InvoiceCreateForm({
         const { assessmentYear, itrForm, assessmentYearId, refundAmount, totalIncome, taxPayable } = result.data;
 
         if (assessmentYearId) {
+          suppressNextAyReset.current = true;
           setSelectedAyId(assessmentYearId);
         } else if (assessmentYear) {
           const match = assessmentYears.find((ay) => ay.label === assessmentYear);
-          if (match) setSelectedAyId(match.id);
+          if (match) {
+            suppressNextAyReset.current = true;
+            setSelectedAyId(match.id);
+          }
         }
 
         const ayLabel = assessmentYear || assessmentYears.find((ay) => ay.id === selectedAyId)?.label || "2026-27";
