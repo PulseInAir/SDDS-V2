@@ -62,6 +62,8 @@ export async function POST(
         itrForm: parsedData.itrForm,
         clientName: parsedData.clientName,
         refundAmount: parsedData.refundAmount,
+        totalIncome: parsedData.totalIncome,
+        taxPayable: parsedData.taxPayable,
         clientId: document.client_id,
         assessmentYearId: document.assessment_year_id,
       },

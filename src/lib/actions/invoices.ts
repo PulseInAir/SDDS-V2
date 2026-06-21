@@ -431,6 +431,9 @@ export async function createInvoiceAction(
     }
   }
 
+  const settingsPct = formData.get("refundClaimSettingsPercentage");
+  const appliedPct = formData.get("refundClaimAppliedPercentage");
+
   await supabase.from("activity_events").insert({
     workspace_id: session.workspace.id,
     actor_id: session.user.id,
@@ -440,6 +443,10 @@ export async function createInvoiceAction(
     entity_id: invoice.id,
     action: "invoice_created",
     message: `Draft invoice ${invoice.invoice_number} was created.`,
+    metadata: settingsPct && appliedPct ? {
+      refund_claim_settings_percentage: parseFloat(String(settingsPct)),
+      refund_claim_applied_percentage: parseFloat(String(appliedPct))
+    } : null
   });
 
   revalidatePath("/invoices");

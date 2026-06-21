@@ -6,6 +6,8 @@ export type ExtractedPdfData = {
   itrForm: string | null;
   clientName: string | null;
   refundAmount: number | null;
+  totalIncome: number | null;
+  taxPayable: number | null;
   rawText: string;
 };
 
@@ -72,6 +74,35 @@ export async function parsePdfBuffer(
     }
   }
 
+  // Attempt to extract Total Income
+  // Typically "Total Income" or "Gross Total Income" or "Total Income / Taxable Income" followed by a number
+  const totalIncomeRegex = /total\s+income\b\s*[:\-\u2013\u2014]?\s*([\d,]+(?:\.\d+)?)/i;
+  const totalIncomeMatch = searchSpace.match(totalIncomeRegex);
+  let totalIncome: number | null = null;
+  if (totalIncomeMatch && totalIncomeMatch[1]) {
+    const cleanAmt = totalIncomeMatch[1].replace(/,/g, "");
+    const parsedAmt = parseFloat(cleanAmt);
+    if (!isNaN(parsedAmt)) {
+      totalIncome = parsedAmt;
+    }
+  }
+
+  // Attempt to extract Tax Payable / Refundable
+  // Tax Payable/Refundable is often written as "Net tax payable", "tax payable", "refundable", "amount payable", or "refund/payable"
+  // Let's search for "tax payable" or "refundable" or "refund" specifically in lines or text.
+  // Note: if refundAmount is parsed, that is the refundable amount (or if negative, payable).
+  // Let's scan for "tax payable", "net tax payable", "amount payable"
+  const taxPayableRegex = /(?:net\s+)?tax\s+payable\b\s*[:\-\u2013\u2014]?\s*([\d,]+(?:\.\d+)?)/i;
+  const taxPayableMatch = searchSpace.match(taxPayableRegex);
+  let taxPayable: number | null = null;
+  if (taxPayableMatch && taxPayableMatch[1]) {
+    const cleanAmt = taxPayableMatch[1].replace(/,/g, "");
+    const parsedAmt = parseFloat(cleanAmt);
+    if (!isNaN(parsedAmt)) {
+      taxPayable = parsedAmt;
+    }
+  }
+
   // Attempt to extract client name
   // Usually, in ITR-V it's preceded by "Name:" or "Received from" or at the top.
   // Let's do a simple extraction from the first few lines of the searchSpace.
@@ -97,6 +128,8 @@ export async function parsePdfBuffer(
     itrForm,
     clientName,
     refundAmount,
+    totalIncome,
+    taxPayable,
     rawText: text,
   };
 }

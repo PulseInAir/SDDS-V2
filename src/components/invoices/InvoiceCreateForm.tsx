@@ -79,6 +79,37 @@ export function InvoiceCreateForm({
   const [selectedDocId, setSelectedDocId] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
 
+  // Extracted ITR-V details
+  const [itrvDetails, setItrvDetails] = useState<{
+    itrForm: string | null;
+    totalIncome: number | null;
+    refundAmount: number | null;
+    taxPayable: number | null;
+  } | null>(null);
+
+  // Calculator inputs
+  const [refundableAmount, setRefundableAmount] = useState("");
+  const [refundPercentage, setRefundPercentage] = useState(
+    String(invoiceSettings?.refund_charge_percentage ?? 10)
+  );
+  const [originalPercentage, setOriginalPercentage] = useState(
+    invoiceSettings?.refund_charge_percentage ?? 10
+  );
+
+  // Validation errors for calculator inputs
+  const [calcErrors, setCalcErrors] = useState<{
+    refundableAmount?: string;
+    refundPercentage?: string;
+  }>({});
+
+  // Sync default percentage when settings change
+  useEffect(() => {
+    if (invoiceSettings?.refund_charge_percentage !== undefined) {
+      setRefundPercentage(String(invoiceSettings.refund_charge_percentage));
+      setOriginalPercentage(invoiceSettings.refund_charge_percentage);
+    }
+  }, [invoiceSettings]);
+
   useEffect(() => {
     if (!selectedClientId) {
       Promise.resolve().then(() => setClientDocuments((prev) => (prev.length === 0 ? prev : [])));
@@ -115,11 +146,65 @@ export function InvoiceCreateForm({
             unitAmount: String(fee),
           },
         ]);
+        // Reset details and calculator when switching clients or AYs
+        setItrvDetails(null);
+        setRefundableAmount("");
       })
       .catch((err) => {
         console.error("Failed to fetch client case for auto-populate:", err);
       });
   }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears]);
+
+  // Calculate Refund Claim Charges Amount in real-time
+  const calculatedRefundChargesAmount = useMemo(() => {
+    const amt = parseFloat(refundableAmount);
+    const pct = parseFloat(refundPercentage);
+
+    // Validate inputs
+    const errors: { refundableAmount?: string; refundPercentage?: string } = {};
+    if (refundableAmount && (isNaN(amt) || amt < 0)) {
+      errors.refundableAmount = "Refundable amount must be a positive number.";
+    }
+    if (refundPercentage && (isNaN(pct) || pct < 0 || pct > 100)) {
+      errors.refundPercentage = "Percentage must be between 0 and 100.";
+    }
+    setCalcErrors(errors);
+
+    if (isNaN(amt) || isNaN(pct) || amt <= 0 || pct <= 0) {
+      return 0;
+    }
+
+    return Math.round((amt * pct) / 100);
+  }, [refundableAmount, refundPercentage]);
+
+  // Sync calculated Refund Claim Charges to items list in real-time
+  useEffect(() => {
+    if (calculatedRefundChargesAmount > 0) {
+      setItems((prev) => {
+        const refundIndex = prev.findIndex((item) => item.description.includes("Refund Claim Charges"));
+        if (refundIndex >= 0) {
+          return prev.map((item, idx) =>
+            idx === refundIndex
+              ? { ...item, unitAmount: String(calculatedRefundChargesAmount) }
+              : item
+          );
+        } else {
+          return [
+            ...prev,
+            {
+              id: crypto.randomUUID(),
+              description: "Refund Claim Charges",
+              quantity: "1",
+              unitAmount: String(calculatedRefundChargesAmount),
+            },
+          ];
+        }
+      });
+    } else {
+      // Remove refund charges item if amount is 0 or invalid
+      setItems((prev) => prev.filter((item) => !item.description.includes("Refund Claim Charges")));
+    }
+  }, [calculatedRefundChargesAmount]);
 
   const handleExtract = async (docId: string) => {
     if (!docId) return;
@@ -130,7 +215,7 @@ export function InvoiceCreateForm({
       });
       const result = await res.json();
       if (result.success && result.data) {
-        const { assessmentYear, itrForm, assessmentYearId, refundAmount } = result.data;
+        const { assessmentYear, itrForm, assessmentYearId, refundAmount, totalIncome, taxPayable } = result.data;
 
         if (assessmentYearId) {
           setSelectedAyId(assessmentYearId);
@@ -144,11 +229,17 @@ export function InvoiceCreateForm({
         const parsedItrForm = itrForm || "ITR-V";
         const fee = rateCard[parsedItrForm] ?? rateCard["ITR-V"] ?? 500;
 
-        const refundPercent = invoiceSettings?.refund_charge_percentage ?? 10;
-        let finalFee = fee;
-        if (refundAmount && refundAmount > 0 && refundPercent > 0) {
-          const refundFee = Math.round(refundAmount * (refundPercent / 100));
-          finalFee += refundFee;
+        // Save parsed details for visual section
+        setItrvDetails({
+          itrForm: parsedItrForm,
+          totalIncome: totalIncome ?? null,
+          refundAmount: refundAmount ?? null,
+          taxPayable: taxPayable ?? null,
+        });
+
+        // Pre-populate refundable amount if found
+        if (refundAmount && refundAmount > 0) {
+          setRefundableAmount(String(refundAmount));
         }
 
         const newItems: InvoiceItemDraft[] = [
@@ -156,7 +247,7 @@ export function InvoiceCreateForm({
             id: crypto.randomUUID(),
             description: `ITR Filing Charges - ${parsedItrForm} (AY ${ayLabel})`,
             quantity: "1",
-            unitAmount: String(finalFee),
+            unitAmount: String(fee),
           },
         ];
 
@@ -272,6 +363,88 @@ export function InvoiceCreateForm({
           </select>
         </label>
       </div>
+
+      {/* Extracted details and Refund calculator section */}
+      {(itrvDetails || refundableAmount) && (
+        <div className="grid gap-4 border-t border-border-subtle pt-4 md:grid-cols-2">
+          {/* ITR-V Extracted details */}
+          <div className="rounded-[var(--radius-panel)] border border-border-subtle bg-white p-4">
+            <h3 className="text-sm font-semibold text-text-primary mb-3">ITR-V Document Details</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between border-b border-border-subtle pb-1">
+                <span className="text-text-muted">Form Number</span>
+                <span className="font-medium text-text-primary">{itrvDetails?.itrForm || "ITR-V"}</span>
+              </div>
+              <div className="flex justify-between border-b border-border-subtle pb-1">
+                <span className="text-text-muted">Total Income</span>
+                <span className="font-medium text-text-primary font-mono">
+                  {itrvDetails?.totalIncome !== null && itrvDetails?.totalIncome !== undefined
+                    ? formatCurrency(itrvDetails.totalIncome).replace(".00", "")
+                    : "—"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-muted">Tax Payable/Refundable</span>
+                <span className="font-semibold font-mono text-text-primary">
+                  {itrvDetails?.refundAmount !== null && itrvDetails?.refundAmount !== undefined && itrvDetails.refundAmount > 0 ? (
+                    <span className="text-green-700">(-) Refundable: {formatCurrency(itrvDetails.refundAmount).replace(".00", "")}</span>
+                  ) : itrvDetails?.taxPayable !== null && itrvDetails?.taxPayable !== undefined && itrvDetails.taxPayable > 0 ? (
+                    <span className="text-red-700">(+) Tax Payable: {formatCurrency(itrvDetails.taxPayable).replace(".00", "")}</span>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Refund Claim Charges Calculator */}
+          <div className="rounded-[var(--radius-panel)] border border-border-subtle bg-white p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-text-primary">Refund Claim Charges Calculator</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="space-y-1 text-xs text-text-secondary">
+                <span className="font-medium text-text-primary">Refundable Amount (₹)</span>
+                <input
+                  type="text"
+                  value={refundableAmount}
+                  onChange={(e) => setRefundableAmount(e.target.value)}
+                  className={`h-9 w-full rounded-[var(--radius-input)] border ${
+                    calcErrors.refundableAmount ? "border-red-500" : "border-border-subtle"
+                  } bg-white px-2.5 text-xs text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600`}
+                />
+                {calcErrors.refundableAmount && (
+                  <p className="text-[10px] text-red-500">{calcErrors.refundableAmount}</p>
+                )}
+              </label>
+
+              <label className="space-y-1 text-xs text-text-secondary">
+                <span className="font-medium text-text-primary">Refund Claim Charges %</span>
+                <input
+                  type="text"
+                  value={refundPercentage}
+                  onChange={(e) => setRefundPercentage(e.target.value)}
+                  className={`h-9 w-full rounded-[var(--radius-input)] border ${
+                    calcErrors.refundPercentage ? "border-red-500" : "border-border-subtle"
+                  } bg-white px-2.5 text-xs text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600`}
+                />
+                {calcErrors.refundPercentage && (
+                  <p className="text-[10px] text-red-500">{calcErrors.refundPercentage}</p>
+                )}
+              </label>
+            </div>
+
+            <div className="rounded-[var(--radius-input)] bg-brand-50 p-2.5 text-center sm:text-left flex flex-col sm:flex-row sm:items-center sm:justify-between border border-brand-100">
+              <span className="text-xs font-medium text-brand-900">Refund Claim Charges Amount</span>
+              <span className="text-base font-bold text-brand-700 font-mono">
+                {formatCurrency(calculatedRefundChargesAmount).replace(".00", "")}
+              </span>
+            </div>
+            {/* Auditing Fields Hidden Inputs */}
+            <input type="hidden" name="refundClaimSettingsPercentage" value={originalPercentage} />
+            <input type="hidden" name="refundClaimAppliedPercentage" value={refundPercentage} />
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
         <div className="flex items-center justify-between">
