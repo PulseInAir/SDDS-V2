@@ -46,7 +46,7 @@ const securityHeaders = [
       `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
       `style-src 'self' 'unsafe-inline'`,
       `connect-src 'self' https://${SUPABASE_HOST} wss://${SUPABASE_HOST}`,
-      `img-src 'self' data: blob: https://api.qrserver.com`,
+      `img-src 'self' data: blob: https://${SUPABASE_HOST} https://api.qrserver.com`,
       `font-src 'self'`,
       `object-src 'none'`,
       `frame-ancestors 'none'`,
