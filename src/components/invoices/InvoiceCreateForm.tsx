@@ -365,7 +365,7 @@ export function InvoiceCreateForm({
       </div>
 
       {/* Extracted details and Refund calculator section */}
-      {(itrvDetails || refundableAmount) && (
+      {selectedClientId && (
         <div className="grid gap-4 border-t border-border-subtle pt-4 md:grid-cols-2">
           {/* ITR-V Extracted details */}
           <div className="rounded-[var(--radius-panel)] border border-border-subtle bg-white p-4">
