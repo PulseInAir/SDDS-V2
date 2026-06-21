@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, useEffect } from "react";
 import { Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 
 import { createInvoiceAction, type InvoiceActionState } from "@/lib/actions/invoices";
+import { getClientDocumentsModuleData } from "@/lib/actions/documents";
 import { Button } from "@/components/ui/Button";
 
 type ClientOption = {
@@ -58,6 +59,72 @@ export function InvoiceCreateForm({
   const [items, setItems] = useState<InvoiceItemDraft[]>([createEmptyItem()]);
   const [discountAmount, setDiscountAmount] = useState("0");
 
+  const [selectedClientId, setSelectedClientId] = useState(defaultClientId ?? "");
+  const [selectedAyId, setSelectedAyId] = useState(
+    assessmentYears.find((year) => year.is_current)?.id ?? ""
+  );
+  const [clientDocuments, setClientDocuments] = useState<any[]>([]);
+  const [selectedDocId, setSelectedDocId] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
+
+  useEffect(() => {
+    if (!selectedClientId) {
+      setClientDocuments([]);
+      return;
+    }
+    getClientDocumentsModuleData(selectedClientId)
+      .then((res) => {
+        const docs = res.chains
+          .map((c) => c.latest)
+          .filter((d) => d.mime_type === "application/pdf");
+        setClientDocuments(docs);
+      })
+      .catch((err) => {
+        console.error("Failed to load client documents:", err);
+      });
+  }, [selectedClientId]);
+
+  const handleExtract = async (docId: string) => {
+    if (!docId) return;
+    setIsExtracting(true);
+    try {
+      const res = await fetch(`/api/documents/${docId}/extract`, {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        const { assessmentYear, itrForm, assessmentYearId } = result.data;
+
+        if (assessmentYearId) {
+          setSelectedAyId(assessmentYearId);
+        } else if (assessmentYear) {
+          const match = assessmentYears.find((ay) => ay.label === assessmentYear);
+          if (match) setSelectedAyId(match.id);
+        }
+
+        let fee = 1500;
+        if (itrForm === "ITR-1") fee = 1000;
+        else if (itrForm === "ITR-2") fee = 2500;
+        else if (itrForm === "ITR-3") fee = 5000;
+        else if (itrForm === "ITR-4") fee = 3500;
+
+        setItems([
+          {
+            id: crypto.randomUUID(),
+            description: `ITR Filing Charges - ${itrForm || "ITR"} (AY ${assessmentYear || "2026-27"})`,
+            quantity: "1",
+            unitAmount: String(fee),
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Extraction error:", err);
+    } finally {
+      setIsExtracting(false);
+      setSelectedDocId("");
+    }
+  };
+
   const subtotal = useMemo(
     () =>
       items.reduce((sum, item) => {
@@ -89,12 +156,47 @@ export function InvoiceCreateForm({
         <Receipt className="h-5 w-5 text-text-muted" aria-hidden="true" />
       </div>
 
+      {selectedClientId && clientDocuments.length > 0 && (
+        <div className="rounded-[var(--radius-input)] border border-brand-100 bg-brand-50/50 p-3 text-sm">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <span className="font-semibold text-brand-900">Autofill from document</span>
+              <p className="text-xs text-brand-700">Extract filing details and auto-populate invoice line items.</p>
+            </div>
+            <select
+              value={selectedDocId}
+              onChange={(e) => {
+                const docId = e.target.value;
+                setSelectedDocId(docId);
+                handleExtract(docId);
+              }}
+              disabled={isExtracting}
+              className="h-9 rounded-[var(--radius-input)] border border-brand-200 bg-white px-2 text-xs text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:opacity-50"
+            >
+              <option value="">Choose a document...</option>
+              {clientDocuments.map((doc) => (
+                <option key={doc.id} value={doc.id}>
+                  {doc.document_type} ({doc.original_filename})
+                </option>
+              ))}
+            </select>
+          </div>
+          {isExtracting && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-brand-800">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-700" />
+              <span>Parsing document and calculating filing charges...</span>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-1 text-sm text-text-secondary">
           <span className="font-medium text-text-primary">Client</span>
           <select
             name="clientId"
-            defaultValue={defaultClientId ?? ""}
+            value={selectedClientId}
+            onChange={(e) => setSelectedClientId(e.target.value)}
             required
             className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
           >
@@ -111,7 +213,8 @@ export function InvoiceCreateForm({
           <span className="font-medium text-text-primary">Assessment year</span>
           <select
             name="assessmentYearId"
-            defaultValue={assessmentYears.find((year) => year.is_current)?.id ?? ""}
+            value={selectedAyId}
+            onChange={(e) => setSelectedAyId(e.target.value)}
             required
             className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
           >
