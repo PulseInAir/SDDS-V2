@@ -35,7 +35,7 @@ function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; 
           
           {/* Logo Container: styled box as reference */}
           <div className="mt-8 bg-[#D5AD4E] p-3 rounded-lg border-4 border-[#610B35] flex items-center justify-center w-36 h-36">
-            <img src="/Logo.png" alt="SDDS Logo" className="object-contain w-full h-full" />
+            <img src="/Logo.png" alt="SDDS Logo" crossOrigin="anonymous" className="object-contain w-full h-full" />
           </div>
         </div>
 
@@ -147,6 +147,7 @@ function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; 
             <img 
               src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions&am=${invoice.balanceAmount}&cu=INR`)}`} 
               alt="Payment QR Code" 
+              crossOrigin="anonymous"
               className="w-24 h-24 object-contain"
             />
           </div>
@@ -169,11 +170,13 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
       const element = document.getElementById("invoice-print-only");
       if (!element) return;
 
-      // Temporarily show it off-screen for html2canvas
+      // Temporarily show it off-screen for html2canvas safely
       element.classList.remove("hidden");
-      element.style.position = "absolute";
-      element.style.left = "-9999px";
-      element.style.top = "-9999px";
+      element.style.position = "fixed";
+      element.style.left = "0";
+      element.style.top = "0";
+      element.style.zIndex = "-9999";
+      element.style.opacity = "0";
       element.style.display = "block";
       element.style.width = "850px";
 
@@ -187,6 +190,8 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
       element.style.position = "";
       element.style.left = "";
       element.style.top = "";
+      element.style.zIndex = "";
+      element.style.opacity = "";
       element.style.display = "";
       element.style.width = "";
       element.classList.add("hidden");
