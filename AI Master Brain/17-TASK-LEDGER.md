@@ -56,6 +56,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-AUTO-ARCHIVE-01 | DONE | Mark client inactive and archive starting from AY 2026-27 if case not opened for straight three AYs | DB-PURGE-01 | Database trigger automatically archives inactive clients on current AY rollover; test validation passes | `e1acb64` |
 | CLIENT-UX-01 | DONE | Relocate Add Client button, make metric cards clickable for filtering, and add sorting to client list column headers | CLIENT-AUTO-ARCHIVE-01 | Filters removed, global Add Client button added, metrics filter list correctly, sorting working | `77bec92` |
 | INVOICE-SETTINGS-01 | DONE | Add workspace default invoice settings, rate cards, refund parsing patterns, and auto-population logic | CLIENT-UX-01 | Settings form implemented, API updated, rate card and refund charges populate dynamically | `06e84bb` |
+| PDF-EXTRACT-01 | DONE | Fix Gemini PDF extraction prompt logic | INVOICE-SETTINGS-01 | Refined prompt rules to eliminate header hallucination as clientName and accurately pull income/tax totals | TBD |
 
 
 

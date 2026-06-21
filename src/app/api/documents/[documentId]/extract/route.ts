@@ -39,21 +39,20 @@ Extract the following fields from this PDF document and return ONLY a valid JSON
 Fields to extract:
 1. pan            — PAN number (format: 5 uppercase letters, 4 digits, 1 uppercase letter; e.g. AEDPH9905C)
 2. assessmentYear — Assessment year in "YYYY-YY" format (e.g. "2026-27"). Found near the top of the acknowledgement.
-3. itrForm        — ITR form type filed (e.g. "ITR-1", "ITR-2", "ITR-3", "ITR-4"). This is the form the taxpayer filed, NOT "ITR-V" (which is just the acknowledgement wrapper).
-4. clientName     — The FULL NAME of the individual taxpayer. This appears as a proper noun name (e.g. "RAMESH KUMAR SHARMA").
-                    CRITICAL: Do NOT use any of the following as the clientName:
-                    - Form titles or headings like "Where the data of the Return of Income in Form ITR-1..."
-                    - Legal/statutory descriptions
-                    - Any text that starts with "Where" or describes the form itself
-                    - Department names or addresses
-                    The taxpayer name is typically a short line with only capital letters near the PAN number or in the acknowledgement details section.
-5. totalIncome    — Total income chargeable to tax as a plain integer in Rupees. Look for a row labelled "Total Income" or "Gross Total Income". Null if not present.
-6. refundAmount   — Net tax refund due as a plain positive integer. Look for a row labelled "(+) Tax Payable / (-) Refundable" where the value is negative (refund). Null if it is a tax-payable case.
-7. taxPayable     — Net tax payable as a plain positive integer. Look for a row labelled "(+) Tax Payable / (-) Refundable" where the value is positive (payable). Null if it is a refund case.
+3. itrForm        — ITR form type filed (e.g. "ITR-1", "ITR-2", "ITR-3", "ITR-4", "ITR-5", "ITR-6", "ITR-7"). Look for the specific form number filed, not the general header.
+4. clientName     — The FULL NAME of the individual or entity taxpayer. 
+                    CRITICAL STRICT RULES for clientName:
+                    - MUST NOT start with "Where the data" or "Where the".
+                    - MUST NOT be a sentence, instruction, or paragraph.
+                    - MUST NOT contain terms like "SAHAJ", "SUGAM", "Form".
+                    - It is typically a short proper noun printed in ALL CAPS near the top, often adjacent to or just above the address or PAN number.
+5. totalIncome    — Total Income. Look for a field explicitly labelled "Total Income" (often field 14 or similar). Extract the numeric value as an integer. Return null if not found.
+6. refundAmount   — Refund Amount. Look for "(+) Tax Payable / (-) Refundable" (often field 17 or similar) or a "Refund" field. If the value represents a refund (often indicated by a negative sign in the calculation or placed in a refund column), extract the absolute integer value. Return null if tax is payable.
+7. taxPayable     — Tax Payable. Look for "(+) Tax Payable / (-) Refundable" or "Tax Payable". If the value represents tax owed, extract the absolute integer value. Return null if it's a refund.
 
 Rules:
 - refundAmount and taxPayable are mutually exclusive — only one can be non-null at a time.
-- All amounts must be plain integers (no ₹, no commas, no decimals).
+- All amounts must be plain integers (no ₹, no commas, no decimals). Example: 60570.
 - If a field genuinely cannot be found in the document, set it to null — do not guess or hallucinate.
 
 Return exactly this JSON structure (no extra keys, no markdown fences):
