@@ -93,10 +93,18 @@ Return exactly:
       taxPayable: safeNum(data.taxPayable),
     };
   } catch (error) {
-    // Re-throw so the route returns a 500 with the real error message.
-    // This surfaces the problem in Vercel function logs instead of silently
-    // falling back to regex and returning misleading partial data.
     const msg = error instanceof Error ? error.message : String(error);
+    // 429 quota exhausted or 404 model-not-found → fall back to regex parser
+    // so extraction still works while billing/key issues are resolved.
+    if (msg.includes("429") || msg.includes("Too Many Requests") ||
+        msg.includes("404") || msg.includes("Not Found")) {
+      console.warn(
+        "[PDF Extract] Gemini unavailable (quota/model error) — falling back to regex parser:",
+        msg.slice(0, 200)
+      );
+      return null;
+    }
+    // Unexpected errors are still surfaced so they appear in Vercel logs.
     console.error("[PDF Extract] Gemini extraction failed:", msg);
     throw new Error(`Gemini API error: ${msg}`);
   }
