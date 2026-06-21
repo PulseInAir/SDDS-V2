@@ -51,6 +51,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | G41 | DONE | Implement fixed full-page print overlay | G40 | Position print layout fixed at 100% width and height to remove white space offsets | `1616b3f` |
 | G42 | DONE | Fix profile avatar JWT cookie size bloat | SHELL-USER-MENU-01 | Migrate profile avatars out of auth metadata JWT into public storage bucket | `e700492` |
 | G43 | DONE | Fix dark mode styling glitches on filing queue and client details | G42 | Configure Tailwind CSS v4 class-based dark mode and remove dark: classes to prevent layout glitches under dark theme preferences | `c1b91a0` |
+| CLIENT-ENH-01 | DONE | Implement Client ID system, metric cards header, and filtering/sorting system | G43 | Client ID assigned sequentially (existing and new), stats cards visible, filters and sorting work | `48e7f41` |
 
 
 ## Task update protocol

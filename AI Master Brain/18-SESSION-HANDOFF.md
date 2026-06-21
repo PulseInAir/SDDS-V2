@@ -4,22 +4,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: G43 — Fix dark mode styling glitches on filing queue and client details (DONE)
-- Next READY task: None
+- Active task: CLIENT-ENH-01 — Implement Client ID system, metric cards header, and filtering/sorting system (DONE)
+- Next READY task: None (awaiting next task assignment)
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `c1b91a0`
+- HEAD: `48e7f41`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## G43 result (2026-06-20)
+## CLIENT-ENH-01 result (2026-06-21)
 
-**Status: DONE — resolved dark mode styling glitches.**
+**Status: DONE — implemented client ID system, metric cards header, and list filtering/sorting.**
 
 ### Verification steps completed:
-1. **Configured Tailwind Dark Mode**: Added `@variant dark (&:where(.dark, .dark *));` to `src/app/globals.css` so that Tailwind's `dark:` classes are only applied if the `.dark` class is explicitly present on the document, preventing automatic system preferences from matching.
-2. **Removed Dark Mode Classes**: Cleaned up the 6 components/pages containing `dark:` variants, ensuring panels, timeline events, and forms always render with the project's standard light-theme surface and text colors.
-3. **Tests & Build**: Ran `npm run check` and `npm run test` successfully. Verified production build succeeds.
+1. **Migration & DB Push**: Created and pushed `20260621030000_add_client_id_system.sql`. Successfully backfilled existing clients with formatted IDs (e.g. `SDDS-00001`).
+2. **Server-side queries**: Extended `getClients` in `clients.ts` server actions to support status filter, custom sortBy sorting, and returning calculated aggregate client metrics (total, active, inactive, excluded).
+3. **Frontend components**: Created `ClientFilters` and updated `ClientList`, `ClientProfileHeader`, and `page.tsx` to handle visual presentation, filter parameters, and displays.
+4. **Build & Tests check**: Executed `npm run check` with 77 tests passing and Next.js build succeeding successfully.
 
