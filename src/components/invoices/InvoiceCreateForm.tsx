@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState, useEffect, useRef } from "react";
+import { useActionState, useMemo, useState, useEffect } from "react";
 import { Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 
 import { createInvoiceAction, type InvoiceActionState } from "@/lib/actions/invoices";
@@ -87,9 +87,6 @@ export function InvoiceCreateForm({
     taxPayable: number | null;
   } | null>(null);
 
-  // Guard ref: when extraction sets the AY programmatically, suppress the useEffect reset
-  const suppressNextAyReset = useRef(false);
-
   // Calculator inputs
   const [refundableAmount, setRefundableAmount] = useState("");
   const [refundPercentage, setRefundPercentage] = useState(
@@ -138,12 +135,6 @@ export function InvoiceCreateForm({
   useEffect(() => {
     if (!selectedClientId || !selectedAyId) return;
 
-    // If this AY change was triggered by PDF extraction, skip the state reset
-    if (suppressNextAyReset.current) {
-      suppressNextAyReset.current = false;
-      return;
-    }
-
     getClientFilingCaseByAY(selectedClientId, selectedAyId)
       .then((filingCase) => {
         const ayLabel = assessmentYears.find((y) => y.id === selectedAyId)?.label ?? "";
@@ -159,9 +150,9 @@ export function InvoiceCreateForm({
             unitAmount: String(fee),
           },
         ]);
-        // Reset extracted details and calculator when AY changes (user-driven, not extraction-driven)
-        setItrvDetails(null);
-        setRefundableAmount("");
+        // NOTE: do NOT reset itrvDetails or refundableAmount here —
+        // those are cleared only when the client changes (above effect).
+        // Clearing here would race against extraction which also updates selectedAyId.
       })
       .catch((err) => {
         console.error("Failed to fetch client case for auto-populate:", err);
@@ -227,18 +218,16 @@ export function InvoiceCreateForm({
         method: "POST",
       });
       const result = await res.json();
+      console.log("[ITR-V Extract] API response:", JSON.stringify(result, null, 2));
       if (result.success && result.data) {
         const { assessmentYear, itrForm, assessmentYearId, refundAmount, totalIncome, taxPayable } = result.data;
+        console.log("[ITR-V Extract] Parsed fields:", { itrForm, totalIncome, refundAmount, taxPayable, assessmentYear, assessmentYearId });
 
         if (assessmentYearId) {
-          suppressNextAyReset.current = true;
           setSelectedAyId(assessmentYearId);
         } else if (assessmentYear) {
           const match = assessmentYears.find((ay) => ay.label === assessmentYear);
-          if (match) {
-            suppressNextAyReset.current = true;
-            setSelectedAyId(match.id);
-          }
+          if (match) setSelectedAyId(match.id);
         }
 
         const ayLabel = assessmentYear || assessmentYears.find((ay) => ay.id === selectedAyId)?.label || "2026-27";
@@ -246,13 +235,15 @@ export function InvoiceCreateForm({
         const parsedItrForm = itrForm || "ITR-V";
         const fee = rateCard[parsedItrForm] ?? rateCard["ITR-V"] ?? 500;
 
-        // Save parsed details for visual section
-        setItrvDetails({
+        const details = {
           itrForm: parsedItrForm,
           totalIncome: totalIncome ?? null,
           refundAmount: refundAmount ?? null,
           taxPayable: taxPayable ?? null,
-        });
+        };
+        console.log("[ITR-V Extract] Setting itrvDetails:", details);
+        // Save parsed details for visual section
+        setItrvDetails(details);
 
         // Pre-populate refundable amount if found
         if (refundAmount && refundAmount > 0) {
@@ -269,6 +260,8 @@ export function InvoiceCreateForm({
         ];
 
         setItems(newItems);
+      } else {
+        console.warn("[ITR-V Extract] No data returned or result.success is false:", result);
       }
     } catch (err) {
       console.error("Extraction error:", err);
