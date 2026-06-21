@@ -28,9 +28,9 @@ async function extractWithGemini(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // gemini-1.5-flash: stable PDF inline data support in @google/generative-ai v0.24.x
-    // (uses generativelanguage.googleapis.com/v1beta which fully supports this model)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // gemini-2.0-flash: current stable model with full PDF inline-data support
+    // (gemini-1.5-flash was removed from the v1beta endpoint)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `You are an expert at reading Indian Income Tax Return (ITR) documents and acknowledgement forms (ITR-V).
 
