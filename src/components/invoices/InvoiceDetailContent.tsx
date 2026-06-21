@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Landmark, Receipt, TriangleAlert } from "lucide-react";
+import { Lora } from "next/font/google";
 
 import type { getInvoiceDetail } from "@/lib/actions/invoices";
 import {
@@ -20,13 +21,15 @@ import { QRCodeSVG } from "qrcode.react";
 
 type InvoiceDetail = NonNullable<Awaited<ReturnType<typeof getInvoiceDetail>>>;
 
+const lora = Lora({ subsets: ["latin"], weight: ["400", "500", "600", "700"], display: "swap" });
+
 function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; className?: string }) {
   const items = invoice.invoice_items ?? [];
   const totalRows = 8;
   const emptyRowCount = Math.max(0, totalRows - items.length);
 
   return (
-    <div className={`flex flex-col sm:flex-row w-full bg-[#FFF4D4] text-neutral-900 font-sans shadow-none border border-neutral-300 ${className ?? ""}`}>
+    <div className={`flex flex-col sm:flex-row w-full bg-[#FFF4D4] text-neutral-900 ${lora.className} shadow-none border border-neutral-300 ${className ?? ""}`}>
       {/* Left Column: Forest Green (Branding & Identity) - Exact 32.5% Width */}
       <div className="w-full sm:w-[32.5%] bg-[#476A30] text-white p-6 flex flex-col items-center justify-between border-b sm:border-b-0 sm:border-r border-neutral-300">
         <div className="flex flex-col items-center w-full">
