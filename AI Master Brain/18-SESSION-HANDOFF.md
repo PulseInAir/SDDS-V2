@@ -4,23 +4,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: CLIENT-ENH-01 — Implement Client ID system, metric cards header, and filtering/sorting system (DONE)
+- Active task: DB-PURGE-01 — Purge test data for production go-live (DONE)
 - Next READY task: None (awaiting next task assignment)
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `48e7f41`
+- HEAD: `b5f5da8`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## CLIENT-ENH-01 result (2026-06-21)
+## DB-PURGE-01 result (2026-06-21)
 
-**Status: DONE — implemented client ID system, metric cards header, and list filtering/sorting.**
+**Status: DONE — purged test data from Supabase DB to go live.**
 
 ### Verification steps completed:
-1. **Migration & DB Push**: Created and pushed `20260621030000_add_client_id_system.sql`. Successfully backfilled existing clients with formatted IDs (e.g. `SDDS-00001`).
-2. **Server-side queries**: Extended `getClients` in `clients.ts` server actions to support status filter, custom sortBy sorting, and returning calculated aggregate client metrics (total, active, inactive, excluded).
-3. **Frontend components**: Created `ClientFilters` and updated `ClientList`, `ClientProfileHeader`, and `page.tsx` to handle visual presentation, filter parameters, and displays.
-4. **Build & Tests check**: Executed `npm run check` with 77 tests passing and Next.js build succeeding successfully.
+1. **Purged Operational Data**: Successfully truncated all 16 client, case, invoice, payment, document, follow-up, notices, and activity log tables on the remote database.
+2. **Owner Login Intact**: Preserved the owner's authentication user and workspace membership rows.
+3. **Reset Client ID Sequence**: Restarted the Client ID sequence generator to start at 1.
+4. **Client Count Verified**: Verified database client count is `0`.
 
