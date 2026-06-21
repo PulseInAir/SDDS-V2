@@ -51,118 +51,116 @@ export function DocumentsPageContent({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-text-primary">Documents</h1>
-              <p className="mt-1 text-sm text-text-muted">
-                Work the checklist exceptions first, then review the latest authorised document history.
-              </p>
-            </div>
-            <Link href={basePath} className="text-sm font-medium text-brand-700 hover:text-brand-800">
-              Reset filters
-            </Link>
+      <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Documents</h1>
+            <p className="mt-1 text-sm text-text-muted">
+              Work the checklist exceptions first, then review the latest authorised document history.
+            </p>
           </div>
+          <Link href={basePath} className="text-sm font-medium text-brand-700 hover:text-brand-800">
+            Reset filters
+          </Link>
+        </div>
 
-          <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {showClientSearch ? (
-              <label className="space-y-1 text-sm text-text-secondary xl:col-span-2">
-                <span className="font-medium text-text-primary">Client search</span>
-                <input
-                  type="text"
-                  name="search"
-                  defaultValue={activeFilters.search ?? ""}
-                  placeholder="Client name or PAN"
-                  className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-                />
-              </label>
-            ) : null}
-
-            {currentClientId ? <input type="hidden" name="clientId" value={currentClientId} /> : null}
-
-            <label className="space-y-1 text-sm text-text-secondary">
-              <span className="font-medium text-text-primary">Assessment year</span>
-              <select
-                name="assessmentYearId"
-                defaultValue={activeFilters.assessmentYearId ?? ""}
-                className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-              >
-                <option value="">All years</option>
-                {data.assessmentYears.map((assessmentYear) => (
-                  <option key={assessmentYear.id} value={assessmentYear.id}>
-                    {assessmentYear.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="space-y-1 text-sm text-text-secondary">
-              <span className="font-medium text-text-primary">Checklist status</span>
-              <select
-                name="checklistStatus"
-                defaultValue={activeFilters.checklistStatus ?? ""}
-                className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-              >
-                <option value="">All statuses</option>
-                {DOCUMENT_CHECKLIST_STATUSES.map((status) => (
-                  <option key={status} value={status}>
-                    {formatDocumentChecklistStatus(status)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="space-y-1 text-sm text-text-secondary">
-              <span className="font-medium text-text-primary">Document type</span>
+        <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {showClientSearch ? (
+            <label className="space-y-1 text-sm text-text-secondary xl:col-span-2">
+              <span className="font-medium text-text-primary">Client search</span>
               <input
                 type="text"
-                name="type"
-                defaultValue={activeFilters.type ?? ""}
-                placeholder="Filter by type"
+                name="search"
+                defaultValue={activeFilters.search ?? ""}
+                placeholder="Client name or PAN"
                 className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </label>
+          ) : null}
 
-            <div className="flex items-end">
-              <Button type="submit" variant="primary" className="w-full">
-                Apply filters
-              </Button>
-            </div>
-          </form>
+          {currentClientId ? <input type="hidden" name="clientId" value={currentClientId} /> : null}
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-text-muted">Exceptions</p>
-                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.exceptionCount}</p>
-              </div>
-              <p className="mt-3 text-sm text-text-secondary">Missing, requested, rejected, or replacement-needed work.</p>
-            </div>
-            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-text-muted">Verified</p>
-                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.verifiedCount}</p>
-              </div>
-              <p className="mt-3 text-sm text-text-secondary">Latest checklist records already verified.</p>
-            </div>
-            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
-                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.receivedCount}</p>
-              </div>
-              <p className="mt-3 text-sm text-text-secondary">Files uploaded and waiting for further review.</p>
-            </div>
-            <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-text-muted">Versioned</p>
-                <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.versionedCount}</p>
-              </div>
-              <p className="mt-3 text-sm text-text-secondary">Document chains that already preserve replacement history.</p>
-            </div>
+          <label className="space-y-1 text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">Assessment year</span>
+            <select
+              name="assessmentYearId"
+              defaultValue={activeFilters.assessmentYearId ?? ""}
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            >
+              <option value="">All years</option>
+              {data.assessmentYears.map((assessmentYear) => (
+                <option key={assessmentYear.id} value={assessmentYear.id}>
+                  {assessmentYear.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">Checklist status</span>
+            <select
+              name="checklistStatus"
+              defaultValue={activeFilters.checklistStatus ?? ""}
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            >
+              <option value="">All statuses</option>
+              {DOCUMENT_CHECKLIST_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {formatDocumentChecklistStatus(status)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">Document type</span>
+            <input
+              type="text"
+              name="type"
+              defaultValue={activeFilters.type ?? ""}
+              placeholder="Filter by type"
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            />
+          </label>
+
+          <div className="flex items-end">
+            <Button type="submit" variant="primary" className="w-full">
+              Apply filters
+            </Button>
           </div>
-        </section>
-      </div>
+        </form>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-text-muted">Exceptions</p>
+              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.exceptionCount}</p>
+            </div>
+            <p className="mt-3 text-sm text-text-secondary">Missing, requested, rejected, or replacement-needed work.</p>
+          </div>
+          <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-text-muted">Verified</p>
+              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.verifiedCount}</p>
+            </div>
+            <p className="mt-3 text-sm text-text-secondary">Latest checklist records already verified.</p>
+          </div>
+          <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
+              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.receivedCount}</p>
+            </div>
+            <p className="mt-3 text-sm text-text-secondary">Files uploaded and waiting for further review.</p>
+          </div>
+          <div className="flex h-full flex-col justify-between rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-text-muted">Versioned</p>
+              <p className="mt-2 text-2xl font-semibold text-text-primary">{data.summary.versionedCount}</p>
+            </div>
+            <p className="mt-3 text-sm text-text-secondary">Document chains that already preserve replacement history.</p>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
         <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
