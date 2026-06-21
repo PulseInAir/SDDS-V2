@@ -28,8 +28,9 @@ async function extractWithGemini(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // gemini-2.0-flash: fast, multimodal, supports PDF inline data
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // gemini-1.5-flash: stable PDF inline data support in @google/generative-ai v0.24.x
+    // (uses generativelanguage.googleapis.com/v1beta which fully supports this model)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are an expert at reading Indian Income Tax Return (ITR) documents and acknowledgement forms (ITR-V).
 
@@ -92,8 +93,12 @@ Return exactly:
       taxPayable: safeNum(data.taxPayable),
     };
   } catch (error) {
-    console.error("[PDF Extract] Gemini extraction failed:", error);
-    return null;
+    // Re-throw so the route returns a 500 with the real error message.
+    // This surfaces the problem in Vercel function logs instead of silently
+    // falling back to regex and returning misleading partial data.
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[PDF Extract] Gemini extraction failed:", msg);
+    throw new Error(`Gemini API error: ${msg}`);
   }
 }
 

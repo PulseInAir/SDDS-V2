@@ -57,11 +57,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // pdf-parse uses pdfjs-dist internally. Externalizing it prevents Next.js/
-  // Webpack from bundling it into the serverless lambda, which would break
-  // the module resolution at runtime. Node.js loads it directly from
-  // node_modules instead.
-  serverExternalPackages: ["pdf-parse"],
+  // Packages that must NOT be webpack-bundled in the serverless lambda.
+  // They rely on dynamic requires, native modules, or network internals that
+  // break when inlined into a webpack chunk. Node.js loads them natively.
+  serverExternalPackages: ["pdf-parse", "@google/generative-ai"],
   async headers() {
     return [
       {
