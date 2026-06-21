@@ -8,19 +8,19 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None (awaiting next task assignment)
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `e1acb64`
+- HEAD: `685bbfb`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
-- Working tree: clean (with brain edits)
+- Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## CLIENT-AUTO-ARCHIVE-01 result (2026-06-21)
+## PDF Data Extraction & Invoice Autofill result (2026-06-21)
 
-**Status: DONE — implemented client auto-archiving trigger.**
+**Status: DONE — implemented PDF extraction and invoice autofill.**
 
 ### Verification steps completed:
-1. **Trigger and Function Applied**: Successfully applied `auto_archive_inactive_clients()` trigger and function on the remote database.
-2. **Static Contract Testing**: Added `client-auto-archive-contract.test.mjs` verifying correctness of database function and trigger declarations.
-3. **Test Suite Execution**: Ran the test suite verifying all 78 tests passed successfully.
+1. **API & Utility Implementation**: Added `src/lib/utils/pdf.ts` and `src/app/api/documents/[documentId]/extract/route.ts` API.
+2. **Form Integration**: Integrated a document dropdown and auto-extraction mechanism in `src/components/invoices/InvoiceCreateForm.tsx`.
+3. **Type and Test Suite Check**: Verified that the app builds/typechecks successfully and all 78 tests pass.
 
 
