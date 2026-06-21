@@ -165,24 +165,28 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
   const handleDownloadJPEG = async () => {
     try {
       setIsDownloading(true);
-      const { default: html2canvas } = await import("html2canvas");
       const element = document.getElementById("invoice-print-only");
       if (!element) return;
 
-      // Temporarily show it off-screen for html2canvas safely
+      // Temporarily show it off-screen safely
       element.classList.remove("hidden");
       element.style.position = "fixed";
       element.style.left = "0";
       element.style.top = "0";
       element.style.zIndex = "-9999";
-      element.style.opacity = "0";
+      element.style.opacity = "1"; // Opacity 1 ensures the renderer sees it. Z-index hides it behind background.
       element.style.display = "block";
       element.style.width = "850px";
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
+      // Allow the browser a frame to layout the visible element
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const { toJpeg } = await import("html-to-image");
+
+      const dataUrl = await toJpeg(element, {
+        quality: 0.95,
         backgroundColor: "#FFF2D3",
+        pixelRatio: 2,
       });
 
       // Restore original state
@@ -195,7 +199,6 @@ export function InvoiceDetailContent({ invoice }: { invoice: InvoiceDetail }) {
       element.style.width = "";
       element.classList.add("hidden");
 
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
       const link = document.createElement("a");
       link.download = `Invoice_${invoice.invoice_number.replace(/\//g, "-")}.jpg`;
       link.href = dataUrl;
