@@ -1,5 +1,4 @@
-// @ts-expect-error pdf-parse lacks default export compatibility under bundler module resolution
-import pdfParse from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 
 export type ExtractedPdfData = {
   pan: string | null;
@@ -10,8 +9,14 @@ export type ExtractedPdfData = {
 };
 
 export async function parsePdfBuffer(buffer: Buffer): Promise<ExtractedPdfData> {
-  const data = await pdfParse(buffer);
-  const text = data.text;
+  const parser = new PDFParse({ data: new Uint8Array(buffer) });
+  let text = "";
+  try {
+    const data = await parser.getText();
+    text = data.text;
+  } finally {
+    await parser.destroy();
+  }
 
   // Regex to extract PAN: 5 uppercase letters, 4 digits, 1 uppercase letter
   const panRegex = /[A-Z]{5}[0-9]{4}[A-Z]{1}/;
