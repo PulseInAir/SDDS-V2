@@ -456,3 +456,24 @@ export async function createFilingCaseAction(
 
   return { success: `Filing case for ${ay.label} created.`, caseId: newCase.id };
 }
+
+export async function getClientFilingCaseByAY(clientId: string, assessmentYearId: string) {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from('filing_cases')
+    .select('id, case_status, return_category')
+    .eq('workspace_id', session.workspace.id)
+    .eq('client_id', clientId)
+    .eq('assessment_year_id', assessmentYearId)
+    .is('archived_at', null)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching client filing case by AY:', error);
+    return null;
+  }
+
+  return data;
+}

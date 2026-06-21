@@ -30,7 +30,11 @@ export default async function InvoicesPage({
 
   return (
     <div className="space-y-6">
-      <InvoiceCreateForm clients={data.clients} assessmentYears={data.assessmentYears} />
+      <InvoiceCreateForm
+        clients={data.clients}
+        assessmentYears={data.assessmentYears}
+        invoiceSettings={data.invoiceSettings}
+      />
       <InvoicePageContent data={data} basePath="/invoices" showClientFilter={true} />
     </div>
   );

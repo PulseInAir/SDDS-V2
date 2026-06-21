@@ -96,6 +96,12 @@ export async function getSettingsPageData() {
     ]),
   );
 
+  const { data: invoiceSettings } = await supabase
+    .from("workspace_invoice_settings")
+    .select("rate_card, refund_charge_percentage, pdf_extraction_settings")
+    .eq("workspace_id", session.workspace.id)
+    .maybeSingle();
+
   return {
     workspace: session.workspace,
     invoiceCount: invoiceCount ?? 0,
@@ -104,6 +110,24 @@ export async function getSettingsPageData() {
       ...assessmentYear,
       nextInvoiceSerial: sequenceMap.get(assessmentYear.id) ?? 1,
     })),
+    invoiceSettings: invoiceSettings ?? {
+      rate_card: {
+        "ITR-1": 500,
+        "ITR-2": 1500,
+        "ITR-3": 3000,
+        "ITR-4": 2000,
+        "ITR-5": 5000,
+        "ITR-6": 10000,
+        "ITR-7": 5000,
+        "ITR-V": 500
+      },
+      refund_charge_percentage: 10,
+      pdf_extraction_settings: {
+        page_scope: "first_page",
+        itr_form_pattern: "ITR-\\d[A-Z]?|ITR-V",
+        refund_amount_pattern: "refund\\s*due|refund|refundable"
+      }
+    }
   };
 }
 
@@ -313,4 +337,61 @@ export async function setAssessmentYearOpenStateAction(formData: FormData) {
   }
 
   revalidatePath("/settings");
+}
+
+export async function updateInvoiceSettingsAction(
+  _previousState: SettingsActionState,
+  formData: FormData
+): Promise<SettingsActionState> {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  try {
+    const refundPercentage = parseFloat(String(formData.get("refundChargePercentage") ?? "0"));
+    if (isNaN(refundPercentage) || refundPercentage < 0 || refundPercentage > 100) {
+      return { error: "Refund charge percentage must be between 0 and 100." };
+    }
+
+    const rateCard: Record<string, number> = {};
+    for (const key of ["ITR-1", "ITR-2", "ITR-3", "ITR-4", "ITR-5", "ITR-6", "ITR-7", "ITR-V"]) {
+      const rate = parseFloat(String(formData.get(`rate_${key}`) ?? "0"));
+      if (isNaN(rate) || rate < 0) {
+        return { error: `Invalid rate for ${key}.` };
+      }
+      rateCard[key] = rate;
+    }
+
+    const pageScope = String(formData.get("pageScope") ?? "first_page");
+    const itrFormPattern = String(formData.get("itrFormPattern") ?? "").trim();
+    const refundAmountPattern = String(formData.get("refundAmountPattern") ?? "").trim();
+
+    if (!itrFormPattern) {
+      return { error: "ITR Form regex pattern is required." };
+    }
+    if (!refundAmountPattern) {
+      return { error: "Refund amount regex pattern is required." };
+    }
+
+    const { error } = await supabase
+      .from("workspace_invoice_settings")
+      .upsert({
+        workspace_id: session.workspace.id,
+        rate_card: rateCard,
+        refund_charge_percentage: refundPercentage,
+        pdf_extraction_settings: {
+          page_scope: pageScope,
+          itr_form_pattern: itrFormPattern,
+          refund_amount_pattern: refundAmountPattern,
+        },
+      });
+
+    if (error) {
+      return { error: `Failed to save settings: ${error.message}` };
+    }
+
+    revalidatePath("/settings");
+    return { success: "Invoice defaults and extraction settings updated." };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "An unexpected error occurred." };
+  }
 }

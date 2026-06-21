@@ -190,8 +190,17 @@ async function fetchInvoices(workspaceId: string, filters: InvoiceFilters) {
 
 export async function getInvoicesModuleData(filters: InvoiceFilters = {}) {
   const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
   const { clients, assessmentYears } = await getInvoiceReferenceData(session.workspace.id, filters.clientId);
-  const invoices = await fetchInvoices(session.workspace.id, filters);
+
+  const [invoices, { data: invoiceSettings }] = await Promise.all([
+    fetchInvoices(session.workspace.id, filters),
+    supabase
+      .from("workspace_invoice_settings")
+      .select("rate_card, refund_charge_percentage, pdf_extraction_settings")
+      .eq("workspace_id", session.workspace.id)
+      .maybeSingle()
+  ]);
 
   const totalInvoices = invoices.length;
   const pageSize = filters.pageSize ?? 12;
@@ -214,6 +223,24 @@ export async function getInvoicesModuleData(filters: InvoiceFilters = {}) {
     assessmentYears,
     invoices,
     paginatedInvoices,
+    invoiceSettings: invoiceSettings ?? {
+      rate_card: {
+        "ITR-1": 500,
+        "ITR-2": 1500,
+        "ITR-3": 3000,
+        "ITR-4": 2000,
+        "ITR-5": 5000,
+        "ITR-6": 10000,
+        "ITR-7": 5000,
+        "ITR-V": 500
+      },
+      refund_charge_percentage: 10,
+      pdf_extraction_settings: {
+        page_scope: "first_page",
+        itr_form_pattern: "ITR-\\d[A-Z]?|ITR-V",
+        refund_amount_pattern: "refund\\s*due|refund|refundable"
+      }
+    },
     summary: {
       billedAmount: Number(billableInvoices.reduce((sum, invoice) => sum + Number(invoice.total_amount ?? 0), 0).toFixed(2)),
       receivedAmount: Number(billableInvoices.reduce((sum, invoice) => sum + invoice.paidAmount, 0).toFixed(2)),

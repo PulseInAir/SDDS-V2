@@ -7,6 +7,7 @@ import {
   setCurrentAssessmentYearAction,
 } from "@/lib/actions/settings";
 import { AssessmentYearCreateForm } from "@/components/settings/AssessmentYearCreateForm";
+import { InvoiceSettingsForm } from "@/components/settings/InvoiceSettingsForm";
 import { PrivacySettingsForm } from "@/components/settings/PrivacySettingsForm";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 
@@ -38,6 +39,7 @@ export function SettingsPageContent({ data }: { data: SettingsPageData }) {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <div className="space-y-6">
+          <InvoiceSettingsForm settings={data.invoiceSettings} />
           <AssessmentYearCreateForm />
 
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">

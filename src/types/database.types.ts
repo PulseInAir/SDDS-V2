@@ -1238,6 +1238,41 @@ export type Database = {
           },
         ]
       }
+      workspace_invoice_settings: {
+        Row: {
+          created_at: string
+          pdf_extraction_settings: Json
+          rate_card: Json
+          refund_charge_percentage: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          pdf_extraction_settings?: Json
+          rate_card?: Json
+          refund_charge_percentage?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          pdf_extraction_settings?: Json
+          rate_card?: Json
+          refund_charge_percentage?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invoice_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           active: boolean

@@ -5,6 +5,7 @@ import { Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 
 import { createInvoiceAction, type InvoiceActionState } from "@/lib/actions/invoices";
 import { getClientDocumentsModuleData } from "@/lib/actions/documents";
+import { getClientFilingCaseByAY } from "@/lib/actions/cases";
 import { Button } from "@/components/ui/Button";
 
 type ClientOption = {
@@ -50,10 +51,20 @@ export function InvoiceCreateForm({
   clients,
   assessmentYears,
   defaultClientId,
+  invoiceSettings,
 }: {
   clients: ClientOption[];
   assessmentYears: AssessmentYearOption[];
   defaultClientId?: string;
+  invoiceSettings?: {
+    rate_card: Record<string, number>;
+    refund_charge_percentage: number;
+    pdf_extraction_settings: {
+      page_scope: string;
+      itr_form_pattern: string;
+      refund_amount_pattern: string;
+    };
+  };
 }) {
   const [state, formAction, isPending] = useActionState(createInvoiceAction, initialState);
   const [items, setItems] = useState<InvoiceItemDraft[]>([createEmptyItem()]);
@@ -63,13 +74,14 @@ export function InvoiceCreateForm({
   const [selectedAyId, setSelectedAyId] = useState(
     assessmentYears.find((year) => year.is_current)?.id ?? ""
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [clientDocuments, setClientDocuments] = useState<any[]>([]);
   const [selectedDocId, setSelectedDocId] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
 
   useEffect(() => {
     if (!selectedClientId) {
-      setClientDocuments([]);
+      Promise.resolve().then(() => setClientDocuments((prev) => (prev.length === 0 ? prev : [])));
       return;
     }
     getClientDocumentsModuleData(selectedClientId)
@@ -84,6 +96,31 @@ export function InvoiceCreateForm({
       });
   }, [selectedClientId]);
 
+  // Autofill flat ITR fee dynamically when Client or AY changes, based on active filing case's ITR return category
+  useEffect(() => {
+    if (!selectedClientId || !selectedAyId) return;
+
+    getClientFilingCaseByAY(selectedClientId, selectedAyId)
+      .then((filingCase) => {
+        const ayLabel = assessmentYears.find((y) => y.id === selectedAyId)?.label ?? "";
+        const rateCard = invoiceSettings?.rate_card ?? {};
+        const parsedItrForm = filingCase?.return_category || "ITR-V";
+        const fee = rateCard[parsedItrForm] ?? rateCard["ITR-V"] ?? 500;
+
+        setItems([
+          {
+            id: crypto.randomUUID(),
+            description: `ITR Filing Charges - ${parsedItrForm} (AY ${ayLabel})`,
+            quantity: "1",
+            unitAmount: String(fee),
+          },
+        ]);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch client case for auto-populate:", err);
+      });
+  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears]);
+
   const handleExtract = async (docId: string) => {
     if (!docId) return;
     setIsExtracting(true);
@@ -93,7 +130,7 @@ export function InvoiceCreateForm({
       });
       const result = await res.json();
       if (result.success && result.data) {
-        const { assessmentYear, itrForm, assessmentYearId } = result.data;
+        const { assessmentYear, itrForm, assessmentYearId, refundAmount } = result.data;
 
         if (assessmentYearId) {
           setSelectedAyId(assessmentYearId);
@@ -102,20 +139,32 @@ export function InvoiceCreateForm({
           if (match) setSelectedAyId(match.id);
         }
 
-        let fee = 1500;
-        if (itrForm === "ITR-1") fee = 1000;
-        else if (itrForm === "ITR-2") fee = 2500;
-        else if (itrForm === "ITR-3") fee = 5000;
-        else if (itrForm === "ITR-4") fee = 3500;
+        const ayLabel = assessmentYear || assessmentYears.find((ay) => ay.id === selectedAyId)?.label || "2026-27";
+        const rateCard = invoiceSettings?.rate_card ?? {};
+        const parsedItrForm = itrForm || "ITR-V";
+        const fee = rateCard[parsedItrForm] ?? rateCard["ITR-V"] ?? 500;
 
-        setItems([
+        const newItems: InvoiceItemDraft[] = [
           {
             id: crypto.randomUUID(),
-            description: `ITR Filing Charges - ${itrForm || "ITR"} (AY ${assessmentYear || "2026-27"})`,
+            description: `ITR Filing Charges - ${parsedItrForm} (AY ${ayLabel})`,
             quantity: "1",
             unitAmount: String(fee),
           },
-        ]);
+        ];
+
+        const refundPercent = invoiceSettings?.refund_charge_percentage ?? 10;
+        if (refundAmount && refundAmount > 0 && refundPercent > 0) {
+          const refundFee = Math.round(refundAmount * (refundPercent / 100));
+          newItems.push({
+            id: crypto.randomUUID(),
+            description: `Refund Processing Fee (${refundPercent}%) - AY ${ayLabel}`,
+            quantity: "1",
+            unitAmount: String(refundFee),
+          });
+        }
+
+        setItems(newItems);
       }
     } catch (err) {
       console.error("Extraction error:", err);

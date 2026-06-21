@@ -45,6 +45,7 @@ export default async function ClientInvoicesPage({
         clients={data.clients}
         assessmentYears={data.assessmentYears}
         defaultClientId={resolvedParams.clientId}
+        invoiceSettings={data.invoiceSettings}
       />
       <InvoicePageContent
         data={data}

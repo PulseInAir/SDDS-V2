@@ -13,14 +13,21 @@ export async function POST(
     const session = await getAuthenticatedWorkspaceSession();
     const supabase = await createSupabaseServerClient();
 
-    // 1. Fetch document metadata
-    const { data: document, error: fetchError } = await supabase
-      .from("documents")
-      .select("storage_path, original_filename, client_id, assessment_year_id")
-      .eq("workspace_id", session.workspace.id)
-      .eq("id", resolvedParams.documentId)
-      .is("archived_at", null)
-      .single();
+    // 1. Fetch document metadata and workspace invoice settings in parallel
+    const [{ data: document, error: fetchError }, { data: invoiceSettings }] = await Promise.all([
+      supabase
+        .from("documents")
+        .select("storage_path, original_filename, client_id, assessment_year_id")
+        .eq("workspace_id", session.workspace.id)
+        .eq("id", resolvedParams.documentId)
+        .is("archived_at", null)
+        .single(),
+      supabase
+        .from("workspace_invoice_settings")
+        .select("rate_card, refund_charge_percentage, pdf_extraction_settings")
+        .eq("workspace_id", session.workspace.id)
+        .maybeSingle()
+    ]);
 
     if (fetchError || !document) {
       return NextResponse.json({ error: "Document not found or inaccessible." }, { status: 404 });
@@ -38,8 +45,14 @@ export async function POST(
     const arrayBuffer = await fileBlob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 3. Parse PDF buffer
-    const parsedData = await parsePdfBuffer(buffer);
+    // 3. Parse PDF buffer using the workspace PDF extraction settings
+    const extractionSettings = invoiceSettings?.pdf_extraction_settings as {
+      page_scope?: string;
+      itr_form_pattern?: string;
+      refund_amount_pattern?: string;
+    } | undefined;
+
+    const parsedData = await parsePdfBuffer(buffer, extractionSettings);
 
     return NextResponse.json({
       success: true,
@@ -48,6 +61,7 @@ export async function POST(
         assessmentYear: parsedData.assessmentYear,
         itrForm: parsedData.itrForm,
         clientName: parsedData.clientName,
+        refundAmount: parsedData.refundAmount,
         clientId: document.client_id,
         assessmentYearId: document.assessment_year_id,
       },

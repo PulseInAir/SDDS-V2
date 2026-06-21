@@ -5,10 +5,18 @@ export type ExtractedPdfData = {
   assessmentYear: string | null;
   itrForm: string | null;
   clientName: string | null;
+  refundAmount: number | null;
   rawText: string;
 };
 
-export async function parsePdfBuffer(buffer: Buffer): Promise<ExtractedPdfData> {
+export async function parsePdfBuffer(
+  buffer: Buffer,
+  settings?: {
+    page_scope?: string;
+    itr_form_pattern?: string;
+    refund_amount_pattern?: string;
+  }
+): Promise<ExtractedPdfData> {
   const parser = new PDFParse({ data: new Uint8Array(buffer) });
   let text = "";
   try {
@@ -18,14 +26,23 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<ExtractedPdfData> 
     await parser.destroy();
   }
 
+  // 1. Determine search space based on page scope settings
+  let searchSpace = text;
+  if (settings?.page_scope === "first_page") {
+    const pages = text.split("\f");
+    if (pages.length > 0) {
+      searchSpace = pages[0];
+    }
+  }
+
   // Regex to extract PAN: 5 uppercase letters, 4 digits, 1 uppercase letter
   const panRegex = /[A-Z]{5}[0-9]{4}[A-Z]{1}/;
-  const panMatch = text.match(panRegex);
+  const panMatch = searchSpace.match(panRegex);
   const pan = panMatch ? panMatch[0] : null;
 
   // Regex to extract Assessment Year (e.g. 2026-27 or 2026-2027)
   const ayRegex = /(20\d{2})[-/](\d{2,4})/;
-  const ayMatch = text.match(ayRegex);
+  const ayMatch = searchSpace.match(ayRegex);
   let assessmentYear = null;
   if (ayMatch) {
     const startYear = ayMatch[1];
@@ -36,15 +53,29 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<ExtractedPdfData> 
     assessmentYear = `${startYear}-${endYear}`;
   }
 
-  // Find ITR Form type (e.g., ITR-1, ITR-4, ITR-V, etc.)
-  const itrFormRegex = /\b(ITR-\d[A-Z]?|ITR-V)\b/i;
-  const itrFormMatch = text.match(itrFormRegex);
+  // Find ITR Form type using settings-derived pattern
+  const itrFormPattern = settings?.itr_form_pattern || "ITR-\\d[A-Z]?|ITR-V";
+  const itrFormRegex = new RegExp(`\\b(${itrFormPattern})\\b`, "i");
+  const itrFormMatch = searchSpace.match(itrFormRegex);
   const itrForm = itrFormMatch ? itrFormMatch[0].toUpperCase() : null;
+
+  // Attempt to extract Refund amount using settings-derived pattern
+  const refundAmountPattern = settings?.refund_amount_pattern || "refund\\s*due|refund|refundable";
+  const refundRegex = new RegExp(`(?:${refundAmountPattern})\\b\\s*[:\\-]?\\s*([\\d,]+(?:\\.\\d+)?)`, "i");
+  const refundMatch = searchSpace.match(refundRegex);
+  let refundAmount: number | null = null;
+  if (refundMatch && refundMatch[1]) {
+    const cleanAmt = refundMatch[1].replace(/,/g, "");
+    const parsedAmt = parseFloat(cleanAmt);
+    if (!isNaN(parsedAmt)) {
+      refundAmount = parsedAmt;
+    }
+  }
 
   // Attempt to extract client name
   // Usually, in ITR-V it's preceded by "Name:" or "Received from" or at the top.
-  // Let's do a simple extraction from the first few lines.
-  const lines = text.split("\n").map((l: string) => l.trim()).filter(Boolean);
+  // Let's do a simple extraction from the first few lines of the searchSpace.
+  const lines = searchSpace.split("\n").map((l: string) => l.trim()).filter(Boolean);
   let clientName: string | null = null;
   
   for (const line of lines) {
@@ -65,6 +96,7 @@ export async function parsePdfBuffer(buffer: Buffer): Promise<ExtractedPdfData> 
     assessmentYear,
     itrForm,
     clientName,
+    refundAmount,
     rawText: text,
   };
 }
