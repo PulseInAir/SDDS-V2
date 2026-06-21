@@ -57,6 +57,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-UX-01 | DONE | Relocate Add Client button, make metric cards clickable for filtering, and add sorting to client list column headers | CLIENT-AUTO-ARCHIVE-01 | Filters removed, global Add Client button added, metrics filter list correctly, sorting working | `77bec92` |
 | INVOICE-SETTINGS-01 | DONE | Add workspace default invoice settings, rate cards, refund parsing patterns, and auto-population logic | CLIENT-UX-01 | Settings form implemented, API updated, rate card and refund charges populate dynamically | `06e84bb` |
 | PDF-EXTRACT-01 | DONE | Fix Gemini PDF extraction prompt logic | INVOICE-SETTINGS-01 | Refined prompt rules to eliminate header hallucination as clientName and accurately pull income/tax totals | `5e8a4fc` |
+| INVOICE-FIX-01 | DONE | Fix ISO date crash in invoice details | PDF-EXTRACT-01 | formatInvoiceDate safely handles full ISO timestamps, preventing client-side render crash | `5186b13` |
 
 
 
