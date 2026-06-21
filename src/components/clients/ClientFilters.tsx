@@ -41,6 +41,11 @@ export function ClientFilters({ initialStatus, initialSortBy }: ClientFiltersPro
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
           <option value="excluded">Follow-up Excluded</option>
+          <option value="new_client">New Client</option>
+          <option value="filing_queue">Filing Queue</option>
+          <option value="filed">Filed</option>
+          <option value="on_hold">On Hold</option>
+          <option value="cancelled">Cancelled</option>
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-text-muted">
           <ChevronDown className="h-4 w-4" aria-hidden="true" />

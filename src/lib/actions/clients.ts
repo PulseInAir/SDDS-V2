@@ -14,18 +14,45 @@ export async function getClients(params: {
   const supabase = await createSupabaseServerClient()
   const { search, page = 1, pageSize = 20, status = 'all', sortBy = 'name_asc' } = params
 
-  let query = supabase
-    .from('clients')
-    .select('*', { count: 'exact' })
-    .is('archived_at', null)
+  // Determine if status is a case status filter
+  const isCaseStatus = ['new_client', 'filing_queue', 'filed', 'on_hold', 'cancelled'].includes(status)
+  const statusMap: Record<string, string> = {
+    new_client: 'New Client',
+    filing_queue: 'Filing Queue',
+    filed: 'Filed',
+    on_hold: 'On Hold',
+    cancelled: 'Cancelled'
+  }
 
-  // Status Filter
-  if (status === 'active') {
-    query = query.eq('active', true)
-  } else if (status === 'inactive') {
-    query = query.eq('active', false)
-  } else if (status === 'excluded') {
-    query = query.eq('follow_up_excluded', true)
+  const { data: currentAY } = await supabase
+    .from('assessment_years')
+    .select('id')
+    .eq('is_current', true)
+    .maybeSingle()
+
+  let query;
+
+  if (isCaseStatus) {
+    query = supabase
+      .from('clients')
+      .select('*, filing_cases!inner(case_status, assessment_year_id)', { count: 'exact' })
+      .is('archived_at', null)
+      .eq('filing_cases.case_status', statusMap[status])
+    if (currentAY) {
+      query = query.eq('filing_cases.assessment_year_id', currentAY.id)
+    }
+  } else {
+    query = supabase
+      .from('clients')
+      .select('*', { count: 'exact' })
+      .is('archived_at', null)
+    if (status === 'active') {
+      query = query.eq('active', true)
+    } else if (status === 'inactive') {
+      query = query.eq('active', false)
+    } else if (status === 'excluded') {
+      query = query.eq('follow_up_excluded', true)
+    }
   }
 
   if (search) {
