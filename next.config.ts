@@ -57,6 +57,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // pdf-parse (and its dependency pdfjs-dist) use a Web Worker internally.
+  // When Webpack bundles them for the server it cannot resolve the worker chunk
+  // path (.next/dev/server/chunks/pdf.worker.mjs), causing a 500 on the
+  // /api/documents/[documentId]/extract route.
+  // Externalising them forces Node.js to require() them directly, bypassing
+  // the Webpack bundle and the missing-worker problem entirely.
+  serverExternalPackages: ["pdf-parse", "pdfjs-dist"],
   async headers() {
     return [
       {
