@@ -97,10 +97,12 @@ export function formatInvoiceDate(value: string | null, options?: Intl.DateTimeF
     return "—";
   }
 
+  const dateString = value.includes("T") ? value : `${value}T00:00:00`;
+
   return new Intl.DateTimeFormat("en-IN", {
     dateStyle: "medium",
     ...options,
-  }).format(new Date(`${value}T00:00:00`));
+  }).format(new Date(dateString));
 }
 
 export function formatDateTime(value: string | null) {
