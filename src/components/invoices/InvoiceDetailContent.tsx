@@ -16,6 +16,7 @@ import { PaymentForm } from "@/components/invoices/PaymentForm";
 import { PrintInvoiceButton } from "@/components/invoices/PrintInvoiceButton";
 import { MoneyValue } from "@/components/ui/MoneyValue";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { QRCodeSVG } from "qrcode.react";
 
 type InvoiceDetail = NonNullable<Awaited<ReturnType<typeof getInvoiceDetail>>>;
 
@@ -35,7 +36,7 @@ function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; 
           
           {/* Logo Container: styled box as reference */}
           <div className="mt-8 bg-[#D5AD4E] p-3 rounded-lg border-4 border-[#610B35] flex items-center justify-center w-36 h-36">
-            <img src="/Logo.png" alt="SDDS Logo" crossOrigin="anonymous" className="object-contain w-full h-full" />
+            <img src="/Logo.png" alt="SDDS Logo" className="object-contain w-full h-full" />
           </div>
         </div>
 
@@ -143,12 +144,10 @@ function BrandedInvoiceLayout({ invoice, className }: { invoice: InvoiceDetail; 
             </div>
           </div>
 
-          <div className="bg-white border border-neutral-300 p-1 rounded shadow-sm">
-            <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions&am=${invoice.balanceAmount}&cu=INR`)}`} 
-              alt="Payment QR Code" 
-              crossOrigin="anonymous"
-              className="w-24 h-24 object-contain"
+          <div className="bg-white border border-neutral-300 p-1 rounded shadow-sm flex items-center justify-center">
+            <QRCodeSVG 
+              value={`upi://pay?pa=8011626740@ybl&pn=Single%20Digit%20Data%20Solutions&am=${invoice.balanceAmount}&cu=INR`} 
+              size={96}
             />
           </div>
         </div>
