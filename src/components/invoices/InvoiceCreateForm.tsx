@@ -259,7 +259,6 @@ export function InvoiceCreateForm({
       console.error("Extraction error:", err);
     } finally {
       setIsExtracting(false);
-      setSelectedDocId("");
     }
   };
 
@@ -375,7 +374,7 @@ export function InvoiceCreateForm({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between border-b border-border-subtle pb-1">
                 <span className="text-text-muted">Form Number</span>
-                <span className="font-medium text-text-primary">{itrvDetails?.itrForm || "ITR-V"}</span>
+                <span className="font-medium text-text-primary">{itrvDetails?.itrForm || "—"}</span>
               </div>
               <div className="flex justify-between border-b border-border-subtle pb-1">
                 <span className="text-text-muted">Total Income</span>
