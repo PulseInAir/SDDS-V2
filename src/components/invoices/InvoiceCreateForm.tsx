@@ -144,25 +144,21 @@ export function InvoiceCreateForm({
         const parsedItrForm = itrForm || "ITR-V";
         const fee = rateCard[parsedItrForm] ?? rateCard["ITR-V"] ?? 500;
 
+        const refundPercent = invoiceSettings?.refund_charge_percentage ?? 10;
+        let finalFee = fee;
+        if (refundAmount && refundAmount > 0 && refundPercent > 0) {
+          const refundFee = Math.round(refundAmount * (refundPercent / 100));
+          finalFee += refundFee;
+        }
+
         const newItems: InvoiceItemDraft[] = [
           {
             id: crypto.randomUUID(),
             description: `ITR Filing Charges - ${parsedItrForm} (AY ${ayLabel})`,
             quantity: "1",
-            unitAmount: String(fee),
+            unitAmount: String(finalFee),
           },
         ];
-
-        const refundPercent = invoiceSettings?.refund_charge_percentage ?? 10;
-        if (refundAmount && refundAmount > 0 && refundPercent > 0) {
-          const refundFee = Math.round(refundAmount * (refundPercent / 100));
-          newItems.push({
-            id: crypto.randomUUID(),
-            description: `Refund Processing Fee (${refundPercent}%) - AY ${ayLabel}`,
-            quantity: "1",
-            unitAmount: String(refundFee),
-          });
-        }
 
         setItems(newItems);
       }
