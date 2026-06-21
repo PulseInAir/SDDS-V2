@@ -212,6 +212,7 @@ export type Database = {
           active: boolean
           address: string | null
           archived_at: string | null
+          client_id_code: string
           created_at: string
           date_of_birth: string | null
           email: string | null
@@ -229,6 +230,7 @@ export type Database = {
           active?: boolean
           address?: string | null
           archived_at?: string | null
+          client_id_code?: string
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           active?: boolean
           address?: string | null
           archived_at?: string | null
+          client_id_code?: string
           created_at?: string
           date_of_birth?: string | null
           email?: string | null

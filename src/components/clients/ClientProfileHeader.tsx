@@ -24,6 +24,11 @@ export function ClientProfileHeader({ client }: { client: ClientRow }) {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
             {client.full_name}
+            {client.client_id_code && (
+              <span className="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">
+                {client.client_id_code}
+              </span>
+            )}
             {!client.active && <StatusBadge variant="neutral">Inactive</StatusBadge>}
           </h1>
           

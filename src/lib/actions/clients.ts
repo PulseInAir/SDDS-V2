@@ -4,22 +4,53 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { clientFormSchema, ClientFormData } from '@/lib/validations/clients'
 
-export async function getClients(params: { search?: string; page?: number; pageSize?: number }) {
+export async function getClients(params: {
+  search?: string
+  page?: number
+  pageSize?: number
+  status?: string
+  sortBy?: string
+}) {
   const supabase = await createSupabaseServerClient()
-  const { search, page = 1, pageSize = 20 } = params
+  const { search, page = 1, pageSize = 20, status = 'all', sortBy = 'name_asc' } = params
 
   let query = supabase
     .from('clients')
     .select('*', { count: 'exact' })
     .is('archived_at', null)
-    .order('created_at', { ascending: false })
+
+  // Status Filter
+  if (status === 'active') {
+    query = query.eq('active', true)
+  } else if (status === 'inactive') {
+    query = query.eq('active', false)
+  } else if (status === 'excluded') {
+    query = query.eq('follow_up_excluded', true)
+  }
 
   if (search) {
-    // Basic search across name, PAN, and mobile
+    // Search across name, PAN, mobile, and client ID
     const searchUpper = search.toUpperCase()
     query = query.or(
-      `full_name.ilike.%${search}%,pan_uppercase.ilike.%${searchUpper}%,mobile.ilike.%${search}%`
+      `full_name.ilike.%${search}%,pan_uppercase.ilike.%${searchUpper}%,mobile.ilike.%${search}%,client_id_code.ilike.%${search}%`
     )
+  }
+
+  // Sorting
+  if (sortBy === 'name_asc') {
+    query = query.order('full_name', { ascending: true })
+  } else if (sortBy === 'name_desc') {
+    query = query.order('full_name', { ascending: false })
+  } else if (sortBy === 'created_desc') {
+    query = query.order('created_at', { ascending: false })
+  } else if (sortBy === 'created_asc') {
+    query = query.order('created_at', { ascending: true })
+  } else if (sortBy === 'client_id_asc') {
+    query = query.order('client_id_code', { ascending: true })
+  } else if (sortBy === 'client_id_desc') {
+    query = query.order('client_id_code', { ascending: false })
+  } else {
+    query = query.order('full_name', { ascending: true })
   }
 
   const from = (page - 1) * pageSize
@@ -34,12 +65,35 @@ export async function getClients(params: { search?: string; page?: number; pageS
     throw new Error('Failed to fetch clients')
   }
 
+  // Fetch metrics for info cards
+  const { data: metricsData, error: metricsError } = await supabase
+    .from('clients')
+    .select('active, follow_up_excluded')
+    .is('archived_at', null)
+
+  let metrics = {
+    total: 0,
+    active: 0,
+    inactive: 0,
+    excluded: 0,
+  }
+
+  if (!metricsError && metricsData) {
+    metrics = {
+      total: metricsData.length,
+      active: metricsData.filter(c => c.active).length,
+      inactive: metricsData.filter(c => !c.active).length,
+      excluded: metricsData.filter(c => c.follow_up_excluded).length,
+    }
+  }
+
   return {
     clients: data,
     count: count || 0,
     page,
     pageSize,
     totalPages: Math.ceil((count || 0) / pageSize),
+    metrics,
   }
 }
 

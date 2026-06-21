@@ -11,11 +11,11 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 // Assuming Database types
 type ClientRow = {
   id: string
+  client_id_code: string
   full_name: string
   pan_uppercase: string
   mobile: string | null
   active: boolean
-  // Add more as needed
 }
 
 export function ClientList({ clients, page, totalPages }: { clients: ClientRow[], page: number, totalPages: number }) {
@@ -48,6 +48,9 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Client ID
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Client Name
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -71,6 +74,9 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={() => router.push(`/clients/${client.id}`)}
               >
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-900">
+                  {client.client_id_code}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="font-medium text-gray-900">{client.full_name}</div>
                 </td>
@@ -88,7 +94,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                   </StatusBadge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
-                  <Link href={`/clients/${client.id}`} className="inline-flex items-center text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors">
+                  <Link href={`/clients/${client.id}`} className="inline-flex items-center text-brand-700 hover:text-brand-900 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-md transition-colors font-medium">
                     <Edit className="w-4 h-4 mr-1.5" />
                     Edit
                   </Link>
