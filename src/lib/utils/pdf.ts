@@ -75,8 +75,8 @@ export async function parsePdfBuffer(
   }
 
   // Attempt to extract Total Income
-  // Typically "Total Income" or "Gross Total Income" or "Total Income / Taxable Income" followed by a number
-  const totalIncomeRegex = /total\s+income\b\s*[:\-\u2013\u2014]?\s*([\d,]+(?:\.\d+)?)/i;
+  // Matches "Total Income" followed by optional code (like 1A or 1) and tabs/spaces, then the amount
+  const totalIncomeRegex = /total\s+income\s*(?:\t\s*\w+\s*)?\t\s*([\d,]+(?:\.\d+)?)/i;
   const totalIncomeMatch = searchSpace.match(totalIncomeRegex);
   let totalIncome: number | null = null;
   if (totalIncomeMatch && totalIncomeMatch[1]) {
@@ -88,18 +88,33 @@ export async function parsePdfBuffer(
   }
 
   // Attempt to extract Tax Payable / Refundable
-  // Tax Payable/Refundable is often written as "Net tax payable", "tax payable", "refundable", "amount payable", or "refund/payable"
-  // Let's search for "tax payable" or "refundable" or "refund" specifically in lines or text.
-  // Note: if refundAmount is parsed, that is the refundable amount (or if negative, payable).
-  // Let's scan for "tax payable", "net tax payable", "amount payable"
-  const taxPayableRegex = /(?:net\s+)?tax\s+payable\b\s*[:\-\u2013\u2014]?\s*([\d,]+(?:\.\d+)?)/i;
-  const taxPayableMatch = searchSpace.match(taxPayableRegex);
+  // Example matches: "(+) Tax Payable /(-) Refundable (6-7) \t8 \t(-) 60,570"
+  // Let's capture the sign (+ or -) and the amount.
+  const taxPayableRefundableRegex = /\(\+\)\s*Tax\s+Payable\s*\/[-\(]*\)\s*Refundable\s*(?:\([^\)]+\))?\s*(?:\t\s*\w+\s*)?\t\s*(\([+-]?\))?\s*([\d,]+(?:\.\d+)?)/i;
+  const taxPayableRefundableMatch = searchSpace.match(taxPayableRefundableRegex);
   let taxPayable: number | null = null;
-  if (taxPayableMatch && taxPayableMatch[1]) {
-    const cleanAmt = taxPayableMatch[1].replace(/,/g, "");
+
+  if (taxPayableRefundableMatch) {
+    const isRefund = taxPayableRefundableMatch[1]?.includes("-");
+    const cleanAmt = taxPayableRefundableMatch[2].replace(/,/g, "");
     const parsedAmt = parseFloat(cleanAmt);
     if (!isNaN(parsedAmt)) {
-      taxPayable = parsedAmt;
+      if (isRefund) {
+        refundAmount = parsedAmt;
+      } else {
+        taxPayable = parsedAmt;
+      }
+    }
+  } else {
+    // Fallback simple regexes if the complex line isn't present
+    const taxPayableRegex = /(?:net\s+)?tax\s+payable\b\s*(?:\t\s*\w+\s*)?\t\s*([\d,]+(?:\.\d+)?)/i;
+    const taxPayableMatch = searchSpace.match(taxPayableRegex);
+    if (taxPayableMatch && taxPayableMatch[1]) {
+      const cleanAmt = taxPayableMatch[1].replace(/,/g, "");
+      const parsedAmt = parseFloat(cleanAmt);
+      if (!isNaN(parsedAmt)) {
+        taxPayable = parsedAmt;
+      }
     }
   }
 
