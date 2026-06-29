@@ -6,7 +6,7 @@ export default async function CredentialsPage({ params }: { params: Promise<{ cl
   const hasExisting = await hasCredential(resolvedParams.clientId)
 
   return (
-    <div className="flex flex-col max-w-4xl space-y-6">
+    <div className="flex flex-col w-full space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Portal Credentials</h2>
         <p className="text-sm text-gray-500 mt-1">Manage encrypted credentials for the income tax portal.</p>

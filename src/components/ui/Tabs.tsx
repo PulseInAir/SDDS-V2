@@ -18,7 +18,11 @@ export function Tabs({ tabs }: TabsProps) {
 
   return (
     <div className="border-b border-gray-200">
-      <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <nav
+        className="-mb-px flex space-x-8 overflow-x-auto"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        aria-label="Tabs"
+      >
         {tabs.map((tab) => {
           // Check if it's the exact path or a subpath (but avoid matching /clients/123/documents with /clients/123)
           // Since the base path is the overview, we need to be careful.

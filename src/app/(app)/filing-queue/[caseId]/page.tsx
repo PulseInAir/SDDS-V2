@@ -13,7 +13,7 @@ export default async function FilingCaseDetailPage({ params }: { params: Promise
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full space-y-8 py-4 sm:py-6">
       {/* Header */}
       <div>
         <nav className="sm:hidden" aria-label="Back">

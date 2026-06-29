@@ -31,7 +31,7 @@ export function AssessmentYearSelect() {
             }
           });
         }}
-        className="h-9 cursor-pointer appearance-none rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel py-1.5 pl-3 pr-8 text-sm font-medium text-text-primary shadow-sm outline-none transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="h-9 cursor-pointer appearance-none rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel py-1.5 pl-2 pr-6 text-xs sm:pl-3 sm:pr-8 sm:text-sm font-medium text-text-primary shadow-sm outline-none transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         aria-label="Selected assessment year"
       >
         {assessmentYears.length === 0 ? (

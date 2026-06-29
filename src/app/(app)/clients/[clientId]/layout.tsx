@@ -39,14 +39,14 @@ export default async function ClientProfileLayout({
   ]
 
   return (
-    <div className="flex flex-col h-full max-w-5xl mx-auto py-6">
+    <div className="flex flex-col h-full w-full py-6">
       <ClientProfileHeader client={client} />
       
       <div className="mt-4 mb-6">
         <Tabs tabs={tabs} />
       </div>
 
-      <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6">
         {children}
       </div>
     </div>

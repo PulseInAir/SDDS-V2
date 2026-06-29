@@ -27,7 +27,7 @@ export function AppShell({
           tabIndex={-1}
           className="flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 print:overflow-visible print:p-0"
         >
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-[1600px] w-full">
             {children}
           </div>
         </main>

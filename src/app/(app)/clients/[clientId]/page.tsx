@@ -26,7 +26,7 @@ export default async function ClientOverviewPage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="flex flex-col max-w-4xl space-y-6">
+    <div className="flex flex-col w-full space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Identity Overview</h2>
         <p className="text-sm text-gray-500 mt-1">Manage core client identity and contact information.</p>
