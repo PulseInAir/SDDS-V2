@@ -61,6 +61,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | INVOICE-UX-01 | DONE | Change Print Invoice to Download JPEG | INVOICE-FIX-01 | Replace window.print() with html2canvas to download a high-quality JPEG of the invoice | `8e58621` |
 | LAYOUT-RESPONSIVE-01 | DONE | Fix UI layout spacing to be auto-adaptive and responsive | INVOICE-UX-01 | Widen AppShell, make tabs scrollable, reduce mobile padding, remove double nested containers | `6009bf8` |
 | LAYOUT-RESPONSIVE-02 | DONE | Advanced dashboard grid auto-adaptation and responsive spacing | LAYOUT-RESPONSIVE-01 | Widen dashboard grids, balance columns, and reclaim cell paddings in all tables | `1faa3b1` |
+| LAYOUT-POLISH-01 | DONE | Widen sidebar navigation, adjust font sizes/icons, and polish all forms, read-only cards, and layouts to use semantic design system tokens and rounded-panel class | LAYOUT-RESPONSIVE-02 | Widescreen navigation is larger and bold, form containers and fields have perfect alignment and design token classes | `c068dc8` |
 
 
 
