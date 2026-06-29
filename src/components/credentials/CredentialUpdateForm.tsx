@@ -40,35 +40,35 @@ export function CredentialUpdateForm({ clientId }: { clientId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded shadow-sm">
-      <h3 className="mb-4 text-md font-medium">Update Credentials</h3>
-
+    <form onSubmit={handleSubmit} className="p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">
+      <h3 className="mb-4 text-sm font-semibold text-text-primary">Update Credentials</h3>
+ 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
       {success && <p className="mb-4 text-sm text-green-600">Credentials updated successfully.</p>}
-
+ 
       <div className="mb-4">
-        <label className="block mb-1 text-sm font-medium text-gray-700">Portal Password</label>
+        <label className="block mb-1 text-sm font-medium text-text-secondary">Portal Password</label>
         <input
           type="password"
           name="password"
           required
-          className="w-full px-3 py-2 border rounded"
+          className="w-full px-3 py-2 border border-border-subtle rounded-input bg-surface-panel text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
         />
       </div>
-
+ 
       <div className="mb-4">
-        <label className="block mb-1 text-sm font-medium text-gray-700">Recovery PIN (Optional)</label>
+        <label className="block mb-1 text-sm font-medium text-text-secondary">Recovery PIN (Optional)</label>
         <input
           type="text"
           name="recovery_pin"
-          className="w-full px-3 py-2 border rounded"
+          className="w-full px-3 py-2 border border-border-subtle rounded-input bg-surface-panel text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
         />
       </div>
-
+ 
       <button
         type="submit"
         disabled={isLoading}
-        className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
+        className="px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-input hover:bg-brand-700 active:bg-brand-800 disabled:opacity-50 transition-colors"
       >
         {isLoading ? "Saving..." : "Save Credentials"}
       </button>

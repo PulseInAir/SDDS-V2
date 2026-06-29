@@ -67,9 +67,9 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
 
   if (!clients || clients.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg bg-gray-50/50">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No clients found</h3>
-        <p className="text-gray-500 max-w-sm mb-6">
+      <div className="flex flex-col items-center justify-center p-12 text-center border border-border-subtle rounded-panel bg-surface-muted">
+        <h3 className="text-lg font-semibold text-text-primary mb-2">No clients found</h3>
+        <p className="text-text-secondary max-w-sm mb-6">
           Get started by adding a new client to the repository.
         </p>
       </div>
@@ -78,13 +78,13 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
 
   return (
     <div className="flex flex-col h-full">
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto rounded-panel border border-border-subtle shadow-xs">
+        <table className="min-w-full divide-y divide-border-subtle">
+          <thead className="bg-surface-muted">
             <tr>
               <th
                 scope="col"
-                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider cursor-pointer select-none hover:bg-surface-hover hover:text-text-primary transition-colors"
                 onClick={() => handleSort('client_id')}
               >
                 <div className="flex items-center">
@@ -94,7 +94,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
               </th>
               <th
                 scope="col"
-                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider cursor-pointer select-none hover:bg-surface-hover hover:text-text-primary transition-colors"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center">
@@ -102,15 +102,15 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                   {renderSortIcon('name')}
                 </div>
               </th>
-              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
                 PAN
               </th>
-              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
                 Mobile
               </th>
               <th
                 scope="col"
-                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider cursor-pointer select-none hover:bg-surface-hover hover:text-text-primary transition-colors"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center">
@@ -123,23 +123,23 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface-panel divide-y divide-border-subtle">
              {clients.map((client) => (
               <tr
                 key={client.id}
-                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                className="hover:bg-surface-hover transition-colors cursor-pointer"
                 onClick={() => router.push(`/clients/${client.id}`)}
               >
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-semibold text-brand-900">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-semibold text-brand-850">
                   {client.client_id_code}
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                  <div className="font-medium text-gray-900">{client.full_name}</div>
+                  <div className="font-semibold text-text-primary">{client.full_name}</div>
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-text-secondary">
                   <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-text-secondary">
                   <MaskedValue value={client.mobile} isPrivacyMode={isPrivacyMode} />
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
@@ -162,11 +162,11 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-white border-t sm:px-6 mt-4">
+        <div className="flex items-center justify-between px-4 py-3 bg-surface-panel border-t border-border-subtle sm:px-6 mt-4 rounded-b-panel">
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-gray-700">
-                Page <span className="font-medium">{page}</span> of <span className="font-medium">{totalPages}</span>
+              <p className="text-sm text-text-secondary">
+                Page <span className="font-semibold text-text-primary">{page}</span> of <span className="font-semibold text-text-primary">{totalPages}</span>
               </p>
             </div>
             <div>

@@ -50,61 +50,61 @@ export default async function ClientsPage({
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Link
           href={getFilterUrl('all')}
-          className={`p-4 rounded-xl border shadow-sm flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-md cursor-pointer ${
-            isAllActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-white border-gray-200/80'
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            isAllActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
           }`}
         >
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-[var(--radius-input)]">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Clients</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{metrics.total}</p>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Total Clients</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.total}</p>
           </div>
         </Link>
 
         <Link
           href={getFilterUrl('active')}
-          className={`p-4 rounded-xl border shadow-sm flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-md cursor-pointer ${
-            isActiveActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-white border-gray-200/80'
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            isActiveActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
           }`}
         >
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-[var(--radius-input)]">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Clients</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{metrics.active}</p>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Active Clients</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.active}</p>
           </div>
         </Link>
 
         <Link
           href={getFilterUrl('inactive')}
-          className={`p-4 rounded-xl border shadow-sm flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-md cursor-pointer ${
-            isInactiveActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-white border-gray-200/80'
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            isInactiveActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
           }`}
         >
-          <div className="p-3 bg-gray-50 text-gray-600 rounded-lg">
+          <div className="p-3 bg-surface-muted text-text-secondary rounded-[var(--radius-input)]">
             <XCircle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Inactive Clients</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{metrics.inactive}</p>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Inactive Clients</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.inactive}</p>
           </div>
         </Link>
 
         <Link
           href={getFilterUrl('excluded')}
-          className={`p-4 rounded-xl border shadow-sm flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-md cursor-pointer ${
-            isExcludedActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-white border-gray-200/80'
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            isExcludedActive ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
           }`}
         >
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+          <div className="p-3 bg-amber-50 text-amber-600 rounded-[var(--radius-input)]">
             <AlertCircle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Excluded Clients</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{metrics.excluded}</p>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Excluded Clients</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.excluded}</p>
           </div>
         </Link>
       </div>

@@ -45,27 +45,27 @@ export function CredentialRevealDialog({ clientId }: { clientId: string }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md p-6 bg-white rounded shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Reveal Credentials</h2>
-
+      <div className="w-full max-w-md p-6 bg-surface-panel rounded-panel border border-border-subtle shadow-lg">
+        <h2 className="mb-4 text-lg font-semibold text-text-primary">Reveal Credentials</h2>
+ 
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-
+ 
         {!credentials && !error && (
-          <p className="mb-4 text-sm text-gray-600">
+          <p className="mb-4 text-sm text-text-secondary">
             Revealing credentials will be logged in the audit trail. Are you sure you want to proceed?
           </p>
         )}
-
+ 
         {credentials && (
-          <div className="p-4 mb-4 font-mono text-sm break-all bg-gray-100 rounded">
+          <div className="p-4 mb-4 font-mono text-sm break-all bg-surface-muted rounded-input border border-border-subtle">
             <pre className="whitespace-pre-wrap">{JSON.stringify(credentials, null, 2)}</pre>
           </div>
         )}
-
+ 
         <div className="flex justify-end space-x-2">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
+            className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-hover rounded-input transition-colors"
           >
             Close
           </button>
@@ -73,7 +73,7 @@ export function CredentialRevealDialog({ clientId }: { clientId: string }) {
             <button
               onClick={handleReveal}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-input hover:bg-brand-700 active:bg-brand-800 disabled:opacity-50 transition-colors"
             >
               {isLoading ? "Revealing..." : "Confirm Reveal"}
             </button>

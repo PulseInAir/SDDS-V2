@@ -17,7 +17,7 @@ export function Tabs({ tabs }: TabsProps) {
   const pathname = usePathname()
 
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b border-border-subtle">
       <nav
         className="-mb-px flex space-x-8 overflow-x-auto"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -38,8 +38,8 @@ export function Tabs({ tabs }: TabsProps) {
               className={cn(
                 isCurrent
                   ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors'
+                  : 'border-transparent text-text-secondary hover:border-border-subtle hover:text-text-primary',
+                'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold transition-colors'
               )}
               aria-current={isCurrent ? 'page' : undefined}
             >

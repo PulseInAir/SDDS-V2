@@ -15,14 +15,14 @@ export function ClientProfileHeader({ client }: { client: ClientRow }) {
 
   return (
     <div className="mb-6">
-      <Link href="/clients" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-4 transition-colors">
+      <Link href="/clients" className="inline-flex items-center text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors">
         <ChevronLeft className="w-4 h-4 mr-1" />
         Back to Clients
       </Link>
       
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
             {client.full_name}
             {client.client_id_code && (
               <span className="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">
@@ -32,20 +32,20 @@ export function ClientProfileHeader({ client }: { client: ClientRow }) {
             {!client.active && <StatusBadge variant="neutral">Inactive</StatusBadge>}
           </h1>
           
-          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-secondary">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-500">PAN:</span>
+              <span className="font-medium text-text-secondary">PAN:</span>
               <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-500">Mobile:</span>
+              <span className="font-medium text-text-secondary">Mobile:</span>
               <MaskedValue value={client.mobile} isPrivacyMode={isPrivacyMode} />
             </div>
-
+ 
             {client.email && (
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-500">Email:</span>
+                <span className="font-medium text-text-secondary">Email:</span>
                 <span>{client.email}</span>
               </div>
             )}

@@ -61,9 +61,9 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-white p-6 rounded-lg border border-gray-200">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-surface-panel p-6 rounded-panel border border-border-subtle shadow-sm">
       {serverError && (
-        <div className="p-4 rounded-md bg-red-50 text-red-700 text-sm border border-red-200">
+        <div className="p-4 rounded-input bg-red-50 text-red-700 text-sm border border-red-200">
           {serverError}
         </div>
       )}
@@ -123,18 +123,18 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
           />
         </div>
 
-        <div className="sm:col-span-2 flex flex-col gap-4 py-4 border-t border-gray-100">
-          <h3 className="text-sm font-medium text-gray-900">Operational Settings</h3>
+        <div className="sm:col-span-2 flex flex-col gap-4 py-4 border-t border-border-subtle">
+          <h3 className="text-sm font-semibold text-text-primary">Operational Settings</h3>
           
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
               {...register('active')}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              className="mt-1 h-4 w-4 rounded-[4px] border-border-subtle text-brand-600 focus:ring-brand-500 focus:ring-offset-0 bg-white"
             />
             <div>
-              <span className="block text-sm font-medium text-gray-900">Active Client</span>
-              <span className="block text-sm text-gray-500">Uncheck to mark the client as inactive and exclude from current workflows.</span>
+              <span className="block text-sm font-medium text-text-primary">Active Client</span>
+              <span className="block text-sm text-text-secondary">Uncheck to mark the client as inactive and exclude from current workflows.</span>
             </div>
           </label>
 
@@ -142,11 +142,11 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
             <input
               type="checkbox"
               {...register('follow_up_excluded')}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              className="mt-1 h-4 w-4 rounded-[4px] border-border-subtle text-brand-600 focus:ring-brand-500 focus:ring-offset-0 bg-white"
             />
             <div>
-              <span className="block text-sm font-medium text-gray-900">Exclude from Follow-ups</span>
-              <span className="block text-sm text-gray-500">Temporarily or permanently exclude this client from automated or manual follow-ups.</span>
+              <span className="block text-sm font-medium text-text-primary">Exclude from Follow-ups</span>
+              <span className="block text-sm text-text-secondary">Temporarily or permanently exclude this client from automated or manual follow-ups.</span>
             </div>
           </label>
 
@@ -163,7 +163,7 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle">
         <Button
           type="button"
           variant="secondary"

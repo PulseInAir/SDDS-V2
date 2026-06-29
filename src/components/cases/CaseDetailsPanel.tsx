@@ -52,7 +52,7 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Case Details</h3>
+        <h3 className="text-lg font-semibold text-text-primary">Case Details</h3>
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)} variant="secondary" size="sm">
             Edit Details
@@ -61,18 +61,18 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
       </div>
 
       {isEditing ? (
-        <form onSubmit={handleSave} className="space-y-6 p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+        <form onSubmit={handleSave} className="space-y-6 p-6 border border-border-subtle rounded-panel bg-surface-panel shadow-sm">
           {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Return Category
               </label>
               <select
                 value={returnCategory}
                 onChange={(e) => setReturnCategory(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               >
                 <option value="">Not specified</option>
                 <option value="ITR-1">ITR-1</option>
@@ -86,31 +86,31 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Expected Completion
               </label>
               <input
                 type="date"
                 value={expectedCompletionDate}
                 onChange={(e) => setExpectedCompletionDate(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Due Date
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Next Action
               </label>
               <input
@@ -118,12 +118,12 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
                 placeholder="e.g. Request form 16"
                 value={nextAction}
                 onChange={(e) => setNextAction(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Blocker Code
               </label>
               <input
@@ -131,12 +131,12 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
                 placeholder="e.g. MISSING_DOCS"
                 value={blockerCode}
                 onChange={(e) => setBlockerCode(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                 Blocker Note
               </label>
               <input
@@ -144,7 +144,7 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
                 placeholder="Describe what is blocking the case"
                 value={blockerNote}
                 onChange={(e) => setBlockerNote(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="block w-full rounded-input border border-border-subtle bg-surface-panel px-3 py-2 text-sm text-text-primary shadow-xs outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
               />
             </div>
           </div>
@@ -155,9 +155,9 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
               type="checkbox"
               checked={followUpExcluded}
               onChange={(e) => setFollowUpExcluded(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              className="h-4 w-4 rounded-[4px] border-border-subtle text-brand-600 focus:ring-brand-500 focus:ring-offset-0 bg-white"
             />
-            <label htmlFor="follow-up-excluded" className="ml-2 block text-sm text-gray-900">
+            <label htmlFor="follow-up-excluded" className="ml-2 block text-sm text-text-primary">
               Exclude from follow-up queue
             </label>
           </div>
@@ -181,23 +181,23 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
         </form>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 border border-gray-200 rounded-lg bg-white">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1">Assessment Year</h3>
-            <p className="text-sm font-medium text-gray-900">{filingCase.assessment_years?.label || 'N/A'}</p>
+          <div className="p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">
+            <h3 className="text-xs uppercase tracking-wider text-text-secondary mb-1">Assessment Year</h3>
+            <p className="text-sm font-medium text-text-primary">{filingCase.assessment_years?.label || 'N/A'}</p>
           </div>
-          <div className="p-4 border border-gray-200 rounded-lg bg-white">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1">Current Status</h3>
+          <div className="p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">
+            <h3 className="text-xs uppercase tracking-wider text-text-secondary mb-1">Current Status</h3>
             <div className="mt-1">
               <StatusBadge>{filingCase.case_status}</StatusBadge>
             </div>
           </div>
-          <div className="p-4 border border-gray-200 rounded-lg bg-white">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1">Return Category</h3>
-            <p className="text-sm font-medium text-gray-900">{filingCase.return_category || 'Not specified'}</p>
+          <div className="p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">
+            <h3 className="text-xs uppercase tracking-wider text-text-secondary mb-1">Return Category</h3>
+            <p className="text-sm font-medium text-text-primary">{filingCase.return_category || 'Not specified'}</p>
           </div>
-          <div className="p-4 border border-gray-200 rounded-lg bg-white">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1">Expected Completion</h3>
-            <p className="text-sm font-medium text-gray-900">
+          <div className="p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">
+            <h3 className="text-xs uppercase tracking-wider text-text-secondary mb-1">Expected Completion</h3>
+            <p className="text-sm font-medium text-text-primary">
               {filingCase.expected_completion_date 
                 ? new Date(filingCase.expected_completion_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                 : 'Not set'}
@@ -207,14 +207,14 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
       )}
 
       {!isEditing && filingCase.blocker_note && (
-        <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+        <div className="p-4 border border-red-200 rounded-panel bg-red-50">
           <h3 className="text-sm font-semibold text-red-800">Blocked: {filingCase.blocker_code || 'Attention Required'}</h3>
           <p className="text-sm text-red-700 mt-1">{filingCase.blocker_note}</p>
         </div>
       )}
 
       {!isEditing && filingCase.hold_reason && filingCase.case_status === 'On Hold' && (
-        <div className="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+        <div className="p-4 border border-yellow-200 rounded-panel bg-yellow-50">
           <h3 className="text-sm font-semibold text-yellow-800">On Hold</h3>
           <p className="text-sm text-yellow-700 mt-1">{filingCase.hold_reason}</p>
           {filingCase.next_review_date && (
@@ -227,7 +227,7 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
 
       {/* History Timeline */}
       <div className="mt-8">
-        <h3 className="text-sm font-medium text-gray-900 mb-4">Status History</h3>
+        <h3 className="text-sm font-medium text-text-primary mb-4">Status History</h3>
         {filingCase.case_status_history && filingCase.case_status_history.length > 0 ? (
           <div className="flow-root">
             <ul role="list" className="-mb-8">
@@ -236,24 +236,24 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
                 <li key={event.id}>
                   <div className="relative pb-8">
                      {eventIdx !== filingCase.case_status_history.length - 1 ? (
-                      <span className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+                      <span className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-border-subtle" aria-hidden="true" />
                     ) : null}
                     <div className="relative flex space-x-3">
                       <div>
-                        <span className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center ring-8 ring-white">
+                        <span className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center ring-8 ring-surface-panel">
                           <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
                         </span>
                       </div>
                       <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Changed to <span className="font-medium text-gray-900">{event.to_status}</span>
+                          <p className="text-sm text-text-secondary">
+                            Changed to <span className="font-semibold text-text-primary">{event.to_status}</span>
                           </p>
                           {event.reason && (
-                            <p className="mt-1 text-sm text-gray-600 italic">&quot;{event.reason}&quot;</p>
+                            <p className="mt-1 text-sm text-text-secondary italic">&quot;{event.reason}&quot;</p>
                           )}
                         </div>
-                        <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                        <div className="whitespace-nowrap text-right text-sm text-text-muted">
                           {new Date(event.changed_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
@@ -264,7 +264,7 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
             </ul>
           </div>
         ) : (
-          <p className="text-sm text-gray-500">No transition history available.</p>
+          <p className="text-sm text-text-muted">No transition history available.</p>
         )}
       </div>
     </div>

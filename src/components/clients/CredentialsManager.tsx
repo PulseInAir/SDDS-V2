@@ -79,10 +79,10 @@ export function CredentialsManager({ clientId, hasExisting }: CredentialsManager
 
   return (
     <div className="space-y-4 max-w-sm">
-      <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-surface-muted border border-border-subtle rounded-panel shadow-xs">
         <div>
-          <p className="text-sm font-medium text-gray-900">Income Tax Portal</p>
-          <p className="text-sm text-gray-500 font-mono tracking-wider mt-1">
+          <p className="text-sm font-semibold text-text-primary">Income Tax Portal</p>
+          <p className="text-sm text-text-secondary font-mono tracking-wider mt-1">
             {isRevealed ? credentials.portal_password : '••••••••'}
           </p>
         </div>
@@ -101,7 +101,7 @@ export function CredentialsManager({ clientId, hasExisting }: CredentialsManager
       </div>
       
       {error && <p className="text-sm text-red-600">{error}</p>}
-
+ 
       <div>
         <Button type="button" variant="secondary" onClick={() => { setIsEditing(true); setCredentials({ portal_password: '' }); setIsRevealed(false) }}>
           Update Password

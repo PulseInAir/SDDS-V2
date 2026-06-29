@@ -46,7 +46,7 @@ export default async function ClientProfileLayout({
         <Tabs tabs={tabs} />
       </div>
 
-      <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6">
+      <div className="flex-1 bg-surface-panel border border-border-subtle rounded-panel shadow-xs p-4 sm:p-6">
         {children}
       </div>
     </div>
