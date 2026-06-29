@@ -4,20 +4,21 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: INVOICE-UX-01
+- Active task: LAYOUT-RESPONSIVE-01
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `8e58621`
+- HEAD: `6009bf8`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## Invoice JPEG Download (2026-06-21)
+## Responsive & Adaptive UI Fixes (2026-06-29)
 
-**Status: DONE — Replaced print dialog with JPEG download.**
+**Status: DONE — Widened primary app container and removed mobile padding bottlenecks.**
 
 ### Verification steps completed:
-1. **Extraction logic**: Replaced `window.print()` with an `html2canvas` implementation that safely reveals the hidden `#invoice-print-only` block, captures a high-quality (scale: 2) JPEG image, restores the layout, and triggers a file download using the invoice number as the filename.
-2. **Code gates**: Next.js production build passes locally and tests pass.
+1. **Adaptive width**: Widened AppShell wrapper to 1600px, removed narrow max-w constraints on client detail subpages.
+2. **Mobile spaces**: Added horizontal scroll to Tabs component to prevent text wrapping/breaks. Hidden "Add Client" text on mobile. Adjusted AY select margins and padding to free up space. Removed double-nested layout wrappers on case detail view.
+3. **Build & Typecheck**: Production build compilation and TypeScript checks pass cleanly. All 78 automated test specs pass.

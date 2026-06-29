@@ -59,6 +59,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | PDF-EXTRACT-01 | DONE | Fix Gemini PDF extraction prompt logic | INVOICE-SETTINGS-01 | Refined prompt rules to eliminate header hallucination as clientName and accurately pull income/tax totals | `5e8a4fc` |
 | INVOICE-FIX-01 | DONE | Fix ISO date crash in invoice details | PDF-EXTRACT-01 | formatInvoiceDate safely handles full ISO timestamps, preventing client-side render crash | `5186b13` |
 | INVOICE-UX-01 | DONE | Change Print Invoice to Download JPEG | INVOICE-FIX-01 | Replace window.print() with html2canvas to download a high-quality JPEG of the invoice | `8e58621` |
+| LAYOUT-RESPONSIVE-01 | DONE | Fix UI layout spacing to be auto-adaptive and responsive | INVOICE-UX-01 | Widen AppShell, make tabs scrollable, reduce mobile padding, remove double nested containers | `6009bf8` |
 
 
 
