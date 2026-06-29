@@ -4,21 +4,21 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: LAYOUT-RESPONSIVE-01
+- Active task: LAYOUT-RESPONSIVE-02
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `6009bf8`
+- HEAD: `1faa3b1`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## Responsive & Adaptive UI Fixes (2026-06-29)
+## Advanced Responsive spacing & grid alignments (2026-06-29)
 
-**Status: DONE — Widened primary app container and removed mobile padding bottlenecks.**
+**Status: DONE — Optimized grid structures to eliminate empty slots and balanced spacing across viewports.**
 
 ### Verification steps completed:
-1. **Adaptive width**: Widened AppShell wrapper to 1600px, removed narrow max-w constraints on client detail subpages.
-2. **Mobile spaces**: Added horizontal scroll to Tabs component to prevent text wrapping/breaks. Hidden "Add Client" text on mobile. Adjusted AY select margins and padding to free up space. Removed double-nested layout wrappers on case detail view.
+1. **Grid auto-adaptation**: Configured attention metrics to a solid 4-column layout (`lg:grid-cols-4`), summary metrics to a smart vertical/horizontal wrap (`xl:grid-cols-1`), and workflow distribution to a fully fluid auto-fit structure (`lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]`), ensuring no trailing empty slots are visible on widescreen monitors.
+2. **Horizontal room**: Optimized header and cell paddings (`px-4 py-3 sm:px-6`) on all major list tables (`ClientList`, `CaseTable`, and `InvoicePageContent`) to prevent condensed spacing and text squishing on mobile viewports.
 3. **Build & Typecheck**: Production build compilation and TypeScript checks pass cleanly. All 78 automated test specs pass.
