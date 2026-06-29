@@ -24,7 +24,7 @@ export function InvoicePageContent({
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
+      <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 sm:p-5 shadow-sm">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">Invoices & Revenue</h1>
@@ -148,7 +148,7 @@ export function InvoicePageContent({
       </section>
 
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
-        <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
+        <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
           <div>
             <h2 className="text-base font-semibold text-text-primary">Invoice register</h2>
             <p className="mt-1 text-sm text-text-muted">The same records drive billing, received cash/UPI totals, and outstanding balances.</p>
@@ -169,21 +169,21 @@ export function InvoicePageContent({
             <table className="min-w-full divide-y divide-border-subtle text-sm">
               <thead className="bg-surface-muted">
                 <tr>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Invoice</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Client</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Issued</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Due</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Total</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Paid</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Balance</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Status</th>
-                  <th className="px-5 py-3 text-left font-medium text-text-secondary">Action</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Invoice</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Client</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Issued</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Due</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Total</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Paid</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Balance</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Status</th>
+                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle bg-white">
                 {data.paginatedInvoices.map((invoice) => (
                   <tr key={invoice.id} className={invoice.derivedStatus === "overdue" ? "bg-red-50/50" : undefined}>
-                    <td className="px-5 py-4 align-top">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 align-top">
                       <div className="space-y-1">
                         <Link href={`/invoices/${invoice.id}`} className="font-mono font-semibold text-brand-700 hover:text-brand-800">
                           {invoice.invoice_number}
@@ -191,29 +191,29 @@ export function InvoicePageContent({
                         <p className="text-xs text-text-muted">{invoice.assessment_years?.label ?? "No AY"}</p>
                       </div>
                     </td>
-                    <td className="px-5 py-4 align-top">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 align-top">
                       <div className="space-y-1">
                         <p className="font-medium text-text-primary">{invoice.clients?.full_name ?? "Unknown client"}</p>
                         <p className="text-xs text-text-muted">{invoice.filing_cases?.next_action ?? "No case note"}</p>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-text-secondary">{formatInvoiceDate(invoice.issue_date)}</td>
-                    <td className="px-5 py-4 text-text-secondary">{formatInvoiceDate(invoice.due_date)}</td>
-                    <td className="px-5 py-4 text-text-primary">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-secondary">{formatInvoiceDate(invoice.issue_date)}</td>
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-secondary">{formatInvoiceDate(invoice.due_date)}</td>
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
                       <MoneyValue value={Number(invoice.total_amount ?? 0)} />
                     </td>
-                    <td className="px-5 py-4 text-text-primary">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
                       <MoneyValue value={invoice.paidAmount} />
                     </td>
-                    <td className="px-5 py-4 text-text-primary">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
                       <MoneyValue value={invoice.balanceAmount} />
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4">
                       <StatusBadge variant={getInvoiceStatusVariant(invoice.derivedStatus)}>
                         {formatInvoiceStatus(invoice.derivedStatus)}
                       </StatusBadge>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-2.5 sm:px-5 sm:py-4">
                       <Link href={`/invoices/${invoice.id}`} className="inline-flex items-center text-sm font-medium text-brand-700 hover:text-brand-800">
                         Open
                         <ArrowUpRight className="ml-1 h-4 w-4" aria-hidden="true" />
@@ -227,7 +227,7 @@ export function InvoicePageContent({
         )}
 
         {data.summary.overdueCount > 0 ? (
-          <div className="border-t border-border-subtle bg-red-50/70 px-5 py-3 text-sm text-red-800">
+          <div className="border-t border-border-subtle bg-red-50/70 px-4 py-3 sm:px-5 text-sm text-red-800">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               <span>
@@ -238,7 +238,7 @@ export function InvoicePageContent({
         ) : null}
 
         {data.totalPages > 1 ? (
-          <div className="flex items-center justify-between border-t border-border-subtle px-5 py-4 text-sm text-text-secondary">
+          <div className="flex items-center justify-between border-t border-border-subtle px-4 py-3 sm:px-5 sm:py-4 text-sm text-text-secondary">
             <span>
               Page {data.page} of {data.totalPages}
             </span>

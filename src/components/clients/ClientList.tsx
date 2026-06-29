@@ -84,7 +84,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
             <tr>
               <th
                 scope="col"
-                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
                 onClick={() => handleSort('client_id')}
               >
                 <div className="flex items-center">
@@ -94,7 +94,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
               </th>
               <th
                 scope="col"
-                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center">
@@ -102,15 +102,15 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                   {renderSortIcon('name')}
                 </div>
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 PAN
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Mobile
               </th>
               <th
                 scope="col"
-                className="group px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
+                className="group px-4 py-3 sm:px-6 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:bg-gray-100/50 hover:text-gray-900 transition-colors"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center">
@@ -118,7 +118,7 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                   {renderSortIcon('status')}
                 </div>
               </th>
-              <th scope="col" className="relative px-6 py-3">
+              <th scope="col" className="relative px-4 py-3 sm:px-6">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -130,26 +130,26 @@ export function ClientList({ clients, page, totalPages }: { clients: ClientRow[]
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={() => router.push(`/clients/${client.id}`)}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-900">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-semibold text-brand-900">
                   {client.client_id_code}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <div className="font-medium text-gray-900">{client.full_name}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
                   <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
                   <MaskedValue value={client.mobile} isPrivacyMode={isPrivacyMode} />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <StatusBadge 
                     variant={client.active ? 'success' : 'neutral'} 
                   >
                     {client.active ? 'Active' : 'Inactive'}
                   </StatusBadge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                   <Link href={`/clients/${client.id}`} className="inline-flex items-center text-brand-700 hover:text-brand-900 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-md transition-colors font-medium">
                     <Edit className="w-4 h-4 mr-1.5" />
                     Edit

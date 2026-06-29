@@ -57,22 +57,22 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
         <table className="min-w-full divide-y divide-border-subtle">
           <thead className="bg-surface-hover">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                 Client
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                 AY
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                 Status
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider hidden sm:table-cell">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-text-muted uppercase tracking-wider hidden sm:table-cell">
                 Due Date
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider hidden md:table-cell">
+              <th scope="col" className="px-4 py-3 sm:px-6 text-left text-xs font-medium text-text-muted uppercase tracking-wider hidden md:table-cell">
                 Next Action
               </th>
-              <th scope="col" className="relative px-6 py-3">
+              <th scope="col" className="relative px-4 py-3 sm:px-6">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -80,16 +80,16 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
           <tbody className="bg-surface-panel divide-y divide-border-subtle">
             {cases.map((c) => (
               <tr key={c.id} className="hover:bg-surface-hover transition-colors group">
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <div className="font-medium text-text-primary">{c.clients?.full_name || 'Unknown Client'}</div>
                   <div className="text-sm text-text-muted mt-0.5">
                     <MaskedValue value={c.clients?.pan_uppercase || ''} isPrivacyMode={isPrivacyMode} />
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-text-secondary">
                   {c.assessment_years?.label || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <StatusBadge 
                     variant={
                       ['Completed', 'Filed'].includes(c.case_status) ? 'success' : 
@@ -105,13 +105,13 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary hidden sm:table-cell">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-text-secondary hidden sm:table-cell">
                   {c.due_date ? new Date(c.due_date).toLocaleDateString() : '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary hidden md:table-cell max-w-[200px] truncate" title={c.next_action || ''}>
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-text-secondary hidden md:table-cell max-w-[200px] truncate" title={c.next_action || ''}>
                   {c.next_action || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link 
                     href={`/filing-queue/${c.id}`} 
                     className="inline-flex items-center rounded-[var(--radius-input)] bg-brand-50 px-3 py-1.5 text-brand-700 transition-colors hover:bg-brand-100 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"

@@ -133,7 +133,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-5 shadow-sm">
+      <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 sm:p-5 shadow-sm">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,1fr)] xl:items-start">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -168,7 +168,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
             </div>
           </div>
 
-          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-2">
+          <div className="grid w-full gap-3 grid-cols-1 sm:grid-cols-3 xl:grid-cols-1">
             {summaryMetrics.map((metric) => (
               <Link
                 key={metric.id}
@@ -184,7 +184,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
         </div>
       </section>
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+      <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {attentionMetrics.map((metric) => (
           <Link
             key={metric.id}
@@ -207,7 +207,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
       <div className="grid gap-5 xl:grid-cols-[minmax(0,2.05fr)_minmax(19rem,1fr)]">
         <div className="space-y-6">
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
-            <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
+            <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
               <div>
                 <h2 className="text-base font-semibold text-text-primary">Workflow distribution</h2>
                 <p className="mt-1 text-sm text-text-muted">
@@ -216,7 +216,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
               </div>
               <StatusBadge>{data.activeCaseCount} active cases</StatusBadge>
             </div>
-            <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 p-4 sm:p-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
               {data.workflowDistribution.map((statusGroup) => (
                 <Link
                   key={statusGroup.status}
@@ -236,7 +236,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
           </section>
 
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
-            <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
+            <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
               <div>
                 <h2 className="text-base font-semibold text-text-primary">Immediate work queue</h2>
                 <p className="mt-1 text-sm text-text-muted">
@@ -314,13 +314,13 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
 
         <div className="space-y-6">
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
-            <div className="border-b border-border-subtle px-5 py-4">
+            <div className="border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
               <h2 className="text-base font-semibold text-text-primary">Financial exceptions</h2>
               <p className="mt-1 text-sm text-text-muted">
                 Billing, receipts, and outstanding balances stay distinct, with overdue invoices listed below the totals.
               </p>
             </div>
-            <div className="grid gap-3 p-5 sm:grid-cols-2">
+            <div className="grid gap-3 p-4 sm:p-5 grid-cols-1 min-[400px]:grid-cols-2">
               <Link href={billedMetric?.destination ?? "/invoices?scope=billed"} className={compactMetricLinkClassName}>
                 <p className="text-xs uppercase tracking-wide text-text-muted">Billed</p>
                 <div className="mt-2 flex items-center gap-2 text-text-primary">
@@ -394,7 +394,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
           </section>
 
           <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
-            <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
+            <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
               <div>
                 <h2 className="text-base font-semibold text-text-primary">Resolution watchlist</h2>
                 <p className="mt-1 text-sm text-text-muted">
