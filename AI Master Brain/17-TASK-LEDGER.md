@@ -63,6 +63,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | LAYOUT-RESPONSIVE-02 | DONE | Advanced dashboard grid auto-adaptation and responsive spacing | LAYOUT-RESPONSIVE-01 | Widen dashboard grids, balance columns, and reclaim cell paddings in all tables | `1faa3b1` |
 | LAYOUT-POLISH-01 | DONE | Widen sidebar navigation, adjust font sizes/icons, and polish all forms, read-only cards, and layouts to use semantic design system tokens and rounded-panel class | LAYOUT-RESPONSIVE-02 | Widescreen navigation is larger and bold, form containers and fields have perfect alignment and design token classes | `c068dc8` |
 | REFUND-REVAMP-01 | DONE | Revamp refund section with client-wise status table and unified create/edit container | LAYOUT-POLISH-01 | Clean status table, no cards or inline update forms, edit triggers upper container | `9d29453` |
+| INVOICE-REVAMP-01 | DONE | Revamp invoice register table and implement refund amount auto-population | REFUND-REVAMP-01 | Clean status columns with client-wise editing, received refund amount auto-populates calculator | `87f271e` |
 
 
 

@@ -4,22 +4,22 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: REFUND-REVAMP-01
+- Active task: INVOICE-REVAMP-01
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `9d29453`
+- HEAD: `87f271e`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## Refund Section Revamp (2026-07-01)
+## Invoice Revamp & Refund Auto-Population (2026-07-01)
 
-**Status: DONE — Revamped the Refunds section, replaced the card-based list with a clean high-density client status table, and unified the upper form to serve as both a create and edit container.**
+**Status: DONE — Revamped the Invoice register to support client-wise status columns, added editing support for draft invoices, and auto-populated refund received amounts.**
 
 ### Verification steps completed:
-1. **Unified State Management**: Created the `RefundsManager.tsx` client wrapper to share editing state and handle resetting form state dynamically using the `key` prop trick.
-2. **Tabular Status View**: Built a clean, responsive HTML table in `RefundPageContent.tsx` with columns `Sl. No.`, `Client Name`, `Assessment Year`, Expected, Received, Pending, Status, and Actions. Styled row backgrounds based on attention level (red for overdue, yellow for due/follow-up).
-3. **Form Support for Edit**: Revamped `RefundCreateForm.tsx` to pre-populate inputs from editing records, disable client/AY selections, and submit to the update server action. Added a Cancel button to exit edit mode.
-4. **TypeScript and Lint checks**: Verified typecheck compiles successfully and linter runs with zero errors on the modified files.
+1. **Invoice Register Revamp**: Replaced the invoice table layout to render exact columns: `Sl. No.`, `Client name`, `ITR Number` (Filing record acknowledgement), `Refund Received` (case refunds received amount), `ITR Filing Charges` (subtotal from line items), `ITR Refund Claim Charges` (subtotal from line items), `Total Invoice value`, `Status`, and `Actions`.
+2. **Draft Editing**: Created the `InvoicesManager` client-side wrapper, revamped `InvoiceCreateForm` to pre-populate inputs from `editingInvoice`, disable selectors, bind action to `updateInvoiceAction`, and support Cancel/Reset.
+3. **Refund Auto-Population**: Added `getReceivedRefundAmount` action and integrated an effect inside `InvoiceCreateForm` to automatically pre-populate the "Refundable Amount" calculator input when client or AY changes.
+4. **TypeScript and Lint checks**: Verified typecheck compiles successfully and linter runs with zero errors on all source files.
