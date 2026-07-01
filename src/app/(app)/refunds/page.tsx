@@ -1,5 +1,4 @@
-import { RefundCreateForm } from "@/components/refunds/RefundCreateForm";
-import { RefundPageContent } from "@/components/refunds/RefundPageContent";
+import { RefundsManager } from "@/components/refunds/RefundsManager";
 import { getRefundsModuleData } from "@/lib/actions/refunds";
 
 export const metadata = {
@@ -29,14 +28,10 @@ export default async function RefundsPage({
   });
 
   return (
-    <div className="space-y-6">
-      <RefundCreateForm
-        clients={data.clients}
-        assessmentYears={data.assessmentYears}
-        caseOptions={data.caseOptions}
-        filingRecordOptions={data.filingRecordOptions}
-      />
-      <RefundPageContent data={data} basePath="/refunds" showClientFilter={true} />
-    </div>
+    <RefundsManager
+      data={data}
+      basePath="/refunds"
+      showClientFilter={true}
+    />
   );
 }

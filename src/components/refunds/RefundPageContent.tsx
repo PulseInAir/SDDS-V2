@@ -1,11 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight, RotateCcw } from "lucide-react";
+import { ArrowUpRight, RotateCcw, Edit } from "lucide-react";
 
 import type { getRefundsModuleData } from "@/lib/actions/refunds";
 import {
   buildRefundQueryHref,
-  formatRefundDate,
-  formatRefundDateTime,
   formatRefundStatus,
   getRefundAttentionLabel,
   getRefundAttentionVariant,
@@ -14,7 +14,7 @@ import {
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyValue } from "@/components/ui/MoneyValue";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { RefundUpdateForm } from "@/components/refunds/RefundUpdateForm";
+import type { RefundFormRecord } from "./RefundsManager";
 
 type RefundsModuleData = Awaited<ReturnType<typeof getRefundsModuleData>>;
 
@@ -22,10 +22,12 @@ export function RefundPageContent({
   data,
   basePath,
   showClientFilter,
+  onEditRefund,
 }: {
   data: RefundsModuleData;
   basePath: string;
   showClientFilter: boolean;
+  onEditRefund: (refund: RefundFormRecord) => void;
 }) {
   const activeFilters = data.filters;
 
@@ -190,107 +192,97 @@ export function RefundPageContent({
             />
           </div>
         ) : (
-          <div className="divide-y divide-border-subtle">
-            {data.paginatedRefunds.map((refund) => (
-              <article
-                key={refund.id}
-                className={`space-y-4 px-5 py-5 ${
-                  refund.attentionLevel === "overdue"
-                    ? "bg-red-50/40"
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px] border-collapse text-left text-sm text-text-primary">
+              <thead>
+                <tr className="border-b border-border-subtle bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                  <th scope="col" className="px-5 py-3 text-center w-16">Sl. No.</th>
+                  <th scope="col" className="px-5 py-3">Client Name</th>
+                  <th scope="col" className="px-5 py-3 w-32">Assessment Year</th>
+                  <th scope="col" className="px-5 py-3 text-right w-36">Expected Amount</th>
+                  <th scope="col" className="px-5 py-3 text-right w-36">Received Amount</th>
+                  <th scope="col" className="px-5 py-3 text-right w-36">Pending Amount</th>
+                  <th scope="col" className="px-5 py-3 w-44">Status</th>
+                  <th scope="col" className="px-5 py-3 text-right w-64">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-subtle">
+                {data.paginatedRefunds.map((refund, index) => {
+                  const slNo = (data.page - 1) * data.pageSize + index + 1;
+                  const rowBg = refund.attentionLevel === "overdue"
+                    ? "bg-red-50/20 hover:bg-red-50/30"
                     : refund.attentionLevel === "due" || refund.attentionLevel === "follow_up"
-                      ? "bg-yellow-50/50"
-                      : ""
-                }`}
-              >
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <StatusBadge variant={getRefundStatusVariant(refund.status)}>
-                        {formatRefundStatus(refund.status)}
-                      </StatusBadge>
-                      <StatusBadge variant={getRefundAttentionVariant(refund.attentionLevel)}>
-                        {getRefundAttentionLabel(refund.attentionLevel)}
-                      </StatusBadge>
-                      <span className="text-sm text-text-muted">
-                        {refund.assessment_years?.label ? `AY ${refund.assessment_years.label}` : "No AY"}
-                      </span>
-                    </div>
+                      ? "bg-yellow-50/30 hover:bg-yellow-50/40"
+                      : "hover:bg-surface-hover";
 
-                    <div>
-                      <p className="text-base font-semibold text-text-primary">{refund.clients?.full_name ?? "Unknown client"}</p>
-                      <p className="text-sm text-text-secondary">
-                        Case status: {refund.filing_cases?.case_status ?? "Unknown"}
-                        {refund.filing_cases?.next_action ? ` • ${refund.filing_cases.next_action}` : ""}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 text-xs text-text-muted">
-                      <span>Expected {formatRefundDate(refund.expected_date)}</span>
-                      <span>Received {formatRefundDate(refund.received_date)}</span>
-                      <span>Last checked {formatRefundDateTime(refund.last_checked_at)}</span>
-                      {refund.filing_records?.filing_kind ? <span>Filing {refund.filing_records.filing_kind}</span> : null}
-                      {refund.filing_records?.acknowledgement_number ? (
-                        <span>Ack {refund.filing_records.acknowledgement_number}</span>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      href={`/clients/${refund.client_id}/refunds`}
-                      className="inline-flex items-center rounded-[var(--radius-input)] border border-border-subtle px-3 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
-                    >
-                      Client view
-                    </Link>
-                    <Link
-                      href={`/filing-queue/${refund.case_id}`}
-                      className="inline-flex items-center text-sm font-medium text-brand-700 hover:text-brand-800"
-                    >
-                      Open case
-                      <ArrowUpRight className="ml-1 h-4 w-4" aria-hidden="true" />
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-[var(--radius-input)] border border-border-subtle bg-white p-3">
-                    <p className="text-xs uppercase tracking-wide text-text-muted">Expected</p>
-                    <p className="mt-2 text-base font-semibold text-text-primary">
-                      <MoneyValue value={refund.expectedAmount} />
-                    </p>
-                  </div>
-                  <div className="rounded-[var(--radius-input)] border border-border-subtle bg-white p-3">
-                    <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
-                    <p className="mt-2 text-base font-semibold text-text-primary">
-                      <MoneyValue value={refund.receivedAmount} />
-                    </p>
-                  </div>
-                  <div className="rounded-[var(--radius-input)] border border-border-subtle bg-white p-3">
-                    <p className="text-xs uppercase tracking-wide text-text-muted">Pending</p>
-                    <p className="mt-2 text-base font-semibold text-text-primary">
-                      <MoneyValue value={refund.pendingAmount} />
-                    </p>
-                  </div>
-                  <div className="rounded-[var(--radius-input)] border border-border-subtle bg-white p-3">
-                    <p className="text-xs uppercase tracking-wide text-text-muted">Next action</p>
-                    <p className="mt-2 text-sm text-text-secondary">{refund.next_action ?? "No next action recorded."}</p>
-                  </div>
-                </div>
-
-                {refund.attentionLevel === "overdue" ? (
-                  <div className="flex items-start gap-2 rounded-[var(--radius-input)] border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>The expected date has passed and this refund still needs closure or an updated next action.</span>
-                  </div>
-                ) : null}
-
-                <RefundUpdateForm
-                  refund={refund}
-                  filingRecordOptions={data.filingRecordOptions.filter((filingRecord) => filingRecord.case_id === refund.case_id)}
-                  revalidateTarget={basePath}
-                />
-              </article>
-            ))}
+                  return (
+                    <tr key={refund.id} className={`${rowBg} transition-colors`}>
+                      <td className="px-5 py-3.5 text-center font-medium text-text-muted">{slNo}</td>
+                      <td className="px-5 py-3.5">
+                        <div>
+                          <p className="font-semibold text-text-primary">{refund.clients?.full_name ?? "Unknown client"}</p>
+                          <p className="text-xs text-text-muted">
+                            Case status: {refund.filing_cases?.case_status ?? "Unknown"}
+                            {refund.filing_cases?.next_action ? ` • ${refund.filing_cases.next_action}` : ""}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 font-medium">
+                        {refund.assessment_years?.label ? `AY ${refund.assessment_years.label}` : "—"}
+                      </td>
+                      <td className="px-5 py-3.5 text-right font-mono tabular-nums">
+                        <MoneyValue value={refund.expectedAmount} />
+                      </td>
+                      <td className="px-5 py-3.5 text-right font-mono tabular-nums">
+                        <MoneyValue value={refund.receivedAmount} />
+                      </td>
+                      <td className="px-5 py-3.5 text-right font-mono tabular-nums font-semibold">
+                        <MoneyValue value={refund.pendingAmount} />
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-wrap gap-1.5">
+                          <StatusBadge variant={getRefundStatusVariant(refund.status)}>
+                            {formatRefundStatus(refund.status)}
+                          </StatusBadge>
+                          {refund.attentionLevel !== "resolved" && (
+                            <StatusBadge variant={getRefundAttentionVariant(refund.attentionLevel)}>
+                              {getRefundAttentionLabel(refund.attentionLevel)}
+                            </StatusBadge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            type="button"
+                            onClick={() => onEditRefund(refund)}
+                            className="inline-flex items-center gap-1 rounded-[var(--radius-input)] border border-border-subtle bg-white px-2.5 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover hover:text-brand-600 focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+                          >
+                            <Edit className="h-3.5 w-3.5" aria-hidden="true" />
+                            Edit
+                          </button>
+                          {showClientFilter && (
+                            <Link
+                              href={`/clients/${refund.client_id}/refunds`}
+                              className="inline-flex items-center rounded-[var(--radius-input)] border border-border-subtle bg-white px-2.5 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+                            >
+                              Client view
+                            </Link>
+                          )}
+                          <Link
+                            href={`/filing-queue/${refund.case_id}`}
+                            className="inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800"
+                          >
+                            Open case
+                            <ArrowUpRight className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 

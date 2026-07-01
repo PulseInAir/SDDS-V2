@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { RefundCreateForm } from "@/components/refunds/RefundCreateForm";
-import { RefundPageContent } from "@/components/refunds/RefundPageContent";
+import { RefundsManager } from "@/components/refunds/RefundsManager";
 import { getClientById } from "@/lib/actions/clients";
 import { getClientRefundsModuleData } from "@/lib/actions/refunds";
 
@@ -44,15 +43,11 @@ export default async function ClientRefundsPage({
   const basePath = `/clients/${resolvedParams.clientId}/refunds`;
 
   return (
-    <div className="space-y-6">
-      <RefundCreateForm
-        clients={data.clients}
-        assessmentYears={data.assessmentYears}
-        caseOptions={data.caseOptions}
-        filingRecordOptions={data.filingRecordOptions}
-        defaultClientId={resolvedParams.clientId}
-      />
-      <RefundPageContent data={data} basePath={basePath} showClientFilter={false} />
-    </div>
+    <RefundsManager
+      data={data}
+      basePath={basePath}
+      showClientFilter={false}
+      defaultClientId={resolvedParams.clientId}
+    />
   );
 }
