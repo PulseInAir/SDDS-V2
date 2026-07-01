@@ -41,7 +41,7 @@ export function LoginForm() {
         />
       </div>
       {state.error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="rounded-lg bg-red-950/40 border border-red-900/30 px-3 py-2 text-sm text-red-300" role="alert">
           {state.error}
         </p>
       ) : null}

@@ -22,19 +22,19 @@ export default async function LoginPage({
   const membershipError = params?.error === "workspace-membership-required";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+    <main className="flex min-h-screen items-center justify-center bg-surface-app p-6">
+      <section className="w-full max-w-md glow-card p-8 rounded-[var(--radius-panel)]">
+        <p className="text-sm font-semibold uppercase tracking-wide text-brand-500">
           Single Digit Data Solutions
         </p>
-        <h1 className="mt-3 text-2xl font-semibold text-slate-950">
+        <h1 className="mt-3 text-2xl font-semibold text-text-primary">
           Sign in to SDDS
         </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <p className="mt-2 text-sm leading-6 text-text-muted">
           Internal access only. Your workspace membership is verified after authentication.
         </p>
         {membershipError ? (
-          <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800" role="alert">
+          <p className="mt-4 rounded-lg bg-amber-950/40 border border-amber-900/30 px-3 py-2 text-sm text-amber-300" role="alert">
             Your login is valid, but no active SDDS workspace membership was found.
           </p>
         ) : null}
