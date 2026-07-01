@@ -66,7 +66,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | INVOICE-REVAMP-01 | DONE | Revamp invoice register table and implement refund amount auto-population | REFUND-REVAMP-01 | Clean status columns with client-wise editing, received refund amount auto-populates calculator | `87f271e` |
 | UI-CINEMATIC-REMODEL-01 | DONE | Remodel project UI with cinematic dark theme, animations, and typography scaling | INVOICE-REVAMP-01 | Custom cursor, click ripples, neon badges, scaled fonts, and dark obsidian variables | `6727b33` |
 | UI-CINEMATIC-REMODEL-02 | DONE | Ditch cursor follower and elevate cinematic ambient highlights (mesh bg, hover spotlights, glassmorphism) | UI-CINEMATIC-REMODEL-01 | Cards hover spotlight follow, animated background aura, glassmorphic panels, no cursor ring | `90d363d` |
-| UI-CINEMATIC-REMODEL-03 | IN_PROGRESS | Implement proximity border spotlights, spring clicks, digital vacuum money glows, and pulsing nav active states | UI-CINEMATIC-REMODEL-02 | Proximity card borders glow on hover, active spring scaling, glowing text shadows, pulsing active lists | — |
+| UI-CINEMATIC-REMODEL-03 | DONE | Implement proximity border spotlights, spring clicks, digital vacuum money glows, and pulsing nav active states | UI-CINEMATIC-REMODEL-02 | Proximity card borders glow on hover, active spring scaling, glowing text shadows, pulsing active lists | `6d66121` |
+
 
 
 
