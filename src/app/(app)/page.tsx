@@ -2,7 +2,7 @@ import { OperationalDashboard } from "@/components/dashboard/OperationalDashboar
 import { getOperationalDashboardData } from "@/lib/actions/dashboard";
 
 export const metadata = {
-  title: "Single Digit Data Solutions Dashboard",
+  title: "Operational Cockpit - Single Digit Data Solutions",
 };
 
 export default async function HomePage() {
