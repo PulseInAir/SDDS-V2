@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { TopUtilityBar } from "./TopUtilityBar";
+import { CinematicEffects } from "@/components/ui/CinematicEffects";
 
 export function AppShell({
   children,
@@ -32,6 +33,7 @@ export function AppShell({
           </div>
         </main>
       </div>
+      <CinematicEffects />
     </div>
   );
 }

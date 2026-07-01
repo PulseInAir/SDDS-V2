@@ -3,35 +3,35 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-50: #EFF6FF;
-  --color-brand-100: #DBEAFE;
-  --color-brand-200: #BFDBFE;
-  --color-brand-300: #93C5FD;
-  --color-brand-400: #60A5FA;
-  --color-brand-500: #3B82F6;
-  --color-brand-600: #2563EB;
-  --color-brand-700: #1D4ED8;
-  --color-brand-800: #1E40AF;
-  --color-brand-900: #1E3A8A;
-  --color-brand-950: #172554;
+  --color-brand-50: #0C1524;
+  --color-brand-100: #12223F;
+  --color-brand-200: #1E3B70;
+  --color-brand-300: #2E5AA8;
+  --color-brand-400: #3B82F6;
+  --color-brand-500: #60A5FA;
+  --color-brand-600: #3B82F6;
+  --color-brand-700: #60A5FA;
+  --color-brand-800: #93C5FD;
+  --color-brand-900: #DBEAFE;
+  --color-brand-950: #EFF6FF;
 
-  --color-text-primary: #172033;
-  --color-text-secondary: #4B5565;
-  --color-text-muted: #667085;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #E2E8F0;
+  --color-text-muted: #94A3B8;
 
-  --color-border-subtle: #DDE3EC;
-  --color-surface-app: #F4F6F9;
-  --color-surface-panel: #FFFFFF;
-  --color-surface-muted: #F8FAFC;
-  --color-surface-hover: #F1F5F9;
-  --color-surface-selected: #EFF6FF;
-  /* low-intensity brand tint */
+  --color-border-subtle: #1E293B;
+  --color-surface-app: #070B14;
+  --color-surface-panel: #0E1626;
+  --color-surface-muted: #0F1A30;
+  --color-surface-hover: #19253F;
+  --color-surface-selected: #1E2E4A;
 
   --radius-input: 8px;
   --radius-panel: 12px;
 
-  /* Typography based on 09-DESIGN-SYSTEM.md */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Typography based on 09-DESIGN-SYSTEM.md and loaded via next/font/google */
+  --font-sans: var(--font-plus-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-space-grotesk), monospace;
 }
 
 :root {
@@ -49,7 +49,8 @@ body {
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
+  font-size: 112.5%; /* 18px base root instead of 16px - scales rem units by 12.5% */
 }
 
 body {
@@ -57,8 +58,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-size: 14px;
-  /* Default body: 13-14px */
+  font-size: 15px; /* Scale default body text size */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -101,8 +101,209 @@ textarea {
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-app);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-600);
+}
 
+/* --- Cinematic Theme Global Overrides --- */
+
+/* Backgrounds */
+.bg-white, [class*="bg-white/"] {
+  background-color: var(--color-surface-panel) !important;
+}
+.bg-gray-50, .bg-slate-50, .bg-surface-muted {
+  background-color: var(--color-surface-muted) !important;
+}
+.bg-gray-100, .bg-slate-100 {
+  background-color: var(--color-surface-hover) !important;
+}
+
+/* Borders */
+.border-gray-200, .border-slate-200, .border-border-subtle, .border-gray-100, .border-slate-100 {
+  border-color: var(--color-border-subtle) !important;
+}
+.divide-gray-200 > *, .divide-slate-200 > *, .divide-border-subtle > * {
+  border-color: var(--color-border-subtle) !important;
+}
+
+/* Texts */
+.text-gray-900, .text-slate-900, .text-text-primary {
+  color: var(--color-text-primary) !important;
+}
+.text-gray-700, .text-slate-700, .text-gray-800, .text-slate-800, .text-text-secondary {
+  color: var(--color-text-secondary) !important;
+}
+.text-gray-500, .text-slate-500, .text-text-muted, .text-gray-400, .text-slate-400 {
+  color: var(--color-text-muted) !important;
+}
+
+/* Tabular numbers for financial displays and table columns */
+.font-mono, td, th, [class*="tabular-nums"] {
+  font-family: var(--font-mono), monospace !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badge Neon Glow Styling */
+.bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+.text-green-800 {
+  color: #34D399 !important;
+}
+.border-green-200 {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.bg-yellow-100 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+.text-yellow-800 {
+  color: #FBBF24 !important;
+}
+.border-yellow-200 {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+.text-red-800 {
+  color: #F87171 !important;
+}
+.border-red-200 {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.bg-brand-100 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+.text-brand-800 {
+  color: #60A5FA !important;
+}
+.border-brand-200 {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Form controls overrides */
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  background-color: var(--color-surface-panel) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-subtle) !important;
+}
+input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+  border-color: var(--color-brand-500) !important;
+}
+
+/* Interactive elements transition */
+a, button, select, textarea, input, .interactive-panel, [class*="hover\:bg-"] {
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Glowing Interactive card effects */
+.interactive-panel:hover, a.compact-metric-link:hover {
+  transform: translateY(-3px) scale(1.008) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(59, 130, 246, 0.18) !important;
+  border-color: var(--color-brand-400) !important;
+  background-color: var(--color-surface-hover) !important;
+}
+
+/* Custom smooth page entrance transition */
+main#main-content {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Cursor Follower & Ripple classes */
+.custom-cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-brand-500);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--color-brand-400);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s cubic-bezier(0.1, 0.8, 0.25, 1), width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.2);
+}
+
+/* Interactive Cursor active states */
+.custom-cursor-ring.hovering {
+  width: 50px;
+  height: 50px;
+  border-color: var(--color-brand-300);
+  background-color: rgba(96, 165, 250, 0.08);
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+}
+
+.custom-cursor-dot.hovering {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-brand-300);
+}
+
+/* Click ripples */
+.ripple-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.ripple-ring {
+  position: absolute;
+  border: 2px solid var(--color-brand-400);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: rippleEffect 0.6s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+  opacity: 0.8;
+}
+
+@keyframes rippleEffect {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
@@ -114,14 +315,12 @@ textarea {
 }
 
 @media print {
-
-  /* Reset app background and padding so the invoice prints on clean white paper. */
   html,
   body {
     background-color: #ffffff !important;
+    font-size: 12pt !important;
   }
 
-  /* Hide everything except the invoice print container. */
   body * {
     visibility: hidden !important;
   }
@@ -141,7 +340,6 @@ textarea {
     background-color: #FFF4D4 !important;
   }
 
-  /* Remove the scroll container padding/max-width constraints from the app shell. */
   main#main-content {
     overflow: visible !important;
     padding: 0 !important;
@@ -151,7 +349,6 @@ textarea {
     max-width: none !important;
   }
 
-  /* Force colours to print as rendered (borders, table fills). */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;

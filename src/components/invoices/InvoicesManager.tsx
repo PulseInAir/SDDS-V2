@@ -52,7 +52,8 @@ export function InvoicesManager({
         assessmentYears={assessmentYears}
         defaultClientId={defaultClientId}
         invoiceSettings={data.invoiceSettings}
-        editingInvoice={editingInvoice}
+        editingInvoice={editingInvoice || undefined}
+
         onCancelEdit={handleCancelEdit}
         revalidateTarget={basePath}
       />
