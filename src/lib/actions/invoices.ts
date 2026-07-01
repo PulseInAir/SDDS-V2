@@ -42,10 +42,19 @@ type InvoiceJoinedRow = InvoiceRow & {
     | Array<Pick<Tables<"assessment_years">, "id" | "label" | "is_current">>
     | null;
   filing_cases:
-    | Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date">
-    | Array<Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date">>
+    | (Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date"> & {
+        filing_records?: Array<{ id: string; acknowledgement_number: string | null; filing_kind: string }> | null;
+        refunds?: Array<{ id: string; received_amount: number | null; status: string }> | null;
+      })
+    | Array<
+        Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date"> & {
+          filing_records?: Array<{ id: string; acknowledgement_number: string | null; filing_kind: string }> | null;
+          refunds?: Array<{ id: string; received_amount: number | null; status: string }> | null;
+        }
+      >
     | null;
   payments: PaymentRow[] | null;
+  invoice_items?: InvoiceItemRow[] | null;
 };
 
 type InvoiceDetailRow = InvoiceJoinedRow & {
@@ -136,8 +145,16 @@ async function fetchInvoices(workspaceId: string, filters: InvoiceFilters) {
       *,
       clients!inner (id, full_name, pan_uppercase),
       assessment_years!inner (id, label, is_current),
-      filing_cases (id, case_status, next_action, due_date),
-      payments (*)
+      filing_cases (
+        id,
+        case_status,
+        next_action,
+        due_date,
+        filing_records (id, acknowledgement_number, filing_kind),
+        refunds (id, received_amount, status)
+      ),
+      payments (*),
+      invoice_items (*)
     `)
     .eq("workspace_id", workspaceId)
     .is("archived_at", null)
@@ -611,4 +628,178 @@ export async function recordPaymentAction(
   revalidatePath(`/clients/${invoice.client_id}/invoices`);
 
   return { success: "Payment recorded." };
+}
+
+export async function updateInvoiceAction(
+  invoiceId: string,
+  _previousState: InvoiceActionState,
+  formData: FormData,
+): Promise<InvoiceActionState> {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: currentInvoice, error: currentInvoiceError } = await supabase
+    .from("invoices")
+    .select("id, client_id, assessment_year_id, status, invoice_number")
+    .eq("workspace_id", session.workspace.id)
+    .eq("id", invoiceId)
+    .is("archived_at", null)
+    .single();
+
+  if (currentInvoiceError || !currentInvoice) {
+    return { error: "Invoice not found." };
+  }
+
+  if (currentInvoice.status !== "draft") {
+    return { error: "Only draft invoices can be updated." };
+  }
+
+  const items = parseItemsJson(String(formData.get("itemsJson") ?? ""));
+  if (!items) {
+    return { error: "Invoice items could not be parsed." };
+  }
+
+  const parsed = createInvoiceSchema.safeParse({
+    clientId: String(formData.get("clientId") ?? "").trim(),
+    assessmentYearId: String(formData.get("assessmentYearId") ?? "").trim(),
+    discountAmount: String(formData.get("discountAmount") ?? "0").trim() || "0",
+    notes: String(formData.get("notes") ?? "").trim(),
+    items,
+  });
+
+  if (!parsed.success) {
+    return { error: mapZodError(parsed.error) };
+  }
+
+  const { clientId, assessmentYearId, discountAmount, notes } = parsed.data;
+
+  const { data: client, error: clientError } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("workspace_id", session.workspace.id)
+    .eq("id", clientId)
+    .is("archived_at", null)
+    .single();
+
+  if (clientError || !client) {
+    return { error: "Client not found in the active workspace." };
+  }
+
+  const { data: assessmentYear, error: assessmentYearError } = await supabase
+    .from("assessment_years")
+    .select("id")
+    .eq("workspace_id", session.workspace.id)
+    .eq("id", assessmentYearId)
+    .single();
+
+  if (assessmentYearError || !assessmentYear) {
+    return { error: "Assessment year not found in the active workspace." };
+  }
+
+  const { data: filingCase, error: caseError } = await supabase
+    .from("filing_cases")
+    .select("id")
+    .eq("workspace_id", session.workspace.id)
+    .eq("client_id", clientId)
+    .eq("assessment_year_id", assessmentYearId)
+    .is("archived_at", null)
+    .maybeSingle();
+
+  if (caseError) {
+    return { error: "Failed to resolve the client filing case for this assessment year." };
+  }
+
+  if (filingCase?.id) {
+    const { data: existingInvoice } = await supabase
+      .from("invoices")
+      .select("id")
+      .eq("workspace_id", session.workspace.id)
+      .eq("case_id", filingCase.id)
+      .neq("id", invoiceId)
+      .neq("status", "cancelled")
+      .is("archived_at", null)
+      .maybeSingle();
+
+    if (existingInvoice) {
+      return { error: "This filing case already has an active primary invoice." };
+    }
+  }
+
+  // Update invoice basic properties (temporarily set discount to 0 to avoid check constraint violations)
+  const { error: invoiceUpdateError } = await supabase
+    .from("invoices")
+    .update({
+      client_id: clientId,
+      case_id: filingCase?.id ?? null,
+      assessment_year_id: assessmentYearId,
+      discount_amount: 0,
+      notes: notes || null,
+    })
+    .eq("workspace_id", session.workspace.id)
+    .eq("id", invoiceId);
+
+  if (invoiceUpdateError) {
+    return { error: `Failed to update the invoice draft: ${invoiceUpdateError.message}` };
+  }
+
+  // Delete existing items
+  const { error: deleteError } = await supabase
+    .from("invoice_items")
+    .delete()
+    .eq("workspace_id", session.workspace.id)
+    .eq("invoice_id", invoiceId);
+
+  if (deleteError) {
+    return { error: `Failed to clear existing invoice items: ${deleteError.message}` };
+  }
+
+  // Insert new items
+  const itemRows = parsed.data.items.map((item, index) => ({
+    workspace_id: session.workspace.id,
+    invoice_id: invoiceId,
+    description: item.description,
+    quantity: item.quantity,
+    unit_amount: item.unitAmount,
+    display_order: index,
+  }));
+
+  const { error: itemsError } = await supabase.from("invoice_items").insert(itemRows);
+
+  if (itemsError) {
+    return { error: `Invoice draft was updated, but its items failed to save: ${itemsError.message}` };
+  }
+
+  // Apply discount real value
+  if (discountAmount > 0) {
+    const { error: discountError } = await supabase
+      .from("invoices")
+      .update({ discount_amount: discountAmount })
+      .eq("workspace_id", session.workspace.id)
+      .eq("id", invoiceId);
+
+    if (discountError) {
+      return { error: `Invoice items were saved, but the discount could not be applied: ${discountError.message}` };
+    }
+  }
+
+  await supabase.from("activity_events").insert({
+    workspace_id: session.workspace.id,
+    actor_id: session.user.id,
+    client_id: clientId,
+    case_id: filingCase?.id ?? null,
+    entity_type: "invoice",
+    entity_id: invoiceId,
+    action: "invoice_updated",
+    message: `Draft invoice ${currentInvoice.invoice_number} was updated.`,
+  });
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${invoiceId}`);
+  revalidatePath(`/clients/${clientId}`);
+  revalidatePath(`/clients/${clientId}/invoices`);
+
+  return {
+    success: `Updated draft invoice.`,
+    invoiceId: invoiceId,
+  };
 }

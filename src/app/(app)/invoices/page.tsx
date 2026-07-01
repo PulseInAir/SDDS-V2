@@ -1,5 +1,4 @@
-import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
-import { InvoicePageContent } from "@/components/invoices/InvoicePageContent";
+import { InvoicesManager } from "@/components/invoices/InvoicesManager";
 import { getInvoicesModuleData } from "@/lib/actions/invoices";
 
 export const metadata = {
@@ -29,13 +28,10 @@ export default async function InvoicesPage({
   });
 
   return (
-    <div className="space-y-6">
-      <InvoiceCreateForm
-        clients={data.clients}
-        assessmentYears={data.assessmentYears}
-        invoiceSettings={data.invoiceSettings}
-      />
-      <InvoicePageContent data={data} basePath="/invoices" showClientFilter={true} />
-    </div>
+    <InvoicesManager
+      data={data}
+      basePath="/invoices"
+      showClientFilter={true}
+    />
   );
 }

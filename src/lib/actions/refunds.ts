@@ -567,3 +567,26 @@ export async function updateRefundAction(
     success: "Refund updated.",
   };
 }
+
+export async function getReceivedRefundAmount(
+  clientId: string,
+  assessmentYearId: string,
+): Promise<number | null> {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("refunds")
+    .select("received_amount")
+    .eq("workspace_id", session.workspace.id)
+    .eq("client_id", clientId)
+    .eq("assessment_year_id", assessmentYearId)
+    .is("archived_at", null)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data.received_amount;
+}

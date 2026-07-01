@@ -119,15 +119,17 @@ export function RefundCreateForm({
           onCancelEdit();
         }
       } else {
-        setExpectedAmount("");
-        setExpectedDate("");
-        setReceivedAmount("");
-        setReceivedDate("");
-        setLastCheckedAt("");
-        setFilingRecordId("");
-        setNextAction("");
-        setNotes("");
-        setSelectedDocId("");
+        Promise.resolve().then(() => {
+          setExpectedAmount("");
+          setExpectedDate("");
+          setReceivedAmount("");
+          setReceivedDate("");
+          setLastCheckedAt("");
+          setFilingRecordId("");
+          setNextAction("");
+          setNotes("");
+          setSelectedDocId("");
+        });
       }
     }
   }, [state.success, editingRefund, onCancelEdit]);

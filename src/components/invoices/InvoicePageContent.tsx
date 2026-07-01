@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight, Receipt } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, Receipt, Edit } from "lucide-react";
 
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
-import { buildInvoiceQueryHref, formatInvoiceDate, formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
+import { buildInvoiceQueryHref, formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyValue } from "@/components/ui/MoneyValue";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -15,10 +15,12 @@ export function InvoicePageContent({
   data,
   basePath,
   showClientFilter,
+  onEditInvoice,
 }: {
   data: InvoicesModuleData;
   basePath: string;
   showClientFilter: boolean;
+  onEditInvoice: (invoice: InvoicesModuleData["paginatedInvoices"][number]) => void;
 }) {
   const activeFilters = data.filters;
 
@@ -166,61 +168,112 @@ export function InvoicePageContent({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-border-subtle text-sm">
-              <thead className="bg-surface-muted">
-                <tr>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Invoice</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Client</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Issued</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Due</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Total</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Paid</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Balance</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Status</th>
-                  <th className="px-3 py-2.5 sm:px-5 sm:py-3 text-left font-medium text-text-secondary">Action</th>
+            <table className="w-full min-w-[1000px] border-collapse text-left text-sm text-text-primary">
+              <thead>
+                <tr className="border-b border-border-subtle bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                  <th scope="col" className="px-4 py-3 text-center w-16">Sl. No.</th>
+                  <th scope="col" className="px-4 py-3">Client name</th>
+                  <th scope="col" className="px-4 py-3 w-36">ITR Number</th>
+                  <th scope="col" className="px-4 py-3 text-right w-36">Refund Received</th>
+                  <th scope="col" className="px-4 py-3 text-right w-36">ITR Filing Charges</th>
+                  <th scope="col" className="px-4 py-3 text-right w-36">ITR Refund Claim Charges</th>
+                  <th scope="col" className="px-4 py-3 text-right w-36">Total Invoice value</th>
+                  <th scope="col" className="px-4 py-3 w-32">Status</th>
+                  <th scope="col" className="px-4 py-3 text-right w-56">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-subtle bg-white">
-                {data.paginatedInvoices.map((invoice) => (
-                  <tr key={invoice.id} className={invoice.derivedStatus === "overdue" ? "bg-red-50/50" : undefined}>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 align-top">
-                      <div className="space-y-1">
-                        <Link href={`/invoices/${invoice.id}`} className="font-mono font-semibold text-brand-700 hover:text-brand-800">
-                          {invoice.invoice_number}
-                        </Link>
-                        <p className="text-xs text-text-muted">{invoice.assessment_years?.label ?? "No AY"}</p>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 align-top">
-                      <div className="space-y-1">
-                        <p className="font-medium text-text-primary">{invoice.clients?.full_name ?? "Unknown client"}</p>
-                        <p className="text-xs text-text-muted">{invoice.filing_cases?.next_action ?? "No case note"}</p>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-secondary">{formatInvoiceDate(invoice.issue_date)}</td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-secondary">{formatInvoiceDate(invoice.due_date)}</td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
-                      <MoneyValue value={Number(invoice.total_amount ?? 0)} />
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
-                      <MoneyValue value={invoice.paidAmount} />
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4 text-text-primary">
-                      <MoneyValue value={invoice.balanceAmount} />
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4">
-                      <StatusBadge variant={getInvoiceStatusVariant(invoice.derivedStatus)}>
-                        {formatInvoiceStatus(invoice.derivedStatus)}
-                      </StatusBadge>
-                    </td>
-                    <td className="px-3 py-2.5 sm:px-5 sm:py-4">
-                      <Link href={`/invoices/${invoice.id}`} className="inline-flex items-center text-sm font-medium text-brand-700 hover:text-brand-800">
-                        Open
-                        <ArrowUpRight className="ml-1 h-4 w-4" aria-hidden="true" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border-subtle">
+                {data.paginatedInvoices.map((invoice, index) => {
+                  const slNo = (data.page - 1) * data.pageSize + index + 1;
+                  const rowBg = invoice.derivedStatus === "overdue"
+                    ? "bg-red-50/20 hover:bg-red-50/30"
+                    : "hover:bg-surface-hover";
+
+                  // Extract filing case and records
+                  const filingCase = invoice.filing_cases;
+                  const itrNumber = filingCase?.filing_records?.[0]?.acknowledgement_number || "—";
+
+                  // Extract received refund amount from matching refunds
+                  const refundReceived = filingCase?.refunds?.[0]?.received_amount ?? 0;
+
+                  // Extract ITR Filing Charges line item
+                  const filingItem = invoice.invoice_items?.find((item) =>
+                    item.description.toLowerCase().includes("filing")
+                  );
+                  const filingCharges = filingItem
+                    ? Number(filingItem.unit_amount ?? 0) * Number(filingItem.quantity ?? 1)
+                    : 0;
+
+                  // Extract ITR Refund Claim Charges line item
+                  const refundItem = invoice.invoice_items?.find((item) =>
+                    item.description.toLowerCase().includes("refund claim") ||
+                    item.description.toLowerCase().includes("refund")
+                  );
+                  const refundClaimCharges = refundItem
+                    ? Number(refundItem.unit_amount ?? 0) * Number(refundItem.quantity ?? 1)
+                    : 0;
+
+                  return (
+                    <tr key={invoice.id} className={`${rowBg} transition-colors`}>
+                      <td className="px-4 py-3 text-center font-medium text-text-muted">{slNo}</td>
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-semibold text-text-primary">{invoice.clients?.full_name ?? "Unknown client"}</p>
+                          <p className="text-xs text-text-muted">
+                            {invoice.invoice_number} • {invoice.assessment_years?.label ? `AY ${invoice.assessment_years.label}` : "No AY"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs">{itrNumber}</td>
+                      <td className="px-4 py-3 text-right font-mono tabular-nums">
+                        <MoneyValue value={refundReceived} />
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono tabular-nums">
+                        <MoneyValue value={filingCharges} />
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono tabular-nums">
+                        <MoneyValue value={refundClaimCharges} />
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono tabular-nums font-semibold">
+                        <MoneyValue value={Number(invoice.total_amount ?? 0)} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge variant={getInvoiceStatusVariant(invoice.derivedStatus)}>
+                          {formatInvoiceStatus(invoice.derivedStatus)}
+                        </StatusBadge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2.5">
+                          {invoice.derivedStatus === "draft" && (
+                            <button
+                              type="button"
+                              onClick={() => onEditInvoice(invoice)}
+                              className="inline-flex items-center gap-1 rounded-[var(--radius-input)] border border-border-subtle bg-white px-2.5 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover hover:text-brand-600 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 cursor-pointer"
+                            >
+                              <Edit className="h-3.5 w-3.5" aria-hidden="true" />
+                              Edit
+                            </button>
+                          )}
+                          {showClientFilter && (
+                            <Link
+                              href={`/clients/${invoice.client_id}/invoices`}
+                              className="inline-flex items-center rounded-[var(--radius-input)] border border-border-subtle bg-white px-2.5 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+                            >
+                              Client view
+                            </Link>
+                          )}
+                          <Link
+                            href={`/invoices/${invoice.id}`}
+                            className="inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800"
+                          >
+                            Open
+                            <ArrowUpRight className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

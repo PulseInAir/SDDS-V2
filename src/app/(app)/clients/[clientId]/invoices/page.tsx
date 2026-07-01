@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
-import { InvoicePageContent } from "@/components/invoices/InvoicePageContent";
+import { InvoicesManager } from "@/components/invoices/InvoicesManager";
 import { getClientById } from "@/lib/actions/clients";
 import { getClientInvoicesModuleData } from "@/lib/actions/invoices";
 
@@ -40,18 +39,11 @@ export default async function ClientInvoicesPage({
   });
 
   return (
-    <div className="space-y-6">
-      <InvoiceCreateForm
-        clients={data.clients}
-        assessmentYears={data.assessmentYears}
-        defaultClientId={resolvedParams.clientId}
-        invoiceSettings={data.invoiceSettings}
-      />
-      <InvoicePageContent
-        data={data}
-        basePath={`/clients/${resolvedParams.clientId}/invoices`}
-        showClientFilter={false}
-      />
-    </div>
+    <InvoicesManager
+      data={data}
+      basePath={`/clients/${resolvedParams.clientId}/invoices`}
+      showClientFilter={false}
+      defaultClientId={resolvedParams.clientId}
+    />
   );
 }

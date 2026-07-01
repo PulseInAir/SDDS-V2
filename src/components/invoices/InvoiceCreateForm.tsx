@@ -3,10 +3,13 @@
 import { useActionState, useMemo, useState, useEffect } from "react";
 import { Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 
-import { createInvoiceAction, type InvoiceActionState } from "@/lib/actions/invoices";
+import { createInvoiceAction, updateInvoiceAction, type InvoiceActionState, type getInvoicesModuleData } from "@/lib/actions/invoices";
+import { getReceivedRefundAmount } from "@/lib/actions/refunds";
 import { getClientDocumentsModuleData } from "@/lib/actions/documents";
 import { getClientFilingCaseByAY } from "@/lib/actions/cases";
 import { Button } from "@/components/ui/Button";
+
+type InvoicesModuleData = Awaited<ReturnType<typeof getInvoicesModuleData>>;
 
 type ClientOption = {
   id: string;
@@ -52,6 +55,8 @@ export function InvoiceCreateForm({
   assessmentYears,
   defaultClientId,
   invoiceSettings,
+  editingInvoice,
+  onCancelEdit,
 }: {
   clients: ClientOption[];
   assessmentYears: AssessmentYearOption[];
@@ -65,15 +70,44 @@ export function InvoiceCreateForm({
       refund_amount_pattern: string;
     };
   };
+  editingInvoice?: InvoicesModuleData["paginatedInvoices"][number];
+  onCancelEdit?: () => void;
+  revalidateTarget?: string;
 }) {
-  const [state, formAction, isPending] = useActionState(createInvoiceAction, initialState);
-  const [items, setItems] = useState<InvoiceItemDraft[]>([createEmptyItem()]);
-  const [discountAmount, setDiscountAmount] = useState("0");
+  const boundAction = editingInvoice
+    ? updateInvoiceAction.bind(null, editingInvoice.id)
+    : createInvoiceAction;
 
-  const [selectedClientId, setSelectedClientId] = useState(defaultClientId ?? "");
-  const [selectedAyId, setSelectedAyId] = useState(
-    assessmentYears.find((year) => year.is_current)?.id ?? ""
-  );
+  const [state, formAction, isPending] = useActionState(boundAction, initialState);
+
+  const [items, setItems] = useState<InvoiceItemDraft[]>(() => {
+    if (editingInvoice?.invoice_items) {
+      return editingInvoice.invoice_items.map((item) => ({
+        id: item.id,
+        description: item.description,
+        quantity: String(item.quantity),
+        unitAmount: String(item.unit_amount),
+      }));
+    }
+    return [createEmptyItem()];
+  });
+
+  const [discountAmount, setDiscountAmount] = useState(() => {
+    return editingInvoice ? String(editingInvoice.discount_amount ?? 0) : "0";
+  });
+
+  const [notes, setNotes] = useState(() => {
+    return editingInvoice?.notes || "";
+  });
+
+  const [selectedClientId, setSelectedClientId] = useState(() => {
+    return editingInvoice?.client_id || defaultClientId || "";
+  });
+
+  const [selectedAyId, setSelectedAyId] = useState(() => {
+    return editingInvoice?.assessment_year_id || assessmentYears.find((year) => year.is_current)?.id || "";
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [clientDocuments, setClientDocuments] = useState<any[]>([]);
   const [selectedDocId, setSelectedDocId] = useState("");
@@ -88,7 +122,23 @@ export function InvoiceCreateForm({
   } | null>(null);
 
   // Calculator inputs
-  const [refundableAmount, setRefundableAmount] = useState("");
+  const [refundableAmount, setRefundableAmount] = useState(() => {
+    if (editingInvoice) {
+      const refundItem = editingInvoice.invoice_items?.find((item) =>
+        item.description.toLowerCase().includes("refund claim") ||
+        item.description.toLowerCase().includes("refund")
+      );
+      if (refundItem && invoiceSettings?.refund_charge_percentage) {
+        const charges = Number(refundItem.unit_amount ?? 0);
+        const pct = Number(invoiceSettings.refund_charge_percentage);
+        if (pct > 0) {
+          return String(Math.round((charges * 100) / pct));
+        }
+      }
+    }
+    return "";
+  });
+
   const [refundPercentage, setRefundPercentage] = useState(
     String(invoiceSettings?.refund_charge_percentage ?? 10)
   );
@@ -96,29 +146,22 @@ export function InvoiceCreateForm({
     invoiceSettings?.refund_charge_percentage ?? 10
   );
 
-  // Validation errors for calculator inputs
-  const [calcErrors, setCalcErrors] = useState<{
-    refundableAmount?: string;
-    refundPercentage?: string;
-  }>({});
-
   // Sync default percentage when settings change
   useEffect(() => {
     if (invoiceSettings?.refund_charge_percentage !== undefined) {
-      setRefundPercentage(String(invoiceSettings.refund_charge_percentage));
-      setOriginalPercentage(invoiceSettings.refund_charge_percentage);
+      Promise.resolve().then(() => {
+        setRefundPercentage(String(invoiceSettings.refund_charge_percentage));
+        setOriginalPercentage(invoiceSettings.refund_charge_percentage);
+      });
     }
   }, [invoiceSettings]);
 
+  // Load client documents
   useEffect(() => {
     if (!selectedClientId) {
       Promise.resolve().then(() => setClientDocuments((prev) => (prev.length === 0 ? prev : [])));
       return;
     }
-    // Reset extraction state when client changes
-    setSelectedDocId("");
-    setItrvDetails(null);
-    setRefundableAmount("");
     getClientDocumentsModuleData(selectedClientId)
       .then((res) => {
         const docs = res.chains
@@ -131,9 +174,9 @@ export function InvoiceCreateForm({
       });
   }, [selectedClientId]);
 
-
+  // Auto-populate case fees on client/AY change (only in Create mode)
   useEffect(() => {
-    if (!selectedClientId || !selectedAyId) return;
+    if (!selectedClientId || !selectedAyId || editingInvoice) return;
 
     getClientFilingCaseByAY(selectedClientId, selectedAyId)
       .then((filingCase) => {
@@ -150,29 +193,48 @@ export function InvoiceCreateForm({
             unitAmount: String(fee),
           },
         ]);
-        // NOTE: do NOT reset itrvDetails or refundableAmount here —
-        // those are cleared only when the client changes (above effect).
-        // Clearing here would race against extraction which also updates selectedAyId.
       })
       .catch((err) => {
         console.error("Failed to fetch client case for auto-populate:", err);
       });
-  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears]);
+  }, [selectedClientId, selectedAyId, invoiceSettings, assessmentYears, editingInvoice]);
 
-  // Calculate Refund Claim Charges Amount in real-time
-  const calculatedRefundChargesAmount = useMemo(() => {
+  // Auto-populate received refund amount on client/AY change (only in Create mode)
+  useEffect(() => {
+    if (!selectedClientId || !selectedAyId || editingInvoice) return;
+
+    getReceivedRefundAmount(selectedClientId, selectedAyId)
+      .then((amt) => {
+        if (amt !== null) {
+          setRefundableAmount(String(amt));
+        } else {
+          setRefundableAmount("");
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch received refund amount:", err);
+      });
+  }, [selectedClientId, selectedAyId, editingInvoice]);
+
+  // Validate calculator inputs on the fly (derived render variable to avoid setState inside useMemo warning)
+  const calcErrors = useMemo(() => {
+    const errors: { refundableAmount?: string; refundPercentage?: string } = {};
     const amt = parseFloat(refundableAmount);
     const pct = parseFloat(refundPercentage);
 
-    // Validate inputs
-    const errors: { refundableAmount?: string; refundPercentage?: string } = {};
     if (refundableAmount && (isNaN(amt) || amt < 0)) {
       errors.refundableAmount = "Refundable amount must be a positive number.";
     }
     if (refundPercentage && (isNaN(pct) || pct < 0 || pct > 100)) {
       errors.refundPercentage = "Percentage must be between 0 and 100.";
     }
-    setCalcErrors(errors);
+    return errors;
+  }, [refundableAmount, refundPercentage]);
+
+  // Calculate Refund Claim Charges Amount in real-time
+  const calculatedRefundChargesAmount = useMemo(() => {
+    const amt = parseFloat(refundableAmount);
+    const pct = parseFloat(refundPercentage);
 
     if (isNaN(amt) || isNaN(pct) || amt <= 0 || pct <= 0) {
       return 0;
@@ -183,32 +245,51 @@ export function InvoiceCreateForm({
 
   // Sync calculated Refund Claim Charges to items list in real-time
   useEffect(() => {
-    if (calculatedRefundChargesAmount > 0) {
-      setItems((prev) => {
-        const refundIndex = prev.findIndex((item) => item.description.includes("Refund Claim Charges"));
-        if (refundIndex >= 0) {
-          return prev.map((item, idx) =>
-            idx === refundIndex
-              ? { ...item, unitAmount: String(calculatedRefundChargesAmount) }
-              : item
-          );
-        } else {
-          return [
-            ...prev,
-            {
-              id: crypto.randomUUID(),
-              description: "Refund Claim Charges",
-              quantity: "1",
-              unitAmount: String(calculatedRefundChargesAmount),
-            },
-          ];
-        }
-      });
-    } else {
-      // Remove refund charges item if amount is 0 or invalid
-      setItems((prev) => prev.filter((item) => !item.description.includes("Refund Claim Charges")));
-    }
+    Promise.resolve().then(() => {
+      if (calculatedRefundChargesAmount > 0) {
+        setItems((prev) => {
+          const refundIndex = prev.findIndex((item) => item.description.includes("Refund Claim Charges"));
+          if (refundIndex >= 0) {
+            return prev.map((item, idx) =>
+              idx === refundIndex
+                ? { ...item, unitAmount: String(calculatedRefundChargesAmount) }
+                : item
+            );
+          } else {
+            return [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                description: "Refund Claim Charges",
+                quantity: "1",
+                unitAmount: String(calculatedRefundChargesAmount),
+              },
+            ];
+          }
+        });
+      } else {
+        setItems((prev) => prev.filter((item) => !item.description.includes("Refund Claim Charges")));
+      }
+    });
   }, [calculatedRefundChargesAmount]);
+
+  // Handle Action Completion / Cancel Edit
+  useEffect(() => {
+    if (state.success) {
+      if (editingInvoice) {
+        if (onCancelEdit) {
+          onCancelEdit();
+        }
+      } else {
+        Promise.resolve().then(() => {
+          setDiscountAmount("0");
+          setNotes("");
+          setRefundableAmount("");
+          setItems([createEmptyItem()]);
+        });
+      }
+    }
+  }, [state.success, editingInvoice, onCancelEdit]);
 
   const handleExtract = async (docId: string) => {
     if (!docId) return;
@@ -242,10 +323,8 @@ export function InvoiceCreateForm({
           taxPayable: taxPayable ?? null,
         };
         console.log("[ITR-V Extract] Setting itrvDetails:", details);
-        // Save parsed details for visual section
         setItrvDetails(details);
 
-        // Pre-populate refundable amount if found
         if (refundAmount && refundAmount > 0) {
           setRefundableAmount(String(refundAmount));
         }
@@ -293,15 +372,19 @@ export function InvoiceCreateForm({
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-text-primary">Create invoice draft</h2>
+          <h2 className="text-base font-semibold text-text-primary">
+            {editingInvoice ? "Edit draft invoice" : "Create invoice draft"}
+          </h2>
           <p className="mt-1 text-sm text-text-muted">
-            Create the draft first, then issue it from the detail view with a due date and print layout.
+            {editingInvoice
+              ? "Modify the draft invoice. Save changes before issuing."
+              : "Create the draft first, then issue it from the detail view with a due date and print layout."}
           </p>
         </div>
         <Receipt className="h-5 w-5 text-text-muted" aria-hidden="true" />
       </div>
 
-      {selectedClientId && clientDocuments.length > 0 && (
+      {selectedClientId && clientDocuments.length > 0 && !editingInvoice && (
         <div className="rounded-[var(--radius-input)] border border-brand-100 bg-brand-50/50 p-3 text-sm">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -341,9 +424,16 @@ export function InvoiceCreateForm({
           <select
             name="clientId"
             value={selectedClientId}
-            onChange={(e) => setSelectedClientId(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedClientId(val);
+              setSelectedDocId("");
+              setItrvDetails(null);
+              setRefundableAmount("");
+            }}
             required
-            className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            disabled={!!editingInvoice}
+            className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:bg-surface-muted disabled:text-text-muted"
           >
             <option value="">Select client</option>
             {clients.map((client) => (
@@ -361,7 +451,8 @@ export function InvoiceCreateForm({
             value={selectedAyId}
             onChange={(e) => setSelectedAyId(e.target.value)}
             required
-            className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            disabled={!!editingInvoice}
+            className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 disabled:bg-surface-muted disabled:text-text-muted"
           >
             <option value="">Select AY</option>
             {assessmentYears.map((assessmentYear) => (
@@ -373,7 +464,6 @@ export function InvoiceCreateForm({
         </label>
       </div>
 
-      {/* Extracted details and Refund calculator section */}
       {selectedClientId && (
         <div className="grid gap-4 border-t border-border-subtle pt-4 md:grid-cols-2">
           {/* ITR-V Extracted details */}
@@ -448,6 +538,7 @@ export function InvoiceCreateForm({
                 {formatCurrency(calculatedRefundChargesAmount).replace(".00", "")}
               </span>
             </div>
+
             {/* Auditing Fields Hidden Inputs */}
             <input type="hidden" name="refundClaimSettingsPercentage" value={originalPercentage} />
             <input type="hidden" name="refundClaimAppliedPercentage" value={refundPercentage} />
@@ -565,6 +656,8 @@ export function InvoiceCreateForm({
           <textarea
             name="notes"
             rows={4}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional internal or printable note."
             className="w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 py-2 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
           />
@@ -625,10 +718,15 @@ export function InvoiceCreateForm({
         </p>
       ) : null}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {editingInvoice && onCancelEdit && (
+          <Button type="button" variant="secondary" onClick={onCancelEdit} disabled={isPending}>
+            Cancel
+          </Button>
+        )}
         <Button type="submit" variant="primary" disabled={isPending}>
           {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-          Create draft
+          {editingInvoice ? "Save update" : "Create draft"}
         </Button>
       </div>
     </form>
