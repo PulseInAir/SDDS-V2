@@ -4,23 +4,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: UI-CINEMATIC-REMODEL-01
+- Active task: None
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `cc0822a`
+- HEAD: `6727b33`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
-
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## Invoice Revamp & Refund Auto-Population (2026-07-01)
+## UI Cinematic Remodel & Typography Scaling (2026-07-01)
 
-**Status: DONE — Revamped the Invoice register to support client-wise status columns, added editing support for draft invoices, and auto-populated refund received amounts.**
+**Status: DONE — Remodeled the UI to use a premium dark obsidian theme, enlarged fonts proportionately by 12.5%, imported Plus Jakarta Sans and Space Grotesk Google Fonts, and implemented custom trailing cursor, click ripples, neon badges, and page entrance animations.**
 
 ### Verification steps completed:
-1. **Invoice Register Revamp**: Replaced the invoice table layout to render exact columns: `Sl. No.`, `Client name`, `ITR Number` (Filing record acknowledgement), `Refund Received` (case refunds received amount), `ITR Filing Charges` (subtotal from line items), `ITR Refund Claim Charges` (subtotal from line items), `Total Invoice value`, `Status`, and `Actions`.
-2. **Draft Editing**: Created the `InvoicesManager` client-side wrapper, revamped `InvoiceCreateForm` to pre-populate inputs from `editingInvoice`, disable selectors, bind action to `updateInvoiceAction`, and support Cancel/Reset.
-3. **Refund Auto-Population**: Added `getReceivedRefundAmount` action and integrated an effect inside `InvoiceCreateForm` to automatically pre-populate the "Refundable Amount" calculator input when client or AY changes.
-4. **TypeScript and Lint checks**: Verified typecheck compiles successfully and linter runs with zero errors on all source files.
+1. **Visual Remodel**: Redefined `@theme` styling tokens in `globals.css` with dark obsidian space variables (`#070B14`, `#0E1626`). Added CSS overrides for `.bg-white` and standard text/border classes to enforce dark mode globally.
+2. **Font Scaling**: Configured base root size to `112.5%` and body to `15px` to scale all typography elements proportionately. Imported Plus Jakarta Sans and Space Grotesk using Next.js `next/font/google`.
+3. **Interactions & Motion**: Created `CinematicEffects.tsx` to handle global mouse coordinates, render a trailing outer cursor follower, and spawn expanding click ripples. Added smooth fadeInUp page entrance and interactive-panel hover scale/glows.
+4. **Build & Compiler Verification**: Next.js production build (`npm run build`) succeeded with zero errors, and TypeScript verification compiled clean.
+
