@@ -231,55 +231,62 @@ a, button, select, textarea, input, .interactive-panel, [class*="hover\:bg-"] {
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Glassmorphism panel and subtle hover styles */
-.rounded-\[var\(--radius-panel\)\] {
-  background: rgba(14, 22, 38, 0.7) !important;
-  backdrop-filter: blur(16px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Glowing Interactive card effects & spotlight layer */
-.interactive-panel, a.compact-metric-link, .compact-metric-link {
+/* Glassmorphism panel and border glow proximity styles (Vercel-style border spotlights) */
+.rounded-\[var\(--radius-panel\)\], .interactive-panel, a.compact-metric-link, .compact-metric-link, .glow-card {
   position: relative !important;
   overflow: hidden !important;
-  background: rgba(15, 26, 48, 0.55) !important;
-  border: 1px solid rgba(255, 255, 255, 0.04) !important;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2) !important;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: 1px solid transparent !important;
+  background-image: linear-gradient(rgba(14, 22, 38, 0.75), rgba(14, 22, 38, 0.75)), linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)) !important;
+  background-origin: border-box !important;
+  background-clip: padding-box, border-box !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.interactive-panel::before, a.compact-metric-link::before, .compact-metric-link::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: radial-gradient(
-    300px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
-    rgba(59, 130, 246, 0.11),
-    transparent 80%
-  ) !important;
-  opacity: 0 !important;
-  transition: opacity 0.3s ease !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-}
-
-.interactive-panel:hover::before, a.compact-metric-link:hover::before, .compact-metric-link:hover::before {
-  opacity: 1 !important;
-}
-
-.interactive-panel:hover, a.compact-metric-link:hover, .compact-metric-link:hover {
+.interactive-panel:hover, a.compact-metric-link:hover, .compact-metric-link:hover, .glow-card:hover {
+  background-image: linear-gradient(rgba(18, 28, 48, 0.85), rgba(18, 28, 48, 0.85)), radial-gradient(350px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(96, 165, 250, 0.45), transparent 80%) !important;
   transform: translateY(-3px) scale(1.006) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(59, 130, 246, 0.12) !important;
-  border-color: rgba(96, 165, 250, 0.25) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(59, 130, 246, 0.15) !important;
 }
 
-/* Ensure contents stay on top of the spotlight glow background layer */
-.interactive-panel > *, a.compact-metric-link > *, .compact-metric-link > * {
+
+/* Ensure inner contents sit above the borders/spotlight layer */
+.rounded-\[var\(--radius-panel\)\] > *, .interactive-panel > *, a.compact-metric-link > *, .compact-metric-link > *, .glow-card > * {
   position: relative !important;
   z-index: 2 !important;
 }
+
+/* Tactile Click Micro-Spring States */
+a:active, button:active, [role="button"]:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Digital Vacuum Glowing Numerals & Financials */
+.font-mono, td, th, [class*="tabular-nums"], .text-lg, .text-xl, .text-2xl, .text-3xl {
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.18);
+}
+
+/* Breathing Active Navigation State */
+@keyframes activePulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15), inset 0 0 8px rgba(59, 130, 246, 0.1);
+    border-left-color: #60A5FA !important;
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 12px rgba(59, 130, 246, 0.2);
+    border-left-color: #93C5FD !important;
+  }
+}
+
+[aria-current="page"] {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #60A5FA !important;
+  animation: activePulse 3s infinite ease-in-out !important;
+}
+
 
 /* Custom smooth page entrance transition */
 main#main-content {
