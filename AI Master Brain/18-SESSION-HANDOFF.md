@@ -4,24 +4,25 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: UI-CINEMATIC-REMODEL-02
+- Active task: None
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `6727b33`
+- HEAD: `90d363d`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
-
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## UI Cinematic Remodel & Typography Scaling (2026-07-01)
+## UI Enhanced Cinematic Dashboard (2026-07-01)
 
-**Status: DONE — Remodeled the UI to use a premium dark obsidian theme, enlarged fonts proportionately by 12.5%, imported Plus Jakarta Sans and Space Grotesk Google Fonts, and implemented custom trailing cursor, click ripples, neon badges, and page entrance animations.**
+**Status: DONE — Ditched the custom trailing cursor dot/ring follower, and elevated the dashboard atmosphere with animated aurora backgrounds, card hover spotlights, glassmorphic panels, and glowing active states.**
 
 ### Verification steps completed:
-1. **Visual Remodel**: Redefined `@theme` styling tokens in `globals.css` with dark obsidian space variables (`#070B14`, `#0E1626`). Added CSS overrides for `.bg-white` and standard text/border classes to enforce dark mode globally.
-2. **Font Scaling**: Configured base root size to `112.5%` and body to `15px` to scale all typography elements proportionately. Imported Plus Jakarta Sans and Space Grotesk using Next.js `next/font/google`.
-3. **Interactions & Motion**: Created `CinematicEffects.tsx` to handle global mouse coordinates, render a trailing outer cursor follower, and spawn expanding click ripples. Added smooth fadeInUp page entrance and interactive-panel hover scale/glows.
-4. **Build & Compiler Verification**: Next.js production build (`npm run build`) succeeded with zero errors, and TypeScript verification compiled clean.
+1. **Ditched Cursor Follower:** Completely removed cursor pointer dot and trailing ring elements from rendering.
+2. **Interactive Hover Spotlights:** Implemented coordinates tracking in `CinematicEffects.tsx` to set local `--mouse-x` and `--mouse-y` coordinates relative to hovered interactive cards. Programmed `::before` radial gradient glows matching mouse pointer position inside cards.
+3. **Animated Mesh Background:** Created a hardware-accelerated 30-second loop animated radial aurora gradient background on the body tag.
+4. **Glassmorphic panels:** Styled panels with backdrop-blur, semi-translucent dark overlays, and thin luminous borders.
+5. **Build Check:** Next.js production build (`npm run build`) and typecheck compiled successfully.
+
 
