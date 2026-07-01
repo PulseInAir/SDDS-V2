@@ -65,6 +65,8 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | REFUND-REVAMP-01 | DONE | Revamp refund section with client-wise status table and unified create/edit container | LAYOUT-POLISH-01 | Clean status table, no cards or inline update forms, edit triggers upper container | `9d29453` |
 | INVOICE-REVAMP-01 | DONE | Revamp invoice register table and implement refund amount auto-population | REFUND-REVAMP-01 | Clean status columns with client-wise editing, received refund amount auto-populates calculator | `87f271e` |
 | UI-CINEMATIC-REMODEL-01 | DONE | Remodel project UI with cinematic dark theme, animations, and typography scaling | INVOICE-REVAMP-01 | Custom cursor, click ripples, neon badges, scaled fonts, and dark obsidian variables | `6727b33` |
+| UI-CINEMATIC-REMODEL-02 | IN_PROGRESS | Ditch cursor follower and elevate cinematic ambient highlights (mesh bg, hover spotlights, glassmorphism) | UI-CINEMATIC-REMODEL-01 | Cards hover spotlight follow, animated background aura, glassmorphic panels, no cursor ring | — |
+
 
 
 

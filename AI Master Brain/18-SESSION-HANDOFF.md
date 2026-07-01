@@ -4,13 +4,14 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: None
+- Active task: UI-CINEMATIC-REMODEL-02
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - HEAD: `6727b33`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
+
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 

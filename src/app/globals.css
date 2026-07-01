@@ -55,13 +55,33 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--background);
+  background-color: #070B14;
+  background-image: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 45%),
+
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 60%);
+  background-size: 200% 200%;
+  animation: auroraMotion 30s ease infinite;
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 15px; /* Scale default body text size */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  will-change: background-position;
 }
+
+@keyframes auroraMotion {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 button,
 input,
@@ -211,12 +231,54 @@ a, button, select, textarea, input, .interactive-panel, [class*="hover\:bg-"] {
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Glowing Interactive card effects */
-.interactive-panel:hover, a.compact-metric-link:hover {
-  transform: translateY(-3px) scale(1.008) !important;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(59, 130, 246, 0.18) !important;
-  border-color: var(--color-brand-400) !important;
-  background-color: var(--color-surface-hover) !important;
+/* Glassmorphism panel and subtle hover styles */
+.rounded-\[var\(--radius-panel\)\] {
+  background: rgba(14, 22, 38, 0.7) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Glowing Interactive card effects & spotlight layer */
+.interactive-panel, a.compact-metric-link, .compact-metric-link {
+  position: relative !important;
+  overflow: hidden !important;
+  background: rgba(15, 26, 48, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2) !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.interactive-panel::before, a.compact-metric-link::before, .compact-metric-link::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(59, 130, 246, 0.11),
+    transparent 80%
+  ) !important;
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.interactive-panel:hover::before, a.compact-metric-link:hover::before, .compact-metric-link:hover::before {
+  opacity: 1 !important;
+}
+
+.interactive-panel:hover, a.compact-metric-link:hover, .compact-metric-link:hover {
+  transform: translateY(-3px) scale(1.006) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(59, 130, 246, 0.12) !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+/* Ensure contents stay on top of the spotlight glow background layer */
+.interactive-panel > *, a.compact-metric-link > *, .compact-metric-link > * {
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 /* Custom smooth page entrance transition */
@@ -236,47 +298,6 @@ main#main-content {
   }
 }
 
-/* Custom Cursor Follower & Ripple classes */
-.custom-cursor-dot {
-  position: fixed;
-  width: 6px;
-  height: 6px;
-  background-color: var(--color-brand-500);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s, background-color 0.2s;
-}
-
-.custom-cursor-ring {
-  position: fixed;
-  width: 34px;
-  height: 34px;
-  border: 1.5px solid var(--color-brand-400);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.08s cubic-bezier(0.1, 0.8, 0.25, 1), width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
-  box-shadow: 0 0 8px rgba(96, 165, 250, 0.2);
-}
-
-/* Interactive Cursor active states */
-.custom-cursor-ring.hovering {
-  width: 50px;
-  height: 50px;
-  border-color: var(--color-brand-300);
-  background-color: rgba(96, 165, 250, 0.08);
-  box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
-}
-
-.custom-cursor-dot.hovering {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-brand-300);
-}
-
 /* Click ripples */
 .ripple-container {
   position: fixed;
@@ -287,21 +308,22 @@ main#main-content {
 
 .ripple-ring {
   position: absolute;
-  border: 2px solid var(--color-brand-400);
+  border: 1.5px solid rgba(96, 165, 250, 0.5);
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0);
-  animation: rippleEffect 0.6s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
-  opacity: 0.8;
+  animation: rippleEffect 0.5s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
 }
 
 @keyframes rippleEffect {
   to {
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1.2);
     opacity: 0;
-    border-width: 0.5px;
+    border-width: 0.1px;
   }
 }
+
 
 @media (prefers-reduced-motion: reduce) {
   *,
