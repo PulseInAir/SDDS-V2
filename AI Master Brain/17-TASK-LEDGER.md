@@ -71,6 +71,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-FILTERS-01 | DONE | Add case and refund status filter cards to the clients page | DASHBOARD-RESHUFFLE-01 | Added extra cards identically styled to existing metric cards, appended sequentially into the 4-column metric grid | `77cf2dbde4d1170886cf01375404b08bcc2c04a3` |
 | CLIENT-SEARCH-01 | DONE | Remove client search bar from the clients page | CLIENT-FILTERS-01 | Removed the `ClientSearch` component and its import from the client page layout | `dd4bb0fcd0a80c15483f75be67c064cae04d3c14` |
 | DASHBOARD-HUD-01 | DONE | Remove Global HUD Mini-Matrix from the dashboard header | CLIENT-SEARCH-01 | Removed the mini-matrix metric cards from `OperationalDashboard` layout | `4f515b4b91dbdd831ca224ffb8f9a7a4a5959d31` |
+| DASHBOARD-EXCEPTIONS-01 | DONE | Remove Filing Exceptions section from the dashboard pipeline map | DASHBOARD-HUD-01 | Removed the exceptions column, allowing the core pipeline to fill the gap naturally | `b4bf243303c6f81e57d57a1d36f67ef068b06daf` |
 ## Task update protocol
 
 When starting:

@@ -8,17 +8,17 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `4f515b4b91dbdd831ca224ffb8f9a7a4a5959d31`
+- HEAD: `b4bf243303c6f81e57d57a1d36f67ef068b06daf`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
 
-## Remove Dashboard Mini-Matrix (2026-07-02)
+## Remove Dashboard Exceptions Section (2026-07-02)
 
-**Status: DONE — Completely removed the Global HUD Mini-Matrix from the operational dashboard.**
+**Status: DONE — Completely removed the Filing Exceptions section from the dashboard interactive pipeline map.**
 
 ### Verification steps completed:
-1. **Component Removal:** Deleted the flex container holding the "Active Cases", "Urgent Queue", and "Recent Events" metric cards from `src/components/dashboard/OperationalDashboard.tsx`.
-2. **Layout Preservation:** Cleaned up the flex layout wrapper without disrupting the dashboard cockpit header.
+1. **Component Removal:** Deleted the flex container for "Filing Exceptions" (which included On Hold and Cancelled cases) from `src/components/dashboard/OperationalDashboard.tsx`.
+2. **Layout Filling:** Verified that the "Filing Core Pipeline" parent container naturally expands to fill the remaining gap due to its `flex-1` structural styling.
 3. **Build Check:** Ran TypeScript validations on related changes to prevent regressions.
