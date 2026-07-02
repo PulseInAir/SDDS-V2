@@ -81,8 +81,11 @@ Return exactly this JSON structure (no extra keys, no markdown fences):
     const data = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
 
     const safeNum = (v: unknown): number | null => {
+      if (typeof v === "string") {
+        v = v.replace(/,/g, "").trim();
+      }
       const n = Number(v);
-      return isFinite(n) && n > 0 ? Math.round(n) : null;
+      return isFinite(n) && n >= 0 ? Math.round(n) : null;
     };
 
     return {

@@ -72,14 +72,25 @@ export async function parsePdfBuffer(
   }
 
   // ── ITR Form ─────────────────────────────────────────────────────────────
-  // Primary: dedicated "Form Number" field (ITR-V acknowledgement header)
-  // e.g. "Form Number  ITR-1" or "Form Number \tITR-1\t"
-  let itrForm: string | null =
-    searchSpace
-      .match(/Form\s+Number\s+(?:[^\n\t]+\t)?\s*(ITR-\d[A-Z]?)/i)?.[1]
-      ?.toUpperCase() ?? null;
+  let itrForm: string | null = null;
+  // Look for "Form Number" first (possibly stuck together as "Form NumberITR-1")
+  const itrMatch = searchSpace.match(/Form\s*Number\s*(?:[^\n\t\d]+)?(ITR-\d[A-Z]?|ITR-V)/i);
+  if (itrMatch) {
+    itrForm = itrMatch[1].toUpperCase();
+  } else {
+    // Fallback: search for any ITR Form, but exclude the standard header line
+    const lines = searchSpace.split("\n");
+    for (const line of lines) {
+      if (line.includes("Return of Income in Form")) continue; // skip header line
+      const m = line.match(/\b(ITR-\d[A-Z]?|ITR-V)\b/i);
+      if (m) {
+        itrForm = m[1].toUpperCase();
+        break;
+      }
+    }
+  }
 
-  // Fallback: any ITR-x mention (ITR-1 through ITR-7, ITR-V, etc.)
+  // Fallback 2: General scan if still not found
   if (!itrForm) {
     const pat = settings?.itr_form_pattern ?? "ITR-\\d[A-Z]?|ITR-V";
     itrForm =
@@ -89,57 +100,33 @@ export async function parsePdfBuffer(
   }
 
   // ── Total Income ─────────────────────────────────────────────────────────
-  // ITR-V PDFs may use tabs, 2+ spaces, or colons between label and value.
-  // The label may be followed by an optional field code like "(1A)" or "1A".
-  const totalIncome = firstNumericMatch(searchSpace, [
-    // Tab-separated with optional row code: "Total Income \t 1A \t 8,40,000"
-    /total\s+income\s*(?:\([^)]*\))?\s*[\t]+\s*(?:[A-Z0-9]{1,4}\s*[\t]+\s*)?([\d,]{4,}(?:\.\d+)?)/i,
-    // Multi-space-separated with optional row code
-    /total\s+income\s*(?:\([^)]*\))?\s{2,}(?:[A-Z0-9]{1,4}\s{2,})?\s*([\d,]{4,}(?:\.\d+)?)/i,
-    // Colon or dash separator
-    /total\s+income\s*[:\-]\s*([\d,]{4,}(?:\.\d+)?)/i,
-    // Most permissive: any non-digit non-newline chars between label and amount
-    // Require >=4 chars in the number to avoid row codes like "1A" or "18"
-    /total\s+income[^\d\n\r]{0,40}([\d]{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d{5,}(?:\.\d+)?)/i,
-  ]);
+  // We match "Total Income" then look for any characters up to the final number on that line
+  let totalIncome: number | null = null;
+  const tiMatch = searchSpace.match(/Total\s+Income[^\n\r]*?([\d,]+(?:\.\d+)?)\s*$/im) || 
+                  searchSpace.match(/Total\s+Income\s*(?:[A-Z0-9]{1,4})?\s*([\d,]+(?:\.\d+)?)/i);
+  if (tiMatch) {
+    totalIncome = toNumber(tiMatch[1]);
+  }
 
   // ── Tax Payable / Refundable ──────────────────────────────────────────────
   let taxPayable: number | null = null;
   let refundAmount: number | null = null;
 
-  // Strategy 1: Parse the ITR-V summary row
-  // "(+) Tax Payable /(-) Refundable (6-7)  8  (-) 60,570"
-  // OR "(+) Tax Payable /(-) Refundable  (+) 45,000"
-  const summaryLine = searchSpace.match(
-    /\(\+\)\s*Tax\s+Payable\s*\/\s*\(-\)\s*Refundable[^\n]*/i
-  )?.[0];
-
-  if (summaryLine) {
-    // Collect all (sign)number pairs on this line
-    const pairs = [...summaryLine.matchAll(/\(([+\-])\)\s*([\d,]+(?:\.\d+)?)/g)];
-    if (pairs.length > 0) {
-      // The LAST pair is the net figure (earlier ones are intermediate calculations)
-      const last = pairs[pairs.length - 1];
-      const sign = last[1];
-      const val = toNumber(last[2]);
-      if (val !== null) {
-        if (sign === "-") refundAmount = val;
-        else taxPayable = val;
-      }
+  // Strategy 1: Parse the ITR-V summary net row specifically
+  // e.g. "(+) Tax Payable /(-) Refundable (6-7)8(-) 60,570"
+  // Match specifically (\(\-\)|\(\+\)) followed by spaces and a number
+  const netMatch = searchSpace.match(/\(\+\)\s*Tax\s+Payable\s*\/[-\(]*\)\s*Refundable[^\n\r]*?(\(\-\)|\(\+\))\s*([\d,]+(?:\.\d+)?)/i);
+  if (netMatch) {
+    const sign = netMatch[1];
+    const val = toNumber(netMatch[2]);
+    if (sign === "(-)") {
+      refundAmount = val;
     } else {
-      // No (sign) pairs — find the last number on the line
-      const nums = [...summaryLine.matchAll(/([\d,]{3,}(?:\.\d+)?)/g)];
-      if (nums.length > 0) {
-        const val = toNumber(nums[nums.length - 1][1]);
-        // Determine sign by checking for a bare minus before the last number
-        const tail = summaryLine.split(/Refundable/i).pop() ?? "";
-        if (/\(\-\)|[\-]\s+[\d]/.test(tail) && val !== null) refundAmount = val;
-        else if (val !== null) taxPayable = val;
-      }
+      taxPayable = val;
     }
   }
 
-  // Strategy 2: Explicit refund lines
+  // Strategy 2: Explicit refund lines fallback
   if (refundAmount === null) {
     const customPat = settings?.refund_amount_pattern;
     const extraPatterns: RegExp[] = customPat
@@ -155,67 +142,48 @@ export async function parsePdfBuffer(
     ]);
   }
 
-  // Strategy 3: Explicit tax payable lines (only if the summary row didn't resolve it)
-  if (taxPayable === null) {
+  // Strategy 3: Explicit tax payable lines fallback
+  if (taxPayable === null && refundAmount === null) {
     taxPayable = firstNumericMatch(searchSpace, [
-      // Tab-separated with optional row code
       /(?:net\s+)?tax\s+payable\s*(?:\([^)]*\))?\s*[\t]+\s*(?:[A-Z0-9]{1,4}\s*[\t]+\s*)?([\d,]{4,}(?:\.\d+)?)/i,
-      // Multi-space
       /(?:net\s+)?tax\s+payable\s*(?:\([^)]*\))?\s{2,}(?:[A-Z0-9]{1,4}\s{2,})?\s*([\d,]{4,}(?:\.\d+)?)/i,
-      // Colon/dash
       /(?:net\s+)?tax\s+payable\s*[:\-]\s*([\d,]{3,}(?:\.\d+)?)/i,
-      // Most permissive
       /(?:net\s+)?tax\s+payable[^\d\n\r]{0,40}([\d]{1,3}(?:,\d{2,3})+(?:\.\d+)?|\d{5,}(?:\.\d+)?)/i,
     ]);
   }
 
-  // ── Mutual exclusivity enforcement ───────────────────────────────────────
-  // refundAmount and taxPayable cannot both be non-null.
-  // The summary-row parse (Strategy 1) is authoritative; if refundAmount was
-  // set there, any taxPayable found by Strategy 3 is a false positive.
-  if (refundAmount !== null && taxPayable !== null) {
-    taxPayable = null; // refund case — discard the taxPayable false positive
-  }
-
   // ── Client Name ───────────────────────────────────────────────────────────
-  const lines = searchSpace
-    .split("\n")
-    .map((l: string) => l.trim())
-    .filter(Boolean);
-
-  // Patterns that indicate a line is NOT a person's name (used in fallback)
-  const nonNamePatterns = [
-    /acknowledgement/i,
-    /^\d{10,}/, // pure numeric (ack number)
-    /[A-Z]{5}\d{4}[A-Z]/, // PAN on its own
-    /date\s+of\s+filing/i,
-    /income\s+tax/i,
-    /assessment\s+year/i,
-    /form\s+number/i,
-    /e-filing/i,
-    /^\d{2}[-/]\w{3}[-/]\d{4}/, // date string
-  ];
-
   let clientName: string | null = null;
-  for (const line of lines) {
-    // Explicit "Name:" or "Name of assessee:" label
-    if (/^name\s*:/i.test(line)) {
-      clientName = line.replace(/^name\s*:\s*/i, "").trim();
-      break;
-    }
-    if (/^name\s+of/i.test(line)) {
-      clientName = line.replace(/^name\s+of[^:]*:\s*/i, "").trim();
-      break;
-    }
-    // ITR-V acknowledgement: "Name  FIRST LAST" or "Name\tFIRST\tLAST"
-    if (/^name[\s\t]/i.test(line)) {
-      clientName = line.replace(/^name\s*/i, "").replace(/\t/g, " ").trim();
-      break;
-    }
+  // Match "Name" followed by colon, spaces, or capital letter (stuck together), then name characters, up to newline or "Address" or "PAN"
+  const nameMatch = searchSpace.match(/Name(?:\s*:\s*|\s+|(?=[A-Z]))([A-Z\t ]{3,60})/i);
+  if (nameMatch) {
+    clientName = nameMatch[1].trim();
   }
 
   // Final fallback: first non-empty line that doesn't look like metadata
   if (!clientName) {
+    const lines = searchSpace
+      .split("\n")
+      .map((l: string) => l.trim())
+      .filter(Boolean);
+
+    const nonNamePatterns = [
+      /acknowledgement/i,
+      /^\d{10,}/, // pure numeric (ack number)
+      /[A-Z]{5}\d{4}[A-Z]/, // PAN on its own
+      /date\s+of\s+filing/i,
+      /income\s+tax/i,
+      /assessment\s+year/i,
+      /form\s+number/i,
+      /e-filing/i,
+      /^\d{2}[-/]\w{3}[-/]\d{4}/, // date string
+      /Return\s+of\s+Income/i, // Skip the standard ITR-V header line
+      /Please\s+see\s+Rule/i, // Skip standard rule line
+      /DO\s+NOT\s+SEND/i,
+      /System\s+Generated/i,
+      /Barcode/i,
+    ];
+
     for (const line of lines) {
       const isNonName = nonNamePatterns.some((p) => p.test(line));
       // Must contain at least two word characters (a real name has letters)
@@ -225,6 +193,7 @@ export async function parsePdfBuffer(
       }
     }
   }
+
   return {
     pan,
     assessmentYear,
