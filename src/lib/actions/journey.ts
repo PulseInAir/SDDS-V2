@@ -434,6 +434,13 @@ export async function recordPaymentAction(data: {
   }
 }
 
+function normalizeRelation<T>(value: T | T[] | null): T | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  return Array.isArray(value) ? value[0] ?? null : value;
+}
+
 export async function getChargesRegisterData(clientId?: string) {
   try {
     const session = await getAuthenticatedWorkspaceSession();
@@ -463,7 +470,10 @@ export async function getChargesRegisterData(clientId?: string) {
           id,
           status,
           total_amount,
-          balance_amount
+          payments (
+            amount,
+            reversed_at
+          )
         )
       `)
       .eq("workspace_id", session.workspace.id)
@@ -480,7 +490,41 @@ export async function getChargesRegisterData(clientId?: string) {
       throw new Error(error.message);
     }
 
-    return { success: true, data: cases || [] };
+    const formattedCases = (cases || []).map((c: any) => {
+      const client = normalizeRelation(c.clients);
+      const ay = normalizeRelation(c.assessment_years);
+      
+      const rawInvoice = normalizeRelation(c.invoices);
+      let invoice = null;
+      if (rawInvoice) {
+        const payments = rawInvoice.payments || [];
+        const paid = payments
+          .filter((p: any) => !p.reversed_at)
+          .reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
+        invoice = {
+          id: rawInvoice.id,
+          status: rawInvoice.status,
+          total_amount: rawInvoice.total_amount,
+          balance_amount: Number(rawInvoice.total_amount) - paid,
+        };
+      }
+
+      return {
+        id: c.id,
+        case_status: c.case_status,
+        return_category: c.return_category,
+        itr_filing_charges: c.itr_filing_charges,
+        refund_claimed_amount: c.refund_claimed_amount,
+        refund_claim_charges: c.refund_claim_charges,
+        client_id: c.client_id,
+        assessment_year_id: c.assessment_year_id,
+        clients: client,
+        assessment_years: ay,
+        invoices: invoice,
+      };
+    });
+
+    return { success: true, data: formattedCases };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to fetch charges register." };
   }

@@ -27,7 +27,8 @@ export default async function ClientProfileLayout({
   }
 
   const tabs = [
-    { name: 'Overview', href: `/clients/${client.id}` },
+    { name: 'Guided Journey', href: `/clients/${client.id}` },
+    { name: 'Identity Profile', href: `/clients/${client.id}/profile` },
     { name: 'Assessment Years', href: `/clients/${client.id}/assessment-years` },
     { name: 'Documents', href: `/clients/${client.id}/documents` },
     { name: 'Filings', href: `/clients/${client.id}/filings` },
