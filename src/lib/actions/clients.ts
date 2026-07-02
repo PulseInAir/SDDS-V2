@@ -14,20 +14,17 @@ export async function getClients(params: {
   const supabase = await createSupabaseServerClient()
   const { search, page = 1, pageSize = 20, status = 'all', sortBy = 'name_asc' } = params
 
-  const isCaseStatus = ['new_client', 'filing_queue', 'filed', 'on_hold', 'cancelled'].includes(status)
-  const isRefundStatus = ['refund_expected', 'refund_processing', 'refund_received', 'refund_adjusted'].includes(status)
+  const isCaseStatus = ['new_client', 'filing_queue', 'filed'].includes(status)
+  const isRefundStatus = ['refund_expected', 'refund_received', 'refund_adjusted'].includes(status)
 
   const statusMap: Record<string, string> = {
     new_client: 'New Client',
     filing_queue: 'Filing Queue',
-    filed: 'Filed',
-    on_hold: 'On Hold',
-    cancelled: 'Cancelled'
+    filed: 'Filed'
   }
 
   const refundStatusMap: Record<string, string> = {
     refund_expected: 'expected',
-    refund_processing: 'processing',
     refund_received: 'received',
     refund_adjusted: 'adjusted',
   }
@@ -132,10 +129,7 @@ export async function getClients(params: {
     new_client: 0,
     filing_queue: 0,
     filed: 0,
-    on_hold: 0,
-    cancelled: 0,
     refund_expected: 0,
-    refund_processing: 0,
     refund_received: 0,
     refund_adjusted: 0,
   }
@@ -153,13 +147,10 @@ export async function getClients(params: {
           if (client.filing_cases.some((fc: any) => fc.assessment_year_id === currentAyId && fc.case_status === 'New Client')) metrics.new_client++;
           if (client.filing_cases.some((fc: any) => fc.assessment_year_id === currentAyId && fc.case_status === 'Filing Queue')) metrics.filing_queue++;
           if (client.filing_cases.some((fc: any) => fc.assessment_year_id === currentAyId && fc.case_status === 'Filed')) metrics.filed++;
-          if (client.filing_cases.some((fc: any) => fc.assessment_year_id === currentAyId && fc.case_status === 'On Hold')) metrics.on_hold++;
-          if (client.filing_cases.some((fc: any) => fc.assessment_year_id === currentAyId && fc.case_status === 'Cancelled')) metrics.cancelled++;
         }
 
         if (client.refunds) {
           if (client.refunds.some((r: any) => r.assessment_year_id === currentAyId && r.status === 'expected')) metrics.refund_expected++;
-          if (client.refunds.some((r: any) => r.assessment_year_id === currentAyId && r.status === 'processing')) metrics.refund_processing++;
           if (client.refunds.some((r: any) => r.assessment_year_id === currentAyId && r.status === 'received')) metrics.refund_received++;
           if (client.refunds.some((r: any) => r.assessment_year_id === currentAyId && r.status === 'adjusted')) metrics.refund_adjusted++;
         }
