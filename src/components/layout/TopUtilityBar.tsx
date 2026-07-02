@@ -157,10 +157,10 @@ export function TopUtilityBar({
                 <img
                   src={user.avatarUrl}
                   alt="User avatar"
-                  className="h-7 w-7 rounded-full object-cover border border-border-subtle"
+                  className="h-9 w-9 rounded-full object-cover border border-border-subtle"
                 />
               ) : (
-                <UserCircle className="h-7 w-7" aria-hidden="true" />
+                <UserCircle className="h-9 w-9" aria-hidden="true" />
               )}
             </button>
 
