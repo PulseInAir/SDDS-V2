@@ -5,14 +5,26 @@ This file is rewritten after every task. Keep it compact and factual.
 ## Current state
 
 - Active task: None
-- Next READY task: None
+- Next READY task: None (all immediate core roadmap items complete)
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `b4bf243303c6f81e57d57a1d36f67ef068b06daf`
+- HEAD: `06aa20f4180c68b9acdec57330adaef490985c48`
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
 - Production URL: `https://sdds-v2.vercel.app/`
+
+## Guided Workflow Engine & Status Cleanup (2026-07-02)
+
+**Status: DONE — Implemented client journey dashboard, 8-step pipeline rail, simplified operational statuses to New Client, Filing Queue, and Filed, and embedded the Charges Register Table in the Invoices page.**
+
+### Verification steps completed:
+1. **Interactive Timeline Rail:** Built a horizontal progress indicator component styled with custom neon glows and active pulse states. Clicking nodes expands the respective step form.
+2. **Auto-Extraction Pipeline Trigger:** Programmed the journey page to automatically run Gemini ITR-V PDF data extraction in the background when a new ITR-V file is uploaded but case charges are pending.
+3. **Billing Charges & Fees Card:** Created an editable charges configuration interface automatically calculating filing fees and expected refund percentages with manual overrides.
+4. **Offline & Online Invoicing/Payment flow:** Integrated pre-populated invoice creation drafts inline and structured cash/UPI payment collection forms.
+5. **Charges Register Table:** Configured a custom dark fintech-style charges table displaying details for all `Filed` cases directly below the invoice form.
+6. **Code Safety & Production Build:** Verified using `npx tsc --noEmit` and `npm run build` which compiled successfully with 0 errors.
 
 ## Remove Dashboard Exceptions Section (2026-07-02)
 

@@ -72,6 +72,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-SEARCH-01 | DONE | Remove client search bar from the clients page | CLIENT-FILTERS-01 | Removed the `ClientSearch` component and its import from the client page layout | `dd4bb0fcd0a80c15483f75be67c064cae04d3c14` |
 | DASHBOARD-HUD-01 | DONE | Remove Global HUD Mini-Matrix from the dashboard header | CLIENT-SEARCH-01 | Removed the mini-matrix metric cards from `OperationalDashboard` layout | `4f515b4b91dbdd831ca224ffb8f9a7a4a5959d31` |
 | DASHBOARD-EXCEPTIONS-01 | DONE | Remove Filing Exceptions section from the dashboard pipeline map | DASHBOARD-HUD-01 | Removed the exceptions column, allowing the core pipeline to fill the gap naturally | `b4bf243303c6f81e57d57a1d36f67ef068b06daf` |
+| GUIDED-WORKFLOW-01 | DONE | Implement Guided Workflow Engine and simplify operational statuses | DASHBOARD-EXCEPTIONS-01 | Client journey dashboard, 8-step pipeline rail, status cleanup to 3 states, embedded charges table | `06aa20f` |
 ## Task update protocol
 
 When starting:
