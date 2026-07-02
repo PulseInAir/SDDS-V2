@@ -1,7 +1,7 @@
 import { getClients } from '@/lib/actions/clients'
 import { ClientList } from '@/components/clients/ClientList'
 import { ClientSearch } from '@/components/clients/ClientSearch'
-import { Users, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
+import { Users, CheckCircle2, XCircle, AlertCircle, Inbox, FileCheck2, Clock, Ban, Clock4, Banknote, RefreshCcw } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
@@ -40,7 +40,7 @@ export default async function ClientsPage({
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Clients</h1>
           <p className="text-sm text-gray-500 mt-1">Manage permanent client records and identities.</p>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-3">
           <ClientSearch initialSearch={search} />
         </div>
@@ -105,6 +105,111 @@ export default async function ClientsPage({
           <div>
             <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Excluded Clients</p>
             <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.excluded}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('filing_queue')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'filing_queue' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-[var(--radius-input)]">
+            <Inbox className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Filing Queue</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.filing_queue}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('filed')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'filed' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-[var(--radius-input)]">
+            <FileCheck2 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Filed</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.filed}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('on_hold')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'on_hold' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-orange-50 text-orange-600 rounded-[var(--radius-input)]">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">On Hold</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.on_hold}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('cancelled')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'cancelled' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-red-50 text-red-600 rounded-[var(--radius-input)]">
+            <Ban className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Cancelled</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.cancelled}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('refund_expected')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'refund_expected' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-orange-50 text-orange-600 rounded-[var(--radius-input)]">
+            <Clock4 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Refund Expected</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.refund_expected}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('refund_processing')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'refund_processing' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-[var(--radius-input)]">
+            <RefreshCcw className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Refund Process</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.refund_processing}</p>
+          </div>
+        </Link>
+
+        <Link
+          href={getFilterUrl('refund_received')}
+          className={`p-4 rounded-panel border shadow-xs flex items-center space-x-4 transition-all duration-200 hover:border-brand-500 hover:shadow-sm cursor-pointer ${
+            status === 'refund_received' ? 'bg-brand-50/10 border-brand-500 ring-1 ring-brand-500' : 'bg-surface-panel border-border-subtle'
+          }`}
+        >
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-[var(--radius-input)]">
+            <Banknote className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Refund Received</p>
+            <p className="text-xl font-extrabold text-text-primary mt-0.5">{metrics.refund_received}</p>
           </div>
         </Link>
       </div>
