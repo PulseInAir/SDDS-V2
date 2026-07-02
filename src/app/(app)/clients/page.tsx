@@ -1,6 +1,5 @@
 import { getClients } from '@/lib/actions/clients'
 import { ClientList } from '@/components/clients/ClientList'
-import { ClientSearch } from '@/components/clients/ClientSearch'
 import { Users, CheckCircle2, XCircle, AlertCircle, Inbox, FileCheck2, Clock4, Banknote } from 'lucide-react'
 import Link from 'next/link'
 
@@ -39,10 +38,6 @@ export default async function ClientsPage({
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Clients</h1>
           <p className="text-sm text-gray-500 mt-1">Manage permanent client records and identities.</p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <ClientSearch initialSearch={search} />
         </div>
       </div>
 
