@@ -68,7 +68,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | UI-CINEMATIC-REMODEL-02 | DONE | Ditch cursor follower and elevate cinematic ambient highlights (mesh bg, hover spotlights, glassmorphism) | UI-CINEMATIC-REMODEL-01 | Cards hover spotlight follow, animated background aura, glassmorphic panels, no cursor ring | `90d363d` |
 | UI-CINEMATIC-REMODEL-03 | DONE | Implement proximity border spotlights, spring clicks, digital vacuum money glows, and pulsing nav active states | UI-CINEMATIC-REMODEL-02 | Proximity card borders glow on hover, active spring scaling, glowing text shadows, pulsing active lists | `6d66121` |
 | DASHBOARD-RESHUFFLE-01 | DONE | Reshuffle and revamp dashboard cards for a premium, structured, and modern layout | UI-CINEMATIC-REMODEL-03 | Redesigned command center with global HUD, interactive filing pipeline map, 2-column asymmetric layout, fintech-style financials, and watchlist feeds | `01b792b1489ebaca4e393266fa113086df1b63ff` |
-| CLIENT-FILTERS-01 | DONE | Add case and refund status filter cards to the clients page | DASHBOARD-RESHUFFLE-01 | Added extra cards identically styled to existing metric cards, appended sequentially into the 4-column metric grid | `166095e97e3ea6e64ceb4a4feb8ac4158329bfc0` |
+| CLIENT-FILTERS-01 | DONE | Add case and refund status filter cards to the clients page | DASHBOARD-RESHUFFLE-01 | Added extra cards identically styled to existing metric cards, appended sequentially into the 4-column metric grid | `77cf2dbde4d1170886cf01375404b08bcc2c04a3` |
 
 
 
