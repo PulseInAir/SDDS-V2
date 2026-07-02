@@ -61,14 +61,14 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-surface-panel p-6 rounded-panel border border-border-subtle shadow-sm">
+    <form onSubmit={handleSubmit(onSubmit)} className="@container space-y-6 w-full max-w-2xl bg-surface-panel p-6 rounded-panel border border-border-subtle shadow-sm">
       {serverError && (
         <div className="p-4 rounded-input bg-red-50 text-red-700 text-sm border border-red-200">
           {serverError}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 @md:grid-cols-2">
         <TextField
           label="Full Name"
           {...register('full_name')}

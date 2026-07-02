@@ -9,7 +9,7 @@ export function SidebarNav({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <div className={classNames("hidden md:flex h-full w-[280px] flex-col border-r border-border-subtle bg-surface-panel", className)}>
+    <div className={classNames("hidden md:flex flex-shrink-0 h-full w-[280px] flex-col border-r border-border-subtle bg-surface-panel", className)}>
       <div className="flex h-[60px] items-center px-7 border-b border-border-subtle bg-surface-muted/30">
         <span className="text-lg font-extrabold tracking-wider text-brand-700 uppercase">SDDS Suite</span>
       </div>
