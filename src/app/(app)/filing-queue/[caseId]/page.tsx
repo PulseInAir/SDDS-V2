@@ -22,7 +22,7 @@ export default async function FilingCaseDetailPage({ params }: { params: Promise
           </Link>
         </nav>
         <nav className="hidden sm:flex" aria-label="Breadcrumb">
-          <ol role="list" className="flex items-center space-x-4">
+          <ol role="list" className="flex flex-wrap items-center gap-2">
             <li>
               <div className="flex">
                 <Link href="/filing-queue" className="text-sm font-medium text-gray-500 hover:text-gray-700">Filing Queue</Link>

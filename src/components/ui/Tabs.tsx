@@ -19,8 +19,7 @@ export function Tabs({ tabs }: TabsProps) {
   return (
     <div className="border-b border-border-subtle">
       <nav
-        className="-mb-px flex space-x-8 overflow-x-auto"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="-mb-px flex flex-wrap gap-x-8 gap-y-0"
         aria-label="Tabs"
       >
         {tabs.map((tab) => {
