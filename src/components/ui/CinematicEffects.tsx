@@ -25,6 +25,10 @@ export function CinematicEffects() {
     }, 0);
 
     const onMouseMove = (e: MouseEvent) => {
+      // Global tracking for the live background
+      document.documentElement.style.setProperty("--bg-mouse-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--bg-mouse-y", `${e.clientY}px`);
+
       const target = e.target as HTMLElement;
       if (!target) return;
 
@@ -73,19 +77,43 @@ export function CinematicEffects() {
   }
 
   return (
-    <div className="ripple-container" aria-hidden="true">
-      {ripples.map((ripple) => (
+    <>
+      {/* Global Interactive Background */}
+      <div className="pointer-events-none fixed inset-0 z-[-1] overflow-hidden">
+        {/* Interactive Dot Grid */}
         <div
-          key={ripple.id}
-          className="ripple-ring"
+          className="absolute inset-0 opacity-[0.25]"
           style={{
-            left: `${ripple.x}px`,
-            top: `${ripple.y}px`,
-            width: "120px",
-            height: "120px",
+            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+            WebkitMaskImage: "radial-gradient(600px circle at var(--bg-mouse-x, 50vw) var(--bg-mouse-y, 50vh), black 10%, transparent 100%)",
+            maskImage: "radial-gradient(600px circle at var(--bg-mouse-x, 50vw) var(--bg-mouse-y, 50vh), black 10%, transparent 100%)",
           }}
         />
-      ))}
-    </div>
+        {/* Interactive Spotlight */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(800px circle at var(--bg-mouse-x, 50vw) var(--bg-mouse-y, 50vh), rgba(59, 130, 246, 0.08), transparent 80%)"
+          }}
+        />
+      </div>
+
+      {/* Click Ripple Effects */}
+      <div className="ripple-container" aria-hidden="true">
+        {ripples.map((ripple) => (
+          <div
+            key={ripple.id}
+            className="ripple-ring"
+            style={{
+              left: `${ripple.x}px`,
+              top: `${ripple.y}px`,
+              width: "120px",
+              height: "120px",
+            }}
+          />
+        ))}
+      </div>
+    </>
   );
 }

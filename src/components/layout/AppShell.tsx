@@ -16,7 +16,7 @@ export function AppShell({
   };
 }) {
   return (
-    <div className="flex min-h-dvh w-full bg-surface-app">
+    <div className="flex min-h-dvh w-full bg-transparent">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
