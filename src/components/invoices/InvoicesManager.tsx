@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
 import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
 import { InvoicePageContent } from "@/components/invoices/InvoicePageContent";
+import { ChargesTable } from "@/components/charges/ChargesTable";
 
 type InvoicesModuleData = Awaited<ReturnType<typeof getInvoicesModuleData>>;
 
@@ -21,11 +22,13 @@ type AssessmentYearOption = {
 
 export function InvoicesManager({
   data,
+  charges = [],
   basePath,
   showClientFilter,
   defaultClientId,
 }: {
   data: InvoicesModuleData;
+  charges?: any[];
   basePath: string;
   showClientFilter: boolean;
   defaultClientId?: string;
@@ -53,10 +56,10 @@ export function InvoicesManager({
         defaultClientId={defaultClientId}
         invoiceSettings={data.invoiceSettings}
         editingInvoice={editingInvoice || undefined}
-
         onCancelEdit={handleCancelEdit}
         revalidateTarget={basePath}
       />
+      <ChargesTable chargesData={charges} />
       <InvoicePageContent
         data={data}
         basePath={basePath}

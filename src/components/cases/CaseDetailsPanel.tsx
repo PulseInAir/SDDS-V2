@@ -213,17 +213,6 @@ export function CaseDetailsPanel({ filingCase }: { filingCase: any }) {
         </div>
       )}
 
-      {!isEditing && filingCase.hold_reason && filingCase.case_status === 'On Hold' && (
-        <div className="p-4 border border-yellow-200 rounded-panel bg-yellow-50">
-          <h3 className="text-sm font-semibold text-yellow-800">On Hold</h3>
-          <p className="text-sm text-yellow-700 mt-1">{filingCase.hold_reason}</p>
-          {filingCase.next_review_date && (
-            <p className="text-xs text-yellow-600 mt-2">
-              Review Date: {new Date(filingCase.next_review_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-            </p>
-          )}
-        </div>
-      )}
 
       {/* History Timeline */}
       <div className="mt-8">

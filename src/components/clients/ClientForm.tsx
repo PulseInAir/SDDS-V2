@@ -56,7 +56,7 @@ export function ClientForm({ client, isEdit = false }: { client?: ClientFormData
     if (result.error) {
       setServerError(result.error)
     } else if (result.success) {
-      router.push(`/clients/${result.client.id}`)
+      router.push(`/clients/${result.client.id}/journey`)
     }
   }
 

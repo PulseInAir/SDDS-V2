@@ -13,17 +13,8 @@ const MAX_IMPORT_SIZE_BYTES = 1024 * 1024;
 
 const CASE_STATUSES = new Set([
   "New Client",
-  "Documents Pending",
-  "Verification Pending",
-  "Computation In Progress",
-  "Client Approval Pending",
-  "Ready To File",
+  "Filing Queue",
   "Filed",
-  "Completed",
-  "Rectification Required",
-  "Notice Received",
-  "On Hold",
-  "Cancelled",
 ]);
 
 const RETURN_CATEGORIES = new Set([

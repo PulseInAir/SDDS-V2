@@ -279,7 +279,6 @@ export async function transitionFilingCase(
     .update({
       case_status: toStatus,
       completed_at: toStatus === 'Filed' ? new Date().toISOString() : null,
-      cancelled_at: toStatus === 'Cancelled' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', caseId);

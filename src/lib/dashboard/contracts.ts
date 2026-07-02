@@ -170,7 +170,7 @@ function countAttentionCases(cases: DashboardCaseSnapshot[]) {
       return true;
     }
 
-    if (filingCase.case_status === "Filed" || filingCase.case_status === "Cancelled") {
+    if (filingCase.case_status === "Filed") {
       return false;
     }
 

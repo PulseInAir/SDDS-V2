@@ -449,7 +449,6 @@ export type Database = {
           assessment_year_id: string
           blocker_code: string | null
           blocker_note: string | null
-          cancelled_at: string | null
           case_status: string
           client_id: string
           completed_at: string | null
@@ -457,10 +456,11 @@ export type Database = {
           due_date: string | null
           expected_completion_date: string | null
           follow_up_excluded: boolean
-          hold_reason: string | null
           id: string
+          itr_filing_charges: number | null
           next_action: string | null
-          next_review_date: string | null
+          refund_claim_charges: number | null
+          refund_claimed_amount: number | null
           return_category: string | null
           updated_at: string
           workspace_id: string
@@ -470,7 +470,6 @@ export type Database = {
           assessment_year_id: string
           blocker_code?: string | null
           blocker_note?: string | null
-          cancelled_at?: string | null
           case_status?: string
           client_id: string
           completed_at?: string | null
@@ -478,10 +477,11 @@ export type Database = {
           due_date?: string | null
           expected_completion_date?: string | null
           follow_up_excluded?: boolean
-          hold_reason?: string | null
           id?: string
+          itr_filing_charges?: number | null
           next_action?: string | null
-          next_review_date?: string | null
+          refund_claim_charges?: number | null
+          refund_claimed_amount?: number | null
           return_category?: string | null
           updated_at?: string
           workspace_id: string
@@ -491,7 +491,6 @@ export type Database = {
           assessment_year_id?: string
           blocker_code?: string | null
           blocker_note?: string | null
-          cancelled_at?: string | null
           case_status?: string
           client_id?: string
           completed_at?: string | null
@@ -499,10 +498,11 @@ export type Database = {
           due_date?: string | null
           expected_completion_date?: string | null
           follow_up_excluded?: boolean
-          hold_reason?: string | null
           id?: string
+          itr_filing_charges?: number | null
           next_action?: string | null
-          next_review_date?: string | null
+          refund_claim_charges?: number | null
+          refund_claimed_amount?: number | null
           return_category?: string | null
           updated_at?: string
           workspace_id?: string

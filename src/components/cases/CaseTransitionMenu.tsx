@@ -39,7 +39,7 @@ export function CaseTransitionMenu({ caseId, currentStatus }: Props) {
     }
   }
 
-  const needsReason = selectedStatus && ['On Hold', 'Cancelled', 'Rectification Required'].includes(selectedStatus);
+  const needsReason = false;
 
   return (
     <form onSubmit={handleTransition} className="space-y-4 p-4 border border-border-subtle rounded-panel bg-surface-panel shadow-xs">

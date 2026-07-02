@@ -91,11 +91,7 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <StatusBadge 
-                    variant={
-                      ['Completed', 'Filed'].includes(c.case_status) ? 'success' : 
-                      ['Notice Received', 'Rectification Required'].includes(c.case_status) ? 'warning' :
-                      ['On Hold', 'Cancelled'].includes(c.case_status) ? 'neutral' : 'info'
-                    }
+                    variant={c.case_status === 'Filed' ? 'success' : 'info'}
                   >
                     {c.case_status}
                   </StatusBadge>
@@ -113,7 +109,7 @@ export function CaseTable({ cases, page, totalPages }: { cases: FilingQueueCaseR
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link 
-                    href={`/filing-queue/${c.id}`} 
+                    href={`/clients/${c.clients.id}/journey?ayId=${c.assessment_years.id}`}
                     className="inline-flex items-center rounded-[var(--radius-input)] bg-brand-50 px-3 py-1.5 text-brand-700 transition-colors hover:bg-brand-100 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                   >
                     View

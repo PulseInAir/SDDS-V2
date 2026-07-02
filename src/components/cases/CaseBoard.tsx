@@ -26,10 +26,7 @@ interface CaseBoardProps {
   statusFilter: string;
 }
 
-const REASON_REQUIRED_STATUSES: CaseStatus[] = [
-  'On Hold',
-  'Cancelled',
-];
+const REASON_REQUIRED_STATUSES: CaseStatus[] = [];
 
 function isCaseStatus(value: string): value is CaseStatus {
   return CASE_STATUSES.includes(value as CaseStatus);
@@ -292,7 +289,7 @@ export function CaseBoard({
                         </div>
 
                         <Link
-                          href={`/filing-queue/${filingCase.id}`}
+                          href={`/clients/${filingCase.clients.id}/journey?ayId=${filingCase.assessment_years.id}`}
                           className="mt-4 inline-flex items-center text-xs font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                         >
                           Open case
