@@ -206,43 +206,6 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
               })}
             </div>
           </div>
-
-          {/* Divider on large screens */}
-          <div className="hidden lg:block w-[1px] bg-border-subtle self-stretch mx-4" />
-
-          {/* Exception Statuses */}
-          <div className="flex flex-col gap-3 min-w-[220px]">
-            <div>
-              <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Filing Exceptions</h2>
-              <p className="text-xs text-text-muted">Filings paused or suspended</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5 h-full items-start">
-              {["On Hold", "Cancelled"].map((status) => {
-                const group = data.workflowDistribution.find((g) => g.status === status);
-                const count = group?.count ?? 0;
-                const dest = group?.destination ?? `/filing-queue?status=${encodeURIComponent(status)}`;
-                const isHold = status === "On Hold";
-
-                return (
-                  <Link
-                    key={status}
-                    href={dest}
-                    className="flex flex-col justify-between p-3 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted/40 hover:border-brand-300 hover:bg-brand-50/10 transition-all group h-full"
-                  >
-                    <span className="text-xs font-medium text-text-secondary group-hover:text-text-primary transition-colors">
-                      {status}
-                    </span>
-                    <div className="flex items-baseline justify-between mt-2">
-                      <span className="text-[10px] text-text-muted">Cases</span>
-                      <span className={`text-lg font-bold font-mono ${count > 0 ? (isHold ? 'text-amber-400' : 'text-slate-400') : 'text-text-muted'}`}>
-                        {count}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
 
