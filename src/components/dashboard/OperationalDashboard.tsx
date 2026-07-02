@@ -141,21 +141,6 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
           </p>
         </div>
 
-        {/* Global HUD Mini-Matrix */}
-        <div className="flex flex-wrap gap-3">
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel/40 backdrop-blur-md px-4 py-2.5 shadow-sm">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-text-muted">Active Cases</p>
-            <p className="text-xl font-bold text-text-primary mt-0.5 tabular-nums">{data.activeCaseCount}</p>
-          </div>
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel/40 backdrop-blur-md px-4 py-2.5 shadow-sm">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-text-muted">Urgent Queue</p>
-            <p className="text-xl font-bold text-brand-400 mt-0.5 tabular-nums">{data.urgentCases.length}</p>
-          </div>
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel/40 backdrop-blur-md px-4 py-2.5 shadow-sm">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-text-muted">Recent Events</p>
-            <p className="text-xl font-bold text-text-primary mt-0.5 tabular-nums">{data.recentActivity.length}</p>
-          </div>
-        </div>
       </header>
 
       {/* 2. Interactive Filing Pipeline Map */}
