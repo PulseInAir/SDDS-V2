@@ -16,7 +16,7 @@ export function AppShell({
   };
 }) {
   return (
-    <div className="flex min-h-dvh w-full bg-transparent">
+    <div className="flex h-dvh w-full overflow-hidden bg-transparent">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -28,7 +28,7 @@ export function AppShell({
           tabIndex={-1}
           className="flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 print:overflow-visible print:p-0"
         >
-          <div className="mx-auto max-w-[1600px] w-full">
+          <div className="mx-auto w-full max-w-screen-2xl 2xl:max-w-none">
             {children}
           </div>
         </main>
