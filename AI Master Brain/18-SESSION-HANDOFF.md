@@ -4,11 +4,22 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `UI-CINEMATIC-WORKFLOW-01`
+- Active task: None
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `f499ba25eb4448d65d93d6783830ce2b6aaaeaaf`
+- HEAD: `76e005c`
+
+## Cinematic Gamified Workflow Redesign (2026-07-03)
+
+**Status: DONE — Overhauled the Client Journey into a full-screen, highly animated level-based wizard.**
+
+### Verification steps completed:
+1. **Decision Registered**: Created D-021 in `02-DECISION-REGISTER.md` to authorize the deviation from the locked iDWELL guidelines for this workflow.
+2. **Dependencies Installed**: Integrated `framer-motion` and `lenis` for cinematic transitions and smooth scrolling physics.
+3. **Remodeled Components**: Rewrote `ClientJourneyPage.tsx` into a centered immersive viewport.
+4. **Minimal HUD**: Reduced the bulky `JourneyPipeline.tsx` to a simple, gamified vertical glowing orb tracker.
+5. **Code Safety & Build**: Checked TypeScript and successfully executed `npm run build` which verified the changes in a production context.
 - Remote: `origin https://github.com/PulseInAir/SDDS-V2.git`
 - Working tree: clean
 - Supabase project: `vorcxrxggfybhucpimfx`
