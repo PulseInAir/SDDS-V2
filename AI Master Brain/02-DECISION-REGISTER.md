@@ -24,6 +24,7 @@ Only the owner may change a LOCKED decision. Add a superseding decision; do not 
 | D-018 | LOCKED | User should need only the command `Continue SDDS.` | Agent obtains work from Git-tracked state. |
 | D-019 | LOCKED | Google Drive is approved as the off-platform encrypted backup destination, while Supabase private Storage remains the primary live document store. | Backup policy may use Google Drive for encrypted retention and restore evidence, but not as authoritative runtime storage. |
 | D-020 | LOCKED | O-002 Invoice Layout and Branding resolution. | Issuer is Single Digit Data Solutions (Duliajan, Assam). Exclude GST and signature blocks. Use green/cream layout. |
+| D-021 | LOCKED | Override D-006 to authorise a gamified, cinematic, scroll-based UI for Client Journey. | Authorises one-level-at-a-time gamified wizard interface with rich animations, ignoring traditional CRM density rules for the workflow engine. |
 
 ## Decision change template
 

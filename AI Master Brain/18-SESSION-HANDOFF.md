@@ -4,8 +4,8 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: None
-- Next READY task: None (all immediate core roadmap items complete)
+- Active task: `UI-CINEMATIC-WORKFLOW-01`
+- Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - HEAD: `f499ba25eb4448d65d93d6783830ce2b6aaaeaaf`
