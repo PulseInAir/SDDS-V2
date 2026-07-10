@@ -8,7 +8,19 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `b3b202b`
+- HEAD: `d6066fc`
+
+## Step 2 Simplification & Header Typography (2026-07-10)
+
+**Status: DONE — Simplified Step 2 from 9-field form to 2-button status toggle, stacked client name/PAN header, enlarged typography.**
+
+### Changes completed:
+1. **ClientStatusStep.tsx**: Removed 9 form fields (ITR No., Filing Date, Refund Amount, Return Category, Expected Completion, Due Date, Next Action, Blocker Code, Blocker Note, Follow-up Exclusion) and all associated state variables. Now renders only two toggle buttons (Filing Queue / Filed) and a Save button. Buttons are `h-14 text-base`, save button is `h-12 text-base`. Selected state uses `bg-amber-500 text-black border-amber-500` with shadow. Save label shows "Save & Proceed →" when Filed, "Save" when Filing Queue.
+2. **ClientJourneyPage.tsx header**: Client name stacked vertically with PAN pill below (not inline). Name bumped from `text-2xl` to `text-3xl`. PAN bumped from `text-[10px]` to `text-xs` with `w-fit`.
+3. **Filed summary card typography**: label `text-[10px]` → `text-xs`, values `text-sm` → `text-base`.
+4. **Step 2 description**: Updated to "Select the filing status for this assessment year."
+5. **journey.ts**: `filingDate` made optional in `recordClientStatusAction` signature. Filing records upsert guarded behind `if (data.filingDate)` — no dummy records created when saving "Filing Queue" status.
+6. **Verification**: `npm run typecheck` clean, `npm run lint` clean, `git diff --check` clean.
 
 ## Client Status Subsume (2026-07-10)
 

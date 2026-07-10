@@ -85,6 +85,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DEPLOYMENT-FIX-02 | DONE | Remove missing lenis import causing Vercel build failure | DEPLOYMENT-FIX-01 | Removed unused Lenis import and initialization from ClientJourneyPage.tsx. | `3fc731b` |
 | CLIENT-JOURNEY-03 | DONE | Redesign Step 1 and 2 to match prompt spec | DEPLOYMENT-FIX-02 | Replaced Step 1 form with simple Create Case button. Replaced Step 2 form with basic ITR No., Filing Date, Refund Amount input. | `4bd0521` |
 | CLIENT-JOURNEY-04 | DONE | Subsume filings details into Step 2 and implement dynamic step shifting | CLIENT-JOURNEY-03 | ClientStatusStep has full filings form. Status selects Filing Queue (stays) or Filed (shifts to Step 3). UI static summary only shows when case is Filed. | `b3b202b` |
+| CLIENT-JOURNEY-04-R1 | DONE | Refinement: simplify Step 2 to 2-button status toggle, stack client name/PAN header, enlarge typography | CLIENT-JOURNEY-04 | Step 2 reduced to Filing Queue/Filed toggle + Save only (fields moved to Step 3 via ITR-V extraction). Header stacked vertically. Filed summary card and step typography bumped. | `d6066fc` |
 ## Task update protocol
 
 When starting:
