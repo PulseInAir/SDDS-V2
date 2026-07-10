@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { ClientJourneyPage } from "@/components/journey/ClientJourneyPage";
 import { getClientJourneyState } from "@/lib/actions/journey";
 import { getInvoicesModuleData } from "@/lib/actions/invoices";
+import { getClientById } from "@/lib/actions/clients";
+import { hasCredential } from "@/lib/actions/credentials";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAuthenticatedWorkspaceSession } from "@/lib/auth/session";
 
@@ -42,6 +44,28 @@ export default async function ClientJourneyRoute({
     .eq("workspace_id", session.workspace.id)
     .order("label", { ascending: false });
 
+  // 4. Fetch client data for identity profile form (Step 1)
+  const client = await getClientById(clientId);
+  let clientFormData = null;
+  if (client) {
+    clientFormData = {
+      id: client.id,
+      full_name: client.full_name,
+      pan_uppercase: client.pan_uppercase,
+      date_of_birth: client.date_of_birth || '',
+      mobile: client.mobile || '',
+      email: client.email || '',
+      address: client.address || '',
+      family_group: client.family_group || '',
+      active: client.active,
+      follow_up_excluded: client.follow_up_excluded,
+      exclusion_reason: client.exclusion_reason || '',
+    };
+  }
+
+  // 5. Check if credentials exist for this client (Step 1)
+  const hasExistingCredential = await hasCredential(clientId);
+
   const clientsOptions = invoiceData.clients.map((c) => ({
     id: c.id,
     full_name: c.full_name,
@@ -62,6 +86,8 @@ export default async function ClientJourneyRoute({
       clientsOptions={clientsOptions}
       ayOptions={ayOptions}
       invoiceSettings={invoiceData.invoiceSettings}
+      clientFormData={clientFormData}
+      hasCredential={hasExistingCredential}
     />
   );
 }

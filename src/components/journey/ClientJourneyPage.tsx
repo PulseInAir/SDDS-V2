@@ -1,9 +1,9 @@
 'use client';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { JourneyPipeline } from "./JourneyPipeline";
+import { JourneyStepHeader } from "./JourneyStepHeader";
 import { CreateCaseStep } from "./steps/CreateCaseStep";
 import { UploadITRVStep } from "./steps/UploadITRVStep";
 import { ChargesStep } from "./steps/ChargesStep";
@@ -12,19 +12,111 @@ import { InvoiceStep } from "./steps/InvoiceStep";
 import { PaymentStep } from "./steps/PaymentStep";
 import { PaymentFollowUpStep } from "./steps/PaymentFollowUpStep";
 import { NextYearFollowUpStep } from "./steps/NextYearFollowUpStep";
+import { ClientForm } from "@/components/clients/ClientForm";
+import { CredentialsManager } from "@/components/clients/CredentialsManager";
 import { getClientJourneyState } from "@/lib/actions/journey";
 import { motion, AnimatePresence } from "framer-motion";
+import Lenis from "lenis";
 
 import { 
   ArrowLeft, 
-  CalendarDays, 
-  Shield, 
   Loader2, 
-  AlertCircle
+  AlertCircle,
+  User,
+  KeyRound,
+  CalendarDays,
+  FolderOpen,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
 import { MaskedValue } from "@/components/ui/MaskedValue";
 import { useAppContext } from "@/contexts/AppContext";
+
+// ─── 5-Step Model ───────────────────────────────────────────────────────────
+type GuidedStepId = "new_client" | "client_status" | "invoice" | "payment" | "next_ay";
+
+interface GuidedStep {
+  id: GuidedStepId;
+  label: string;
+  status: "done" | "current" | "future" | "skipped";
+}
+
+// Map the old 8-step journey state into the new 5-step model
+function resolveGuidedSteps(state: any, filingCase: any): GuidedStep[] {
+  const oldSteps = state.steps || [];
+  const getOldStep = (id: string) => oldSteps.find((s: any) => s.id === id);
+
+  const caseStep = getOldStep("case_created");
+  const filedStep = getOldStep("filed");
+  const chargesStep = getOldStep("charges");
+  const refundStep = getOldStep("refund");
+  const invoiceStep = getOldStep("invoice");
+  const paymentStep = getOldStep("payment");
+  const paymentFollowupStep = getOldStep("payment_followup");
+  const nextAyStep = getOldStep("next_ay_followup");
+
+  // Step 1: New Client — done when case exists
+  const step1Done = caseStep?.status === "done";
+
+  // Step 2: Client Status — done when filing is recorded (filed step done)
+  const step2Done = filedStep?.status === "done";
+
+  // Step 3: Invoice — done when invoice is created
+  const invoiceDone = invoiceStep?.status === "done";
+  // Also check if charges + upload are done
+  const chargesDone = chargesStep?.status === "done";
+
+  // Step 4: Payment — done when payment is done
+  const paymentDone = paymentStep?.status === "done";
+
+  // Step 5: Next AY — done when follow-up is scheduled
+  const nextAyDone = nextAyStep?.status === "done";
+
+  const getStatus = (isDone: boolean, prevDone: boolean): "done" | "current" | "future" => {
+    if (isDone) return "done";
+    if (prevDone) return "current";
+    return "future";
+  };
+
+  return [
+    {
+      id: "new_client",
+      label: "New Client",
+      status: getStatus(step1Done, true), // always accessible
+    },
+    {
+      id: "client_status",
+      label: "Client Status",
+      status: getStatus(step2Done, step1Done),
+    },
+    {
+      id: "invoice",
+      label: "Invoice",
+      status: getStatus(invoiceDone, step2Done),
+    },
+    {
+      id: "payment",
+      label: "Payment",
+      status: getStatus(paymentDone, invoiceDone),
+    },
+    {
+      id: "next_ay",
+      label: "Next AY",
+      status: getStatus(nextAyDone, paymentDone),
+    },
+  ];
+}
+
+function resolveCurrentGuidedStep(steps: GuidedStep[]): GuidedStepId {
+  const current = steps.find(s => s.status === "current");
+  if (current) return current.id;
+  // If all done, show last
+  if (steps.every(s => s.status === "done" || s.status === "skipped")) return "next_ay";
+  return "new_client";
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 interface ClientJourneyPageProps {
   clientId: string;
@@ -33,6 +125,8 @@ interface ClientJourneyPageProps {
   clientsOptions: any[];
   ayOptions: any[];
   invoiceSettings: any;
+  clientFormData?: any;
+  hasCredential?: boolean;
 }
 
 export function ClientJourneyPage({
@@ -42,17 +136,48 @@ export function ClientJourneyPage({
   clientsOptions,
   ayOptions,
   invoiceSettings,
+  clientFormData,
+  hasCredential = false,
 }: ClientJourneyPageProps) {
   const router = useRouter();
   const { isPrivacyMode } = useAppContext();
   
   const [journeyData, setJourneyData] = useState(initialJourneyData);
   const [selectedAyId, setSelectedAyId] = useState(initialJourneyData.selectedAyId);
-  const [selectedStepId, setSelectedStepId] = useState<any>(initialJourneyData.state.currentStepId || "case_created");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
 
+  // Compute the 5-step model
+  const guidedSteps = resolveGuidedSteps(journeyData.state || { steps: [] }, journeyData.filingCase);
+  const [selectedStepId, setSelectedStepId] = useState<GuidedStepId>(
+    resolveCurrentGuidedStep(guidedSteps)
+  );
 
+  // Section collapse states for Step 1
+  const [showIdentity, setShowIdentity] = useState(true);
+  const [showCredentials, setShowCredentials] = useState(false);
+
+  // Initialize smooth scrolling with Lenis
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      touchMultiplier: 2,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   // Re-fetch journey state whenever AY changes
   useEffect(() => {
@@ -64,8 +189,8 @@ export function ClientJourneyPage({
   // Auto-extraction trigger
   useEffect(() => {
     const caseRecord = journeyData.filingCase;
-    const filings = journeyData.state.steps.find((s: any) => s.id === "filed")?.data;
-    const chargesSet = journeyData.state.steps.find((s: any) => s.id === "charges")?.status === "done";
+    const filings = journeyData.state?.steps?.find((s: any) => s.id === "filed")?.data;
+    const chargesSet = journeyData.state?.steps?.find((s: any) => s.id === "charges")?.status === "done";
     
     if (caseRecord && filings && !chargesSet && !isExtracting) {
       fetchClientItrvAndExtract(caseRecord.id);
@@ -85,7 +210,6 @@ export function ClientJourneyPage({
             const extractData = await extractRes.json();
             if (extractData.success && extractData.data) {
               await handleRefresh(selectedAyId);
-              setSelectedStepId("charges");
             }
           }
         }
@@ -104,11 +228,23 @@ export function ClientJourneyPage({
     
     if (res.success && res.state) {
       setJourneyData(res);
-      // Automatically advance to the current step if user was on a step that is now done
-      if (selectedStepId === "case_created" || selectedStepId === res.state.currentStepId) {
-         setSelectedStepId(res.state.currentStepId || "case_created");
-      }
+      // Update current step after refresh
+      const newGuidedSteps = resolveGuidedSteps(res.state, res.filingCase);
+      const newCurrent = resolveCurrentGuidedStep(newGuidedSteps);
+      setSelectedStepId(newCurrent);
     }
+  }
+
+  // Navigate to next guided step
+  function goToNextStep() {
+    const idx = guidedSteps.findIndex(s => s.id === selectedStepId);
+    if (idx < guidedSteps.length - 1) {
+      setSelectedStepId(guidedSteps[idx + 1].id);
+    }
+  }
+
+  function goToStep(stepId: GuidedStepId) {
+    setSelectedStepId(stepId);
   }
 
   if (!journeyData.success) {
@@ -125,15 +261,14 @@ export function ClientJourneyPage({
   }
 
   const { client, filingCase, state } = journeyData;
-  const currentStep = state.steps.find((s: any) => s.id === selectedStepId);
 
-  // Retrieve files/docs to show inside Step 2 if uploaded
+  // Old step data accessors (still used by substep components)
   const itrvStepData = state.steps.find((s: any) => s.id === "filed")?.data;
-
-  // Extract variables for each step component
   const activeInvoice = state.steps.find((s: any) => s.id === "invoice")?.data;
   const activeRefund = state.steps.find((s: any) => s.id === "refund")?.data;
   const activeFollowup = state.steps.find((s: any) => s.id === "next_ay_followup")?.data;
+
+  const currentGuidedStep = guidedSteps.find(s => s.id === selectedStepId);
 
   // Animation variants
   const pageVariants = {
@@ -143,44 +278,44 @@ export function ClientJourneyPage({
   };
 
   return (
-    <div className="relative bg-[#030303] text-white selection:bg-amber-500/30 min-h-full">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-[#030303] text-white overflow-x-hidden selection:bg-amber-500/30">
       
       {/* Cinematic Ambient Background */}
-      {/* Ambient Background — absolute, not fixed */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[10%] left-[20%] w-[40rem] h-[40rem] bg-amber-600/5 rounded-full blur-[120px] animate-[pulse_8s_ease-in-out_infinite_alternate]" />
         <div className="absolute bottom-[10%] right-[10%] w-[50rem] h-[50rem] bg-orange-600/5 rounded-full blur-[150px] animate-[pulse_12s_ease-in-out_infinite_alternate]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* Cinematic Header */}
-      {/* Sticky header — stays within scroll container */}
       <motion.div 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="sticky top-0 z-40 border-b border-white/5 bg-[#030303]/90 backdrop-blur-xl px-8 py-5 flex items-center justify-between"
+        className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-[#030303]/60 backdrop-blur-xl"
       >
-        <div className="flex items-center gap-6">
-          <Link 
-            href={`/clients/${clientId}`}
-            className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 hover:border-amber-500/50 transition-all duration-300"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-light tracking-wide text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                {client.full_name}
-              </h1>
-              <span className="text-[10px] font-medium font-mono px-3 py-1 rounded-full bg-amber-950/30 text-amber-400 border border-amber-500/20 uppercase tracking-widest shadow-[0_0_10px_rgba(245,158,11,0.1)]">
-                PAN: <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
-              </span>
+        {/* Top bar: client info + AY selector */}
+        <div className="px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Link 
+              href="/clients"
+              className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 hover:border-amber-500/50 transition-all duration-300"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-light tracking-wide text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  {client.full_name}
+                </h1>
+                <span className="text-[10px] font-medium font-mono px-3 py-1 rounded-full bg-amber-950/30 text-amber-400 border border-amber-500/20 uppercase tracking-widest shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                  PAN: <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <select
               value={selectedAyId}
               onChange={(e) => setSelectedAyId(e.target.value)}
@@ -193,19 +328,29 @@ export function ClientJourneyPage({
                 </option>
               ))}
             </select>
+            {isRefreshing && <Loader2 className="h-4 w-4 animate-spin text-amber-400" />}
           </div>
+        </div>
+
+        {/* Step header — replaces old tab bar */}
+        <div className="pb-3">
+          <JourneyStepHeader
+            steps={guidedSteps}
+            currentStepId={selectedStepId}
+            onStepClick={(id) => setSelectedStepId(id as GuidedStepId)}
+          />
         </div>
       </motion.div>
 
       {/* Side HUD */}
       <JourneyPipeline
-        steps={state.steps}
+        steps={guidedSteps}
         currentStepId={selectedStepId}
-        onStepClick={(id) => setSelectedStepId(id)}
+        onStepClick={(id) => setSelectedStepId(id as GuidedStepId)}
       />
 
       {/* Main Cinematic Viewport */}
-      <main className="relative z-10 w-full pb-24 px-8 pt-8 flex flex-col items-center">
+      <main className="relative z-10 w-full min-h-screen pt-40 pb-24 px-8 flex flex-col items-center justify-start">
         
         {isExtracting ? (
           <motion.div 
@@ -213,7 +358,6 @@ export function ClientJourneyPage({
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-2xl aspect-video rounded-3xl border border-amber-500/20 bg-[#0a0700]/80 backdrop-blur-2xl flex flex-col items-center justify-center relative overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.05)]"
           >
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay" />
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent animate-[scan_2s_ease-in-out_infinite]" />
             <Loader2 className="h-12 w-12 text-amber-500 animate-spin mb-6 drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
             <h3 className="text-2xl font-light text-amber-100" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Extracting ITR-V Intelligence</h3>
@@ -223,7 +367,7 @@ export function ClientJourneyPage({
           </motion.div>
         ) : (
           <AnimatePresence mode="wait">
-            {currentStep && (
+            {currentGuidedStep && (
               <motion.div
                 key={selectedStepId}
                 variants={pageVariants}
@@ -232,15 +376,8 @@ export function ClientJourneyPage({
                 exit="exit"
                 className="w-full max-w-4xl"
               >
+                {/* Step title area — no step numbers */}
                 <div className="mb-8 text-center flex flex-col items-center">
-                  <motion.span 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-[10px] font-bold font-mono tracking-[0.3em] uppercase text-amber-500/80 mb-4"
-                  >
-                    Level {state.steps.findIndex((s: any) => s.id === selectedStepId) + 1}
-                  </motion.span>
                   <motion.h2 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -248,7 +385,7 @@ export function ClientJourneyPage({
                     className="text-5xl md:text-6xl font-light text-white mb-2" 
                     style={{ fontFamily: "'Cormorant Garamond', serif" }}
                   >
-                    {currentStep.label}
+                    {currentGuidedStep.label}
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -258,18 +395,18 @@ export function ClientJourneyPage({
                   >
                     Status: 
                     <span className={
-                      currentStep.status === "done" 
+                      currentGuidedStep.status === "done" 
                         ? "text-emerald-400" 
-                        : currentStep.status === "current" 
+                        : currentGuidedStep.status === "current" 
                         ? "text-amber-400 animate-pulse" 
                         : "text-white/40"
                     }>
-                      {currentStep.status}
+                      {currentGuidedStep.status}
                     </span>
-                    {isRefreshing && <Loader2 className="h-3 w-3 animate-spin ml-2" />}
                   </motion.p>
                 </div>
 
+                {/* Glassmorphic Content Card */}
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.98, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -281,157 +418,439 @@ export function ClientJourneyPage({
                   <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-1000" />
 
                   <div className="relative z-10 w-full">
-                    {/* Render corresponding form/content */}
-                    {selectedStepId === "case_created" && (
-                      <div className="space-y-8 flex flex-col items-center text-center">
-                        <div>
-                          <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto">
-                             Initialize the operational core for Assessment Year {ayOptions.find(o => o.id === selectedAyId)?.label || "current"}. This establishes the secure perimeter for all client data.
-                          </p>
-                        </div>
-                        {filingCase ? (
-                          <div className="p-8 rounded-2xl border border-white/10 bg-black/40 text-sm space-y-4 w-full max-w-md backdrop-blur-sm">
-                            <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                              <span className="text-white/40 font-mono tracking-widest uppercase text-[10px]">Case ID</span>
-                              <span className="font-mono text-white/80">{filingCase.id.slice(0, 8)}</span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                              <span className="text-white/40 font-mono tracking-widest uppercase text-[10px]">Opened At</span>
-                              <span className="text-white/80">{new Date(filingCase.created_at).toLocaleDateString()}</span>
-                            </div>
-                            {filingCase.return_category && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-white/40 font-mono tracking-widest uppercase text-[10px]">Category</span>
-                                <span className="font-semibold text-amber-400">{filingCase.return_category}</span>
+
+                    {/* ════════════════════════════════════════════════════════════════
+                        STEP 1 — NEW CLIENT
+                        Subsumes: Identity Profile + Assessment Years + Credentials
+                    ════════════════════════════════════════════════════════════════ */}
+                    {selectedStepId === "new_client" && (
+                      <div className="space-y-8">
+                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
+                          Activate this client for Assessment Year {ayOptions.find(o => o.id === selectedAyId)?.label || "current"}. Review identity, credentials, and create or open the filing case.
+                        </p>
+
+                        {/* Identity Profile Section */}
+                        <div className="border border-white/5 rounded-2xl overflow-hidden">
+                          <button
+                            onClick={() => setShowIdentity(!showIdentity)}
+                            className="w-full flex items-center justify-between px-6 py-4 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <User className="h-4 w-4 text-amber-400" />
                               </div>
-                            )}
-                            
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                const nextIdx = state.steps.findIndex((s:any) => s.id === "case_created") + 1;
-                                if(state.steps[nextIdx]) setSelectedStepId(state.steps[nextIdx].id);
-                              }}
-                              className="w-full mt-6 py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 font-medium tracking-widest uppercase text-[11px] hover:bg-amber-500 hover:text-black transition-all"
-                            >
-                              Proceed to Upload
-                            </motion.button>
+                              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">Identity Profile</span>
+                            </div>
+                            {showIdentity ? <ChevronUp className="h-4 w-4 text-white/40" /> : <ChevronDown className="h-4 w-4 text-white/40" />}
+                          </button>
+                          {showIdentity && clientFormData && (
+                            <div className="p-6 border-t border-white/5">
+                              <ClientForm client={clientFormData} isEdit={true} />
+                            </div>
+                          )}
+                          {showIdentity && !clientFormData && (
+                            <div className="p-6 border-t border-white/5 text-center text-sm text-white/40">
+                              <p>Client identity data is displayed on the profile page.</p>
+                              <Link href={`/clients/${clientId}/profile`} className="text-amber-400 hover:underline mt-2 inline-block text-xs">
+                                Open Identity Profile →
+                              </Link>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Credentials Section */}
+                        <div className="border border-white/5 rounded-2xl overflow-hidden">
+                          <button
+                            onClick={() => setShowCredentials(!showCredentials)}
+                            className="w-full flex items-center justify-between px-6 py-4 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <KeyRound className="h-4 w-4 text-amber-400" />
+                              </div>
+                              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">Portal Credentials</span>
+                            </div>
+                            {showCredentials ? <ChevronUp className="h-4 w-4 text-white/40" /> : <ChevronDown className="h-4 w-4 text-white/40" />}
+                          </button>
+                          {showCredentials && (
+                            <div className="p-6 border-t border-white/5">
+                              <CredentialsManager clientId={clientId} hasExisting={hasCredential} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Assessment Year & Case Action */}
+                        <div className="border border-white/5 rounded-2xl p-6">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                              <CalendarDays className="h-4 w-4 text-amber-400" />
+                            </div>
+                            <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">Assessment Year & Case</span>
                           </div>
-                        ) : (
-                          <div className="w-full max-w-md mx-auto">
+
+                          <div className="flex items-center gap-4 mb-6">
+                            <select
+                              value={selectedAyId}
+                              onChange={(e) => setSelectedAyId(e.target.value)}
+                              className="h-10 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white/80 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+                            >
+                              {assessmentYears.map((ay) => (
+                                <option key={ay.id} value={ay.id} className="bg-neutral-900 text-white">
+                                  AY {ay.label} {ay.is_current ? "(Current)" : ""}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {filingCase ? (
+                            <div className="space-y-4">
+                              <div className="p-5 rounded-xl border border-emerald-500/20 bg-emerald-950/10">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                                    <FolderOpen className="h-4 w-4 text-emerald-400" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Case Exists</p>
+                                    <p className="text-sm text-white/60 mt-0.5">Case ID: {filingCase.id.slice(0, 8)}...</p>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 text-sm">
+                                  <div>
+                                    <span className="text-white/40 text-xs font-mono">Status</span>
+                                    <p className="text-white/80 font-medium">{filingCase.case_status}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-white/40 text-xs font-mono">Category</span>
+                                    <p className="text-white/80 font-medium">{filingCase.return_category || "—"}</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => goToStep("client_status")}
+                                className="w-full py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 font-medium tracking-widest uppercase text-[11px] hover:bg-amber-500 hover:text-black transition-all"
+                              >
+                                Open Case →
+                              </motion.button>
+                            </div>
+                          ) : (
+                            <div className="w-full">
+                              <CreateCaseStep
+                                clientId={clientId}
+                                selectedAyId={selectedAyId}
+                                assessmentYears={ayOptions}
+                                onComplete={() => {
+                                  handleRefresh().then(() => goToStep("client_status"));
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ════════════════════════════════════════════════════════════════
+                        STEP 2 — CLIENT STATUS
+                        Subsumes: Filings
+                        Shows: ITR No., Filing Date, Refund Amount only
+                    ════════════════════════════════════════════════════════════════ */}
+                    {selectedStepId === "client_status" && (
+                      <div className="space-y-6">
+                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
+                          Record the filing status for this assessment year. Select the current status and filing details.
+                        </p>
+
+                        {/* Filing details display */}
+                        {filingCase && itrvStepData && (
+                          <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] max-w-md mx-auto">
+                            <span className="text-[10px] font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Filing Details</span>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between items-center">
+                                <span className="text-white/40">ITR No.</span>
+                                <span className="font-semibold text-white/80 font-mono">{filingCase.return_category || "—"}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-white/40">Filing Date</span>
+                                <span className="font-medium text-white/80">{itrvStepData.filingDate ? new Date(itrvStepData.filingDate).toLocaleDateString('en-GB') : "—"}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-white/40">Refund Amount</span>
+                                <span className="font-semibold text-emerald-400 font-mono">
+                                  {filingCase.refund_claimed_amount ? `₹${Number(filingCase.refund_claimed_amount).toLocaleString()}` : "None"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Filing form if not yet filed */}
+                        {!itrvStepData ? (
+                          <div className="w-full max-w-xl mx-auto">
                             <CreateCaseStep
                               clientId={clientId}
                               selectedAyId={selectedAyId}
                               assessmentYears={ayOptions}
-                              onComplete={() => handleRefresh()}
+                              onComplete={() => {
+                                handleRefresh().then(() => goToStep("invoice"));
+                              }}
                             />
+                          </div>
+                        ) : (
+                          <div className="flex justify-center">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => goToStep("invoice")}
+                              className="py-4 px-8 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 font-medium tracking-widest uppercase text-[11px] hover:bg-amber-500 hover:text-black transition-all"
+                            >
+                              Proceed to Invoice →
+                            </motion.button>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {selectedStepId === "filed" && (
-                      <div className="w-full max-w-xl mx-auto">
-                        <UploadITRVStep
-                          clientId={clientId}
-                          selectedAyId={selectedAyId}
-                          existingItrvDoc={itrvStepData ? { id: "", original_filename: itrvStepData.ackNumber } : null}
-                          onComplete={() => {
-                            handleRefresh();
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    {selectedStepId === "charges" && (
-                      <div className="w-full">
-                        <ChargesStep
-                          caseId={filingCase?.id || ""}
-                          clientId={clientId}
-                          rateCard={invoiceSettings?.rate_card || {}}
-                          refundChargePercentage={invoiceSettings?.refund_charge_percentage || 10}
-                          defaultItrForm={filingCase?.return_category || "ITR-1"}
-                          initialRefundClaimed={filingCase?.refund_claimed_amount || 0}
-                          initialItrCharges={filingCase?.itr_filing_charges || undefined}
-                          initialRefundCharges={filingCase?.refund_claim_charges || undefined}
-                          onComplete={() => handleRefresh()}
-                        />
-                      </div>
-                    )}
-
-                    {selectedStepId === "refund" && (
-                      <div className="w-full max-w-2xl mx-auto">
-                        <RefundTrackingStep
-                          caseId={filingCase?.id || ""}
-                          clientId={clientId}
-                          expectedAmount={filingCase?.refund_claimed_amount || 0}
-                          initialStatus={activeRefund?.status || "Pending"}
-                          initialReceivedAmount={activeRefund?.receivedAmount || undefined}
-                          initialReceivedDate={activeRefund?.receivedDate || undefined}
-                          onComplete={() => handleRefresh()}
-                        />
-                      </div>
-                    )}
-
+                    {/* ════════════════════════════════════════════════════════════════
+                        STEP 3 — INVOICE
+                        Subsumes: Documents + Invoices & Payments + Refunds
+                        Sub-window A: Upload ITR-V
+                        Sub-window B: Charges + Invoice + Refund
+                    ════════════════════════════════════════════════════════════════ */}
                     {selectedStepId === "invoice" && (
-                      <div className="w-full max-w-3xl mx-auto">
-                        <InvoiceStep
-                          clientId={clientId}
-                          selectedAyId={selectedAyId}
-                          clientsOptions={clientsOptions}
-                          ayOptions={ayOptions}
-                          invoiceSettings={invoiceSettings}
-                          existingInvoice={activeInvoice ? {
-                            id: activeInvoice.invoiceId,
-                            invoice_number: activeInvoice.invoiceNumber,
-                            status: activeInvoice.status,
-                            total_amount: activeInvoice.totalAmount,
-                            balance_amount: activeInvoice.balanceAmount,
-                          } : null}
-                          onComplete={() => handleRefresh()}
-                        />
+                      <div className="space-y-8">
+                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
+                          Upload the ITR-V acknowledgement, review charges, track refunds, and generate the invoice.
+                        </p>
+
+                        {/* Sub-window A: Upload ITR-V (if not yet uploaded) */}
+                        {!itrvStepData && (
+                          <div className="w-full max-w-xl mx-auto">
+                            <UploadITRVStep
+                              clientId={clientId}
+                              selectedAyId={selectedAyId}
+                              existingItrvDoc={null}
+                              onComplete={() => handleRefresh()}
+                            />
+                          </div>
+                        )}
+
+                        {/* Sub-window B: After upload — Charges + Refund + Invoice */}
+                        {itrvStepData && (
+                          <div className="space-y-8">
+                            {/* Re-upload option */}
+                            <div className="flex justify-end">
+                              <UploadITRVStep
+                                clientId={clientId}
+                                selectedAyId={selectedAyId}
+                                existingItrvDoc={{ id: "", original_filename: itrvStepData.ackNumber }}
+                                onComplete={() => handleRefresh()}
+                              />
+                            </div>
+
+                            {/* Charges section */}
+                            {state.steps.find((s: any) => s.id === "charges")?.status !== "done" && (
+                              <ChargesStep
+                                caseId={filingCase?.id || ""}
+                                clientId={clientId}
+                                rateCard={invoiceSettings?.rate_card || {}}
+                                refundChargePercentage={invoiceSettings?.refund_charge_percentage || 10}
+                                defaultItrForm={filingCase?.return_category || "ITR-1"}
+                                initialRefundClaimed={filingCase?.refund_claimed_amount || 0}
+                                initialItrCharges={filingCase?.itr_filing_charges || undefined}
+                                initialRefundCharges={filingCase?.refund_claim_charges || undefined}
+                                onComplete={() => handleRefresh()}
+                              />
+                            )}
+
+                            {/* Refund tracking (if applicable) */}
+                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" && 
+                             state.steps.find((s: any) => s.id === "refund")?.status !== "skipped" && (
+                              <RefundTrackingStep
+                                caseId={filingCase?.id || ""}
+                                clientId={clientId}
+                                expectedAmount={filingCase?.refund_claimed_amount || 0}
+                                initialStatus={activeRefund?.status || "Pending"}
+                                initialReceivedAmount={activeRefund?.receivedAmount || undefined}
+                                initialReceivedDate={activeRefund?.receivedDate || undefined}
+                                onComplete={() => handleRefresh()}
+                              />
+                            )}
+
+                            {/* Invoice generation */}
+                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" && (
+                              <InvoiceStep
+                                clientId={clientId}
+                                selectedAyId={selectedAyId}
+                                clientsOptions={clientsOptions}
+                                ayOptions={ayOptions}
+                                invoiceSettings={invoiceSettings}
+                                existingInvoice={activeInvoice ? {
+                                  id: activeInvoice.invoiceId,
+                                  invoice_number: activeInvoice.invoiceNumber,
+                                  status: activeInvoice.status,
+                                  total_amount: activeInvoice.totalAmount,
+                                  balance_amount: activeInvoice.balanceAmount,
+                                } : null}
+                                onComplete={() => {
+                                  handleRefresh().then(() => goToStep("payment"));
+                                }}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
+                    {/* ════════════════════════════════════════════════════════════════
+                        STEP 4 — PAYMENT
+                        Subsumes: Communication & Activity
+                        Stage-by-stage reveal
+                    ════════════════════════════════════════════════════════════════ */}
                     {selectedStepId === "payment" && (
-                      <div className="w-full max-w-xl mx-auto">
-                        <PaymentStep
-                          clientId={clientId}
-                          invoiceId={activeInvoice?.invoiceId || ""}
-                          balanceAmount={activeInvoice?.balanceAmount || 0}
-                          onComplete={() => handleRefresh()}
-                        />
+                      <div className="space-y-8">
+                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
+                          Manage payments and follow-up communications for this filing case.
+                        </p>
+
+                        {/* Payment form */}
+                        {activeInvoice && activeInvoice.balanceAmount > 0 && (
+                          <div className="w-full max-w-xl mx-auto">
+                            <PaymentStep
+                              clientId={clientId}
+                              invoiceId={activeInvoice.invoiceId || ""}
+                              balanceAmount={activeInvoice.balanceAmount || 0}
+                              onComplete={() => {
+                                handleRefresh().then(() => goToStep("next_ay"));
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {/* Fully paid state */}
+                        {activeInvoice && activeInvoice.balanceAmount <= 0 && (
+                          <div className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-950/10 text-center max-w-md mx-auto">
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
+                              <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            </div>
+                            <h4 className="text-lg font-semibold text-emerald-400">Payment Complete</h4>
+                            <p className="text-sm text-white/50 mt-2">All dues have been cleared for this filing case.</p>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => goToStep("next_ay")}
+                              className="mt-6 py-3 px-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 font-medium tracking-widest uppercase text-[11px] hover:bg-amber-500 hover:text-black transition-all"
+                            >
+                              Proceed to Next AY →
+                            </motion.button>
+                          </div>
+                        )}
+
+                        {/* Payment follow-up (if not paid) */}
+                        {activeInvoice && activeInvoice.balanceAmount > 0 && (
+                          <div className="w-full max-w-2xl mx-auto mt-8 border-t border-white/5 pt-8">
+                            <PaymentFollowUpStep
+                              clientId={clientId}
+                              caseId={filingCase?.id || ""}
+                              clientMobile={client.mobile}
+                              clientName={client.full_name}
+                              balanceAmount={activeInvoice.balanceAmount || 0}
+                              invoiceNumber={activeInvoice.invoiceNumber || ""}
+                              onComplete={() => handleRefresh()}
+                            />
+                          </div>
+                        )}
+
+                        {/* No invoice yet — tell user to go back to step 3 */}
+                        {!activeInvoice && (
+                          <div className="text-center py-8">
+                            <p className="text-sm text-white/40">No invoice has been generated yet.</p>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => goToStep("invoice")}
+                              className="mt-4 py-3 px-6 bg-white/5 border border-white/10 rounded-xl text-white/60 font-medium tracking-widest uppercase text-[11px] hover:bg-white/10 transition-all"
+                            >
+                              ← Go to Invoice Step
+                            </motion.button>
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {selectedStepId === "payment_followup" && (
-                      <div className="w-full max-w-2xl mx-auto">
-                        <PaymentFollowUpStep
-                          clientId={clientId}
-                          caseId={filingCase?.id || ""}
-                          clientMobile={client.mobile}
-                          clientName={client.full_name}
-                          balanceAmount={activeInvoice?.balanceAmount || 0}
-                          invoiceNumber={activeInvoice?.invoiceNumber || ""}
-                          onComplete={() => handleRefresh()}
-                        />
+                    {/* ════════════════════════════════════════════════════════════════
+                        STEP 5 — NEXT AY PREPARATION
+                        Countdown timer + Call client + Create new case loop
+                    ════════════════════════════════════════════════════════════════ */}
+                    {selectedStepId === "next_ay" && (
+                      <div className="space-y-8">
+                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
+                          Prepare for the next assessment year. Review the current filing and schedule the next cycle.
+                        </p>
+
+                        {/* Previous filing details summary */}
+                        {filingCase && (
+                          <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] max-w-md mx-auto">
+                            <span className="text-[10px] font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Current Filing Summary</span>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between items-center">
+                                <span className="text-white/40">ITR Form</span>
+                                <span className="font-semibold text-white/80 font-mono">{filingCase.return_category || "—"}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-white/40">Case Status</span>
+                                <span className="font-medium text-white/80">{filingCase.case_status}</span>
+                              </div>
+                              {filingCase.itr_filing_charges && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-white/40">Filing Charges</span>
+                                  <span className="font-semibold text-white/80 font-mono">₹{Number(filingCase.itr_filing_charges).toLocaleString()}</span>
+                                </div>
+                              )}
+                              {filingCase.refund_claimed_amount > 0 && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-white/40">Refund Claimed</span>
+                                  <span className="font-semibold text-emerald-400 font-mono">₹{Number(filingCase.refund_claimed_amount).toLocaleString()}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Countdown timer to next filing season (June) */}
+                        <div className="p-5 rounded-xl border border-amber-500/10 bg-amber-500/[0.02] max-w-md mx-auto text-center">
+                          <span className="text-[10px] font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Next Filing Season</span>
+                          <NextFilingCountdown />
+                        </div>
+
+                        {/* Next year follow-up */}
+                        <div className="w-full max-w-xl mx-auto">
+                          <NextYearFollowUpStep
+                            clientId={clientId}
+                            nextAyLabel={state.steps.find((s: any) => s.id === "next_ay_followup")?.data?.nextAyLabel || null}
+                            existingFollowup={activeFollowup ? {
+                              id: "",
+                              status: activeFollowup.status,
+                              due_date: activeFollowup.due_date || null,
+                            } : null}
+                          />
+                        </div>
+
+                        {/* Create New Case button — loops back to Step 1 */}
+                        <div className="flex justify-center pt-4">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => goToStep("new_client")}
+                            className="py-4 px-8 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 font-medium tracking-widest uppercase text-[11px] hover:bg-amber-500 hover:text-black transition-all"
+                          >
+                            Create New Case for Next AY →
+                          </motion.button>
+                        </div>
                       </div>
                     )}
 
-                    {selectedStepId === "next_ay_followup" && (
-                      <div className="w-full max-w-xl mx-auto">
-                        <NextYearFollowUpStep
-                          clientId={clientId}
-                          nextAyLabel={state.steps.find((s: any) => s.id === "next_ay_followup")?.data?.nextAyLabel || null}
-                          existingFollowup={activeFollowup ? {
-                            id: "",
-                            status: activeFollowup.status,
-                            due_date: activeFollowup.due_date || null,
-                          } : null}
-                        />
-                      </div>
-                    )}
                   </div>
                 </motion.div>
               </motion.div>
@@ -440,6 +859,56 @@ export function ClientJourneyPage({
         )}
       </main>
 
+    </div>
+  );
+}
+
+// ─── Countdown Component ────────────────────────────────────────────────────
+function NextFilingCountdown() {
+  const [timeLeft, setTimeLeft] = React.useState({ days: 0, hours: 0, minutes: 0 });
+
+  React.useEffect(() => {
+    function calculateTimeLeft() {
+      const now = new Date();
+      let nextJune = new Date(now.getFullYear(), 5, 1); // June 1st
+      if (now >= nextJune) {
+        nextJune = new Date(now.getFullYear() + 1, 5, 1);
+      }
+      const diff = nextJune.getTime() - now.getTime();
+      return {
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / 1000 / 60) % 60),
+      };
+    }
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center gap-6 py-3">
+      <div className="text-center">
+        <div className="text-3xl font-light text-amber-400 font-mono" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          {timeLeft.days}
+        </div>
+        <div className="text-[9px] uppercase tracking-widest text-white/30 font-mono mt-1">Days</div>
+      </div>
+      <div className="text-white/10 text-lg">:</div>
+      <div className="text-center">
+        <div className="text-3xl font-light text-amber-400 font-mono" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          {timeLeft.hours}
+        </div>
+        <div className="text-[9px] uppercase tracking-widest text-white/30 font-mono mt-1">Hours</div>
+      </div>
+      <div className="text-white/10 text-lg">:</div>
+      <div className="text-center">
+        <div className="text-3xl font-light text-amber-400 font-mono" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          {timeLeft.minutes}
+        </div>
+        <div className="text-[9px] uppercase tracking-widest text-white/30 font-mono mt-1">Minutes</div>
+      </div>
     </div>
   );
 }
