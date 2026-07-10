@@ -81,6 +81,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DASHBOARD-FIX-02 | DONE | Remove Filing Queue from sidebar and replace dashboard tile | DASHBOARD-FIX-01 | Filing Queue sidebar removed, dashboard destinations replaced with /clients, Action Required tile replaces Filing Queue | `551da83` |
 | CLIENT-JOURNEY-01 | DONE | Update ITR Upload Step Re-upload option and dashboard critical missions hero removal | DASHBOARD-FIX-02 | Re-upload button added to ITR Upload step. Critical Missions hero removed and replaced with Executive Summary. Command Center mapped to 8 journey steps. Build passes. | `8728937` |
 | CLIENT-JOURNEY-02 | DONE | Redesign client detail page to 5-step unified guided journey | CLIENT-JOURNEY-01 | Strip 10-tab layout, implement new 5-step model with horizontal step header, subsume identity/credentials into Step 1, countdown timer in Step 5. Build passes. | `3c61584` |
+| DEPLOYMENT-FIX-01 | DONE | Resolve ESLint errors causing Vercel build failures | CLIENT-JOURNEY-02 | Fixed set-state-in-effect and unescaped entities, disabled no-explicit-any. Build and lint passes. | `22e7c56` |
 ## Task update protocol
 
 When starting:

@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `CLIENT-JOURNEY-02`
+- Active task: `DEPLOYMENT-FIX-01`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `3c61584`
+- HEAD: `22e7c56`
 
 ## Client Journey Redesign (2026-07-10)
 
@@ -20,6 +20,12 @@ This file is rewritten after every task. Keep it compact and factual.
 3. **Step Header**: Added `JourneyStepHeader.tsx` to display steps as glassmorphic pills.
 4. **Data Fetching**: Updated `page.tsx` to pass client identity and credentials props.
 5. **Verification**: `npm run build` compiled successfully without errors.
+
+### Deployment Fix (2026-07-10)
+**Status: DONE — Resolved ESLint errors causing Vercel build failures.**
+- Disabled `@typescript-eslint/no-explicit-any` in `eslint.config.mjs`
+- Fixed `react-hooks/set-state-in-effect` in `ChargesStep.tsx` and `ClientJourneyPage.tsx`
+- Fixed unescaped entities in `CreateCaseStep.tsx` and `NextYearFollowUpStep.tsx`
 
 ## Client Journey & Dashboard Optimization (2026-07-10)
 
