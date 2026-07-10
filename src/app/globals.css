@@ -50,7 +50,7 @@ body {
 
 html {
   color-scheme: dark;
-  font-size: 112.5%; /* 18px base root instead of 16px - scales rem units by 12.5% */
+  font-size: 100%; /* 16px base root - keeps rem units aligned with the design-system scale */
 }
 
 body {
@@ -65,7 +65,7 @@ body {
   animation: auroraMotion 30s ease infinite;
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-size: 15px; /* Scale default body text size */
+  font-size: 14px; /* Design-system body size (13-14px) - prevents wrapping in dense rows */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   will-change: background-position;
