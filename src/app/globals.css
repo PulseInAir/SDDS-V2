@@ -55,7 +55,8 @@ html {
 
 body {
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: #070B14;
   background-image: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 45%),
     radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 45%),
