@@ -4,13 +4,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: INVOICE-RESTORE-01
+- Active task: INVOICE-REVAMP-02
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `5f635ae0d2081069fee08eb67002aa7b006d47eb`
+- HEAD: `d59757258ac3b8f14c236181c94655897648fa32`
 
-## Invoice Generation Section Restoration (2026-07-10)
+## Invoice Module Revamp (2026-07-10)
+
+**Status: DONE — Removed Charges Register, moved Invoice register to top, fixed ITR Form column to fetch from filing_cases.return_category, summary tiles show dynamic auto-generated figures.**
+
+### Changes completed:
+1. **InvoicesManager.tsx**: Removed `ChargesTable` import and rendering, removed `charges` prop. Reordered to show `InvoicePageContent` first, then `InvoiceCreateForm`.
+2. **InvoicePageContent.tsx**: Moved Invoice register table to top. Fixed ITR Form column to use `filing_cases.return_category` instead of `filing_records[0].filing_kind`. Summary tiles already show dynamic figures from `data.summary.*`.
+3. **Page Files**: Removed `getChargesRegisterData` calls and `charges` prop from both `/invoices` and `/clients/[clientId]/invoices` pages.
+4. **invoices.ts**: Added `return_category` to `InvoiceJoinedRow` type and `fetchInvoices` select statement.
+
+### Invoice Generation Section Restoration (2026-07-10)
 
 **Status: DONE — Restored Invoice Create Form, Charges Register Table, and Invoices & Revenue header section with filters and summary cards.**
 

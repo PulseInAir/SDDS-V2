@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
 import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
 import { InvoicePageContent } from "@/components/invoices/InvoicePageContent";
-import { ChargesTable } from "@/components/charges/ChargesTable";
 
 type InvoicesModuleData = Awaited<ReturnType<typeof getInvoicesModuleData>>;
 
@@ -22,13 +21,11 @@ type AssessmentYearOption = {
 
 export function InvoicesManager({
   data,
-  charges = [],
   basePath,
   showClientFilter,
   defaultClientId,
 }: {
   data: InvoicesModuleData;
-  charges?: any[];
   basePath: string;
   showClientFilter: boolean;
   defaultClientId?: string;
@@ -49,6 +46,12 @@ export function InvoicesManager({
 
   return (
     <div className="space-y-6">
+      <InvoicePageContent
+        data={data}
+        basePath={basePath}
+        showClientFilter={showClientFilter}
+        onEditInvoice={handleEditInvoice}
+      />
       <InvoiceCreateForm
         key={editingInvoice?.id || "create"}
         clients={clients}
@@ -58,13 +61,6 @@ export function InvoicesManager({
         editingInvoice={editingInvoice || undefined}
         onCancelEdit={handleCancelEdit}
         revalidateTarget={basePath}
-      />
-      <ChargesTable chargesData={charges} />
-      <InvoicePageContent
-        data={data}
-        basePath={basePath}
-        showClientFilter={showClientFilter}
-        onEditInvoice={handleEditInvoice}
       />
     </div>
   );

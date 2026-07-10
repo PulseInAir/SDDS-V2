@@ -42,12 +42,12 @@ type InvoiceJoinedRow = InvoiceRow & {
     | Array<Pick<Tables<"assessment_years">, "id" | "label" | "is_current">>
     | null;
   filing_cases:
-    | (Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date"> & {
+    | (Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date" | "return_category"> & {
         filing_records?: Array<{ id: string; acknowledgement_number: string | null; filing_kind: string }> | null;
         refunds?: Array<{ id: string; received_amount: number | null; status: string }> | null;
       })
     | Array<
-        Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date"> & {
+        Pick<Tables<"filing_cases">, "id" | "case_status" | "next_action" | "due_date" | "return_category"> & {
           filing_records?: Array<{ id: string; acknowledgement_number: string | null; filing_kind: string }> | null;
           refunds?: Array<{ id: string; received_amount: number | null; status: string }> | null;
         }
@@ -150,6 +150,7 @@ async function fetchInvoices(workspaceId: string, filters: InvoiceFilters) {
         case_status,
         next_action,
         due_date,
+        return_category,
         filing_records (id, acknowledgement_number, filing_kind),
         refunds (id, received_amount, status)
       ),
