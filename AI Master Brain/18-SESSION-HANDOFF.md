@@ -4,23 +4,21 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: None
+- Active task: `CLIENT-JOURNEY-01`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
 - HEAD: `551da83`
 
-## Remove Filing Queue Sidebar and Replace Dashboard Tile (2026-07-10)
+## Client Journey & Dashboard Optimization (2026-07-10)
 
-**Status: DONE — Removed Filing Queue from sidebar and replaced its dashboard linking.**
+**Status: DONE — Re-upload functionality, hero section replacement, and dashboard metrics upgrade.**
 
 ### Changes completed:
-1. **navigation.ts**: Removed the `Filing Queue` entry from the `primaryNavigation` array to remove it from the sidebar.
-2. **contracts.ts**: Updated all `getDashboardWorkflowDistribution` and metric definitions that linked to `/filing-queue` to link to `/clients` instead, leveraging the existing client page filter cards.
-3. **OperationalDashboard.tsx**: Replaced the "Filing Queue" stat tile in the Filing Reactor Core with a new "Action Required" tile pulling from the `attention_cases` metric.
+1. **UploadITRVStep.tsx**: Added re-upload functionality to the Client Guided Journey.
+2. **OperationalDashboard.tsx**: Removed the "Critical Missions" hero section and replaced it with an Executive Summary displaying 3 key top-level metrics.
+3. **Command Center Metrics**: Upgraded to 8 tiles mapped to the 8 standard Journey Steps, with secure links to filtered client lists.
 4. **Verification**: `npm run build` compiled successfully without errors.
-
-## Dashboard & Journey Scroll and Data Fix (2026-07-10)
 
 **Status: DONE — Fixed Dashboard/Journey scroll and restored missing dashboard data sections.**
 

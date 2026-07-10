@@ -17,6 +17,8 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const [isReuploading, setIsReuploading] = useState(false);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -46,20 +48,23 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
         </p>
       </div>
 
-      {existingItrvDoc ? (
+      {existingItrvDoc && !isReuploading ? (
         <div className="p-4 rounded-[var(--radius-panel)] border border-emerald-500/30 bg-emerald-950/20 max-w-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-950/60 border border-emerald-500 flex items-center justify-center text-emerald-400">
               <FileText className="h-5 w-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wide">ITR-V Uploaded</p>
+              <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wide">Document Uploaded</p>
               <p className="text-sm text-text-primary font-medium truncate mt-0.5">{existingItrvDoc.original_filename}</p>
             </div>
             <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
           </div>
           
-          <div className="mt-3 flex justify-end">
+          <div className="mt-4 flex justify-end gap-3">
+            <Button size="sm" variant="ghost" className="text-text-muted hover:text-white" onClick={() => setIsReuploading(true)}>
+              Re-upload ITR-V
+            </Button>
             <Button size="sm" variant="secondary" onClick={onComplete}>
               Continue to Charges
             </Button>

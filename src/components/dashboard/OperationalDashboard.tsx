@@ -114,13 +114,15 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50rem] h-[50rem] bg-emerald-600/5 rounded-full blur-[150px] animate-[pulse_15s_ease-in-out_infinite_alternate]" />
       </div>
 
-      {/* ───── LEVEL 1: HERO / PRIMARY MISSION ───── */}
-      <section className="relative z-10 flex flex-col items-center justify-center px-6 pt-8 pb-16">
+
+
+      {/* ───── LEVEL 1: EXECUTIVE SUMMARY ───── */}
+      <section className="relative z-10 px-6 pt-8 pb-8">
         <motion.div
           initial="hidden"
           animate="visible"
-          variants={sectionVariants}
-          className="text-center w-full max-w-4xl"
+          variants={staggerContainer}
+          className="w-full max-w-6xl mx-auto"
         >
           <div className="flex items-center justify-center gap-3 mb-8">
             <span className="text-[10px] font-bold font-mono tracking-[0.3em] uppercase px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60">
@@ -131,44 +133,35 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
             </span>
           </div>
 
-          {hasUrgent ? (
-            <div className="space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 mb-4 relative">
-                <div className="absolute inset-0 rounded-full border border-red-500/50 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" />
-                <Target className="w-8 h-8 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-              </div>
-              <h1 className="text-5xl md:text-7xl font-light text-white leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                <span className="text-red-400 font-bold">{totalUrgent}</span> Critical Missions <br /> Await Your Command
-              </h1>
-              <p className="text-sm font-mono text-white/50 tracking-widest uppercase mt-6 max-w-lg mx-auto leading-relaxed">
-                Notice responses and blocked filings are jeopardizing the perimeter. Immediate action required.
-              </p>
-              <div className="pt-8 flex justify-center gap-4 flex-wrap">
-                <Link href="/filing-queue?scope=attention">
-                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-red-500 text-white rounded-full font-mono text-xs uppercase tracking-widest hover:bg-red-600 transition-colors shadow-[0_0_20px_rgba(239,68,68,0.3)]">
-                    Engage Cases ({data.urgentCases.length})
-                  </motion.button>
-                </Link>
-                <Link href="/notices?attentionOnly=true&unresolvedOnly=true">
-                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-transparent border border-red-500/30 text-red-400 rounded-full font-mono text-xs uppercase tracking-widest hover:bg-red-500/10 transition-colors">
-                    Handle Notices ({data.noticeAttention.length})
-                  </motion.button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-4 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                <ShieldAlert className="w-8 h-8 text-emerald-400" />
-              </div>
-              <h1 className="text-6xl md:text-8xl font-light text-white leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                System <span className="text-emerald-400">Nominal</span>
-              </h1>
-              <p className="text-sm font-mono text-white/50 tracking-widest uppercase mt-6 max-w-lg mx-auto leading-relaxed">
-                The perimeter is secure. No urgent cases or notices detected in the active assessment year.
-              </p>
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {[
+              { id: "active_clients", icon: Users, color: "text-blue-400", borderColor: "border-blue-500/30", bgColor: "bg-blue-500/10", title: "Active Cases" },
+              { id: "filed", icon: CheckCircle2, color: "text-emerald-400", borderColor: "border-emerald-500/30", bgColor: "bg-emerald-500/10", title: "Successfully Filed" },
+              { id: "attention_cases", icon: AlertTriangle, color: "text-red-400", borderColor: "border-red-500/30", bgColor: "bg-red-500/10", title: "Action Required" },
+            ].map((item) => {
+              const metric = metricMap.get(item.id as any);
+              if (!metric) return null;
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.id} variants={cardVariants}>
+                  <Link href={metric.destination} className="block">
+                    <div className={`relative overflow-hidden rounded-3xl border ${item.borderColor} ${item.bgColor} p-8 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 group`}>
+                      <div className="flex items-start justify-between mb-6">
+                        <div className={`p-3 rounded-xl border ${item.borderColor} bg-black/20 backdrop-blur-md`}>
+                          <Icon className={`w-6 h-6 ${item.color}`} />
+                        </div>
+                        <ArrowUpRight className="w-5 h-5 text-white/20 group-hover:text-white/60 transition-colors" />
+                      </div>
+                      <p className={`text-5xl md:text-6xl font-light tabular-nums ${item.color}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                        {metric.value}
+                      </p>
+                      <p className="text-xs font-mono tracking-[0.2em] uppercase text-white/50 mt-3">{item.title}</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
         </motion.div>
       </section>
 
@@ -186,13 +179,16 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
             <h3 className="text-3xl md:text-4xl font-light text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Command Center Metrics</h3>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
             {[
-              { id: "active_clients", icon: Users, color: "text-blue-400", borderColor: "border-blue-500/20", bgColor: "bg-blue-500/5" },
               { id: "new_yet_to_start", icon: Clock3, color: "text-amber-400", borderColor: "border-amber-500/20", bgColor: "bg-amber-500/5" },
               { id: "filed", icon: CheckCircle2, color: "text-emerald-400", borderColor: "border-emerald-500/20", bgColor: "bg-emerald-500/5" },
-              { id: "attention_cases", icon: AlertTriangle, color: "text-red-400", borderColor: "border-red-500/20", bgColor: "bg-red-500/5" },
-              { id: "follow_ups_due", icon: CalendarCheck, color: "text-purple-400", borderColor: "border-purple-500/20", bgColor: "bg-purple-500/5" },
+              { id: "billed", icon: IndianRupee, color: "text-blue-400", borderColor: "border-blue-500/20", bgColor: "bg-blue-500/5" },
+              { id: "refunds_pending", icon: RefreshCcw, color: "text-purple-400", borderColor: "border-purple-500/20", bgColor: "bg-purple-500/5" },
+              { id: "outstanding", icon: AlertTriangle, color: "text-red-400", borderColor: "border-red-500/20", bgColor: "bg-red-500/5" },
+              { id: "received", icon: CheckCircle2, color: "text-emerald-400", borderColor: "border-emerald-500/20", bgColor: "bg-emerald-500/5" },
+              { id: "overdue", icon: AlertTriangle, color: "text-red-500", borderColor: "border-red-500/20", bgColor: "bg-red-500/5" },
+              { id: "follow_ups_due", icon: CalendarCheck, color: "text-amber-400", borderColor: "border-amber-500/20", bgColor: "bg-amber-500/5" },
             ].map((item) => {
               const metric = metricMap.get(item.id as any);
               if (!metric) return null;
