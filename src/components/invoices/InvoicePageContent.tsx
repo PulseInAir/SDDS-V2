@@ -1,10 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, Receipt, Edit } from "lucide-react";
 
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
-import { buildInvoiceQueryHref, formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
+import { formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyValue } from "@/components/ui/MoneyValue";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -22,133 +23,59 @@ export function InvoicePageContent({
   showClientFilter: boolean;
   onEditInvoice: (invoice: InvoicesModuleData["paginatedInvoices"][number]) => void;
 }) {
-  const activeFilters = data.filters;
+  // Compute row-level values and totals dynamically
+  const { rowData, totals } = useMemo(() => {
+    const rows = data.paginatedInvoices.map((invoice) => {
+      const filingCase = invoice.filing_cases;
+      const filingRecord = filingCase?.filing_records?.[0];
+      const itrFormType = filingRecord?.filing_kind || "—";
+      const refundReceived = filingCase?.refunds?.[0]?.received_amount ?? 0;
+
+      const filingItem = invoice.invoice_items?.find((item) =>
+        item.description.toLowerCase().includes("filing")
+      );
+      const filingCharges = filingItem
+        ? Number(filingItem.unit_amount ?? 0) * Number(filingItem.quantity ?? 1)
+        : 0;
+
+      const refundItem = invoice.invoice_items?.find((item) =>
+        item.description.toLowerCase().includes("refund claim") ||
+        item.description.toLowerCase().includes("refund")
+      );
+      const refundClaimCharges = refundItem
+        ? Number(refundItem.unit_amount ?? 0) * Number(refundItem.quantity ?? 1)
+        : 0;
+
+      const totalInvoiceValue = Number(invoice.total_amount ?? 0);
+
+      return {
+        invoice,
+        itrFormType,
+        refundReceived,
+        filingCharges,
+        refundClaimCharges,
+        totalInvoiceValue,
+      };
+    });
+
+    const totalRefundReceived = rows.reduce((sum, r) => sum + r.refundReceived, 0);
+    const totalFilingCharges = rows.reduce((sum, r) => sum + r.filingCharges, 0);
+    const totalRefundClaimCharges = rows.reduce((sum, r) => sum + r.refundClaimCharges, 0);
+    const totalInvoiceValue = rows.reduce((sum, r) => sum + r.totalInvoiceValue, 0);
+
+    return {
+      rowData: rows,
+      totals: {
+        refundReceived: Number(totalRefundReceived.toFixed(2)),
+        filingCharges: Number(totalFilingCharges.toFixed(2)),
+        refundClaimCharges: Number(totalRefundClaimCharges.toFixed(2)),
+        totalInvoiceValue: Number(totalInvoiceValue.toFixed(2)),
+      },
+    };
+  }, [data.paginatedInvoices]);
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 sm:p-5 shadow-sm">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Invoices & Revenue</h1>
-            <p className="mt-1 text-sm text-text-muted">
-              Track billed, received, outstanding, and overdue values from the same invoice and payment records.
-            </p>
-          </div>
-          <Link href={basePath} className="text-sm font-medium text-brand-700 hover:text-brand-800">
-            Reset filters
-          </Link>
-        </div>
-
-        <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          <label className="space-y-1 text-sm text-text-secondary xl:col-span-2">
-            <span className="font-medium text-text-primary">Search</span>
-            <input
-              type="text"
-              name="search"
-              defaultValue={activeFilters.search ?? ""}
-              placeholder="Client, PAN, or invoice number"
-              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-            />
-          </label>
-
-          {showClientFilter ? (
-            <label className="space-y-1 text-sm text-text-secondary">
-              <span className="font-medium text-text-primary">Client</span>
-              <select
-                name="clientId"
-                defaultValue={activeFilters.clientId ?? ""}
-                className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-              >
-                <option value="">All clients</option>
-                {data.clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.full_name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
-
-          <label className="space-y-1 text-sm text-text-secondary">
-            <span className="font-medium text-text-primary">Assessment year</span>
-            <select
-              name="assessmentYearId"
-              defaultValue={activeFilters.assessmentYearId ?? ""}
-              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-            >
-              <option value="">All years</option>
-              {data.assessmentYears.map((assessmentYear) => (
-                <option key={assessmentYear.id} value={assessmentYear.id}>
-                  {assessmentYear.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm text-text-secondary">
-            <span className="font-medium text-text-primary">Status</span>
-            <select
-              name="status"
-              defaultValue={activeFilters.status ?? ""}
-              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
-            >
-              <option value="">All statuses</option>
-              <option value="draft">Draft</option>
-              <option value="issued">Issued</option>
-              <option value="partially_paid">Partially Paid</option>
-              <option value="paid">Paid</option>
-              <option value="overdue">Overdue</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </label>
-
-          <label className="flex items-end gap-2 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted px-3 py-2 text-sm text-text-secondary">
-            <input type="checkbox" name="overdueOnly" value="true" defaultChecked={activeFilters.overdueOnly === true} className="h-4 w-4 rounded border-border-subtle text-brand-600 focus:ring-brand-600" />
-            <span>Only overdue</span>
-          </label>
-
-          <div className="flex items-end">
-            <button
-              type="submit"
-              className="inline-flex h-10 w-full items-center justify-center rounded-[var(--radius-input)] bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700"
-            >
-              Apply filters
-            </button>
-          </div>
-        </form>
-
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-            <p className="text-xs uppercase tracking-wide text-text-muted">Billed</p>
-            <p className="mt-2 text-2xl font-semibold text-text-primary">
-              <MoneyValue value={data.summary.billedAmount} />
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">Issued invoice totals only.</p>
-          </div>
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-            <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
-            <p className="mt-2 text-2xl font-semibold text-text-primary">
-              <MoneyValue value={data.summary.receivedAmount} />
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">Valid non-reversed payments.</p>
-          </div>
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-            <p className="text-xs uppercase tracking-wide text-text-muted">Outstanding</p>
-            <p className="mt-2 text-2xl font-semibold text-text-primary">
-              <MoneyValue value={data.summary.outstandingAmount} />
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">{data.summary.partialCount} invoices are partially paid.</p>
-          </div>
-          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
-            <p className="text-xs uppercase tracking-wide text-text-muted">Overdue</p>
-            <p className="mt-2 text-2xl font-semibold text-text-primary">
-              <MoneyValue value={data.summary.overdueAmount} />
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">{data.summary.overdueCount} invoices need follow-up.</p>
-          </div>
-        </div>
-      </section>
-
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
         <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
           <div>
@@ -173,7 +100,7 @@ export function InvoicePageContent({
                 <tr className="border-b border-border-subtle bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                   <th scope="col" className="px-4 py-3 text-center w-16">Sl. No.</th>
                   <th scope="col" className="px-4 py-3">Client name</th>
-                  <th scope="col" className="px-4 py-3 w-36">ITR Number</th>
+                  <th scope="col" className="px-4 py-3 w-28">ITR Form</th>
                   <th scope="col" className="px-4 py-3 text-right w-36">Refund Received</th>
                   <th scope="col" className="px-4 py-3 text-right w-36">ITR Filing Charges</th>
                   <th scope="col" className="px-4 py-3 text-right w-36">ITR Refund Claim Charges</th>
@@ -183,35 +110,12 @@ export function InvoicePageContent({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
-                {data.paginatedInvoices.map((invoice, index) => {
+                {rowData.map((row, index) => {
+                  const { invoice, itrFormType, refundReceived, filingCharges, refundClaimCharges, totalInvoiceValue } = row;
                   const slNo = (data.page - 1) * data.pageSize + index + 1;
                   const rowBg = invoice.derivedStatus === "overdue"
                     ? "bg-red-50/20 hover:bg-red-50/30"
                     : "hover:bg-surface-hover";
-
-                  // Extract filing case and records
-                  const filingCase = invoice.filing_cases;
-                  const itrNumber = filingCase?.filing_records?.[0]?.acknowledgement_number || "—";
-
-                  // Extract received refund amount from matching refunds
-                  const refundReceived = filingCase?.refunds?.[0]?.received_amount ?? 0;
-
-                  // Extract ITR Filing Charges line item
-                  const filingItem = invoice.invoice_items?.find((item) =>
-                    item.description.toLowerCase().includes("filing")
-                  );
-                  const filingCharges = filingItem
-                    ? Number(filingItem.unit_amount ?? 0) * Number(filingItem.quantity ?? 1)
-                    : 0;
-
-                  // Extract ITR Refund Claim Charges line item
-                  const refundItem = invoice.invoice_items?.find((item) =>
-                    item.description.toLowerCase().includes("refund claim") ||
-                    item.description.toLowerCase().includes("refund")
-                  );
-                  const refundClaimCharges = refundItem
-                    ? Number(refundItem.unit_amount ?? 0) * Number(refundItem.quantity ?? 1)
-                    : 0;
 
                   return (
                     <tr key={invoice.id} className={`${rowBg} transition-colors`}>
@@ -220,11 +124,15 @@ export function InvoicePageContent({
                         <div>
                           <p className="font-semibold text-text-primary">{invoice.clients?.full_name ?? "Unknown client"}</p>
                           <p className="text-xs text-text-muted">
-                            {invoice.invoice_number} • {invoice.assessment_years?.label ? `AY ${invoice.assessment_years.label}` : "No AY"}
+                            {invoice.assessment_years?.label ? `AY ${invoice.assessment_years.label}` : "No AY"}
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs">{itrNumber}</td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center rounded-md bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-200">
+                          {itrFormType}
+                        </span>
+                      </td>
                       <td className="px-4 py-3 text-right font-mono tabular-nums">
                         <MoneyValue value={refundReceived} />
                       </td>
@@ -235,7 +143,7 @@ export function InvoicePageContent({
                         <MoneyValue value={refundClaimCharges} />
                       </td>
                       <td className="px-4 py-3 text-right font-mono tabular-nums font-semibold">
-                        <MoneyValue value={Number(invoice.total_amount ?? 0)} />
+                        <MoneyValue value={totalInvoiceValue} />
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge variant={getInvoiceStatusVariant(invoice.derivedStatus)}>
@@ -275,6 +183,26 @@ export function InvoicePageContent({
                   );
                 })}
               </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-border-subtle bg-surface-muted font-semibold text-text-primary">
+                  <td className="px-4 py-3 text-center" colSpan={3}>
+                    TOTAL
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">
+                    <MoneyValue value={totals.refundReceived} />
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">
+                    <MoneyValue value={totals.filingCharges} />
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">
+                    <MoneyValue value={totals.refundClaimCharges} />
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">
+                    <MoneyValue value={totals.totalInvoiceValue} />
+                  </td>
+                  <td className="px-4 py-3" colSpan={2}></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         )}
@@ -297,14 +225,7 @@ export function InvoicePageContent({
             </span>
             <div className="flex gap-2">
               <Link
-                href={buildInvoiceQueryHref(basePath, {
-                  search: activeFilters.search,
-                  clientId: activeFilters.clientId,
-                  assessmentYearId: activeFilters.assessmentYearId,
-                  status: activeFilters.status,
-                  overdueOnly: activeFilters.overdueOnly ? "true" : undefined,
-                  page: data.page > 1 ? String(data.page - 1) : undefined,
-                })}
+                href={`${basePath}?page=${data.page > 1 ? data.page - 1 : 1}`}
                 aria-disabled={data.page <= 1}
                 className={`rounded-[var(--radius-input)] border px-3 py-1.5 ${
                   data.page <= 1
@@ -315,14 +236,7 @@ export function InvoicePageContent({
                 Previous
               </Link>
               <Link
-                href={buildInvoiceQueryHref(basePath, {
-                  search: activeFilters.search,
-                  clientId: activeFilters.clientId,
-                  assessmentYearId: activeFilters.assessmentYearId,
-                  status: activeFilters.status,
-                  overdueOnly: activeFilters.overdueOnly ? "true" : undefined,
-                  page: data.page < data.totalPages ? String(data.page + 1) : undefined,
-                })}
+                href={`${basePath}?page=${data.page < data.totalPages ? data.page + 1 : data.totalPages}`}
                 aria-disabled={data.page >= data.totalPages}
                 className={`rounded-[var(--radius-input)] border px-3 py-1.5 ${
                   data.page >= data.totalPages
