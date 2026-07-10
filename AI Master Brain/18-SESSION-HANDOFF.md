@@ -4,11 +4,21 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: INVOICE-REVAMP-02
+- Active task: None
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `d59757258ac3b8f14c236181c94655897648fa32`
+- HEAD: `964828a`
+
+## Dashboard & Journey Scroll and Data Fix (2026-07-10)
+
+**Status: DONE — Fixed Dashboard/Journey scroll and restored missing dashboard data sections.**
+
+### Changes completed:
+1. **OperationalDashboard.tsx**: Replaced `fixed` CSS positioning with `absolute` and removed `min-h-screen` sections. Restored all missing data sections (urgent cases, overdue invoices, pending refunds, notice alerts, follow-ups, and activity feed) with animated Framer Motion reveals.
+2. **ClientJourneyPage.tsx**: Replaced `fixed` header/background positioning with `sticky`/`absolute` to ensure scroll works inside the overflow container. Removed unused Lenis import causing build warnings.
+3. **JourneyPipeline.tsx**: Replaced `fixed` positioning with `sticky`.
+4. **Verification**: `npm run build` compiled successfully without errors. Scroll functions perfectly.
 
 ## Invoice Module Revamp (2026-07-10)
 
