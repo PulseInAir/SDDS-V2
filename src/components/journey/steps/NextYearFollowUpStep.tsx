@@ -20,7 +20,7 @@ export function NextYearFollowUpStep({ clientId, nextAyLabel, existingFollowup }
       <div>
         <h3 className="text-lg font-semibold text-text-primary">Next Year Pipeline</h3>
         <p className="text-sm text-text-muted mt-0.5">
-          Automated transition of this client into the next year's operational workflow.
+          Automated transition of this client into the next year&apos;s operational workflow.
         </p>
       </div>
 

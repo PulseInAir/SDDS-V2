@@ -52,7 +52,7 @@ export function CreateCaseStep({ clientId, selectedAyId, assessmentYears, onComp
       <div>
         <h3 className="text-lg font-semibold text-text-primary">Record Filing Case</h3>
         <p className="text-sm text-text-muted mt-0.5">
-          Initialize this year's case and record the return filing acknowledgement details.
+          Initialize this year&apos;s case and record the return filing acknowledgement details.
         </p>
       </div>
 

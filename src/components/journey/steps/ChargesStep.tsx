@@ -50,21 +50,6 @@ export function ChargesStep({
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // Recalculate default charges when ITR form or refund amount changes in EDIT mode
-  useEffect(() => {
-    if (isEditing) {
-      const defaultFee = rateCard[itrForm] ?? rateCard["ITR-V"] ?? 500;
-      setItrFilingCharges(defaultFee);
-    }
-  }, [itrForm, isEditing, rateCard]);
-
-  useEffect(() => {
-    if (isEditing) {
-      const defaultRefundFee = Math.round((refundClaimedAmount * refundChargePercentage) / 100);
-      setRefundClaimCharges(defaultRefundFee);
-    }
-  }, [refundClaimedAmount, isEditing, refundChargePercentage]);
-
   const totalCharges = Number(itrFilingCharges) + Number(refundClaimCharges);
 
   async function handleConfirm() {
@@ -108,7 +93,12 @@ export function ChargesStep({
             <span className="font-semibold text-text-primary">ITR Form type</span>
             <select
               value={itrForm}
-              onChange={(e) => setItrForm(e.target.value)}
+              onChange={(e) => {
+                const newForm = e.target.value;
+                setItrForm(newForm);
+                const defaultFee = rateCard[newForm] ?? rateCard["ITR-V"] ?? 500;
+                setItrFilingCharges(defaultFee);
+              }}
               className="h-10 rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel px-3 text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
             >
               {["ITR-1", "ITR-2", "ITR-3", "ITR-4", "ITR-5", "ITR-6", "ITR-7", "ITR-V"].map((form) => (
@@ -132,7 +122,12 @@ export function ChargesStep({
             <input
               type="number"
               value={refundClaimedAmount}
-              onChange={(e) => setRefundClaimedAmount(Math.max(0, parseInt(e.target.value) || 0))}
+              onChange={(e) => {
+                const newAmount = Math.max(0, parseInt(e.target.value) || 0);
+                setRefundClaimedAmount(newAmount);
+                const defaultRefundFee = Math.round((newAmount * refundChargePercentage) / 100);
+                setRefundClaimCharges(defaultRefundFee);
+              }}
               className="h-10 rounded-[var(--radius-input)] border border-border-subtle bg-surface-panel px-3 text-sm text-text-primary outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
             />
           </label>

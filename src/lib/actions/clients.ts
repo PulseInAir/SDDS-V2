@@ -121,7 +121,7 @@ export async function getClients(params: {
     `)
     .is('archived_at', null)
 
-  let metrics = {
+  const metrics = {
     total: 0,
     active: 0,
     inactive: 0,
