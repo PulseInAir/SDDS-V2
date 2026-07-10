@@ -79,7 +79,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | INVOICE-REVAMP-02 | DONE | Remove Charges Register, move Invoice register to top, fetch ITR Form from return_category | INVOICE-RESTORE-01 | ChargesTable removed, Invoice register at top, ITR Form column shows filing_cases.return_category, summary tiles show dynamic figures, build passes | `d59757258ac3b8f14c236181c94655897648fa32` |
 | DASHBOARD-FIX-01 | DONE | Fix Dashboard/Journey scroll and restore missing dashboard data sections | INVOICE-REVAMP-02 | Scroll works without breaking UI layout, missing dashboard sections restored, build passes | `8654081` |
 | DASHBOARD-FIX-02 | DONE | Remove Filing Queue from sidebar and replace dashboard tile | DASHBOARD-FIX-01 | Filing Queue sidebar removed, dashboard destinations replaced with /clients, Action Required tile replaces Filing Queue | `551da83` |
-| CLIENT-JOURNEY-01 | DONE | Update ITR Upload Step Re-upload option and dashboard critical missions hero removal | DASHBOARD-FIX-02 | Re-upload button added to ITR Upload step. Critical Missions hero removed and replaced with Executive Summary. Command Center mapped to 8 journey steps. Build passes. | Pending |
+| CLIENT-JOURNEY-01 | DONE | Update ITR Upload Step Re-upload option and dashboard critical missions hero removal | DASHBOARD-FIX-02 | Re-upload button added to ITR Upload step. Critical Missions hero removed and replaced with Executive Summary. Command Center mapped to 8 journey steps. Build passes. | `8728937` |
 ## Task update protocol
 
 When starting:
