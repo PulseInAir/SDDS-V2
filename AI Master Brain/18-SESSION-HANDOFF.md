@@ -4,11 +4,22 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `CLIENT-JOURNEY-01`
+- Active task: `CLIENT-JOURNEY-02`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `551da83`
+- HEAD: `3c61584`
+
+## Client Journey Redesign (2026-07-10)
+
+**Status: DONE — Redesign client detail page to a 5-step unified guided journey.**
+
+### Changes completed:
+1. **Layout**: Stripped `ClientProfileHeader` and `Tabs` from `layout.tsx`.
+2. **Journey Component**: Rewrote `ClientJourneyPage.tsx` with a new 5-step model.
+3. **Step Header**: Added `JourneyStepHeader.tsx` to display steps as glassmorphic pills.
+4. **Data Fetching**: Updated `page.tsx` to pass client identity and credentials props.
+5. **Verification**: `npm run build` compiled successfully without errors.
 
 ## Client Journey & Dashboard Optimization (2026-07-10)
 

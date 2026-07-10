@@ -80,6 +80,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DASHBOARD-FIX-01 | DONE | Fix Dashboard/Journey scroll and restore missing dashboard data sections | INVOICE-REVAMP-02 | Scroll works without breaking UI layout, missing dashboard sections restored, build passes | `8654081` |
 | DASHBOARD-FIX-02 | DONE | Remove Filing Queue from sidebar and replace dashboard tile | DASHBOARD-FIX-01 | Filing Queue sidebar removed, dashboard destinations replaced with /clients, Action Required tile replaces Filing Queue | `551da83` |
 | CLIENT-JOURNEY-01 | DONE | Update ITR Upload Step Re-upload option and dashboard critical missions hero removal | DASHBOARD-FIX-02 | Re-upload button added to ITR Upload step. Critical Missions hero removed and replaced with Executive Summary. Command Center mapped to 8 journey steps. Build passes. | `8728937` |
+| CLIENT-JOURNEY-02 | DONE | Redesign client detail page to 5-step unified guided journey | CLIENT-JOURNEY-01 | Strip 10-tab layout, implement new 5-step model with horizontal step header, subsume identity/credentials into Step 1, countdown timer in Step 5. Build passes. | `3c61584` |
 ## Task update protocol
 
 When starting:
