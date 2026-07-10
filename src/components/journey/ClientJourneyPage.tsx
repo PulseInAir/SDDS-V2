@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { JourneyPipeline } from "./JourneyPipeline";
 import { JourneyStepHeader } from "./JourneyStepHeader";
-import { CreateCaseStep } from "./steps/CreateCaseStep";
+import { ClientStatusStep } from "./steps/ClientStatusStep";
 import { UploadITRVStep } from "./steps/UploadITRVStep";
 import { ChargesStep } from "./steps/ChargesStep";
 import { RefundTrackingStep } from "./steps/RefundTrackingStep";
@@ -15,6 +15,7 @@ import { NextYearFollowUpStep } from "./steps/NextYearFollowUpStep";
 import { ClientForm } from "@/components/clients/ClientForm";
 import { CredentialsManager } from "@/components/clients/CredentialsManager";
 import { getClientJourneyState } from "@/lib/actions/journey";
+import { createFilingCaseAction } from "@/lib/actions/cases";
 import { motion, AnimatePresence } from "framer-motion";
 
 
@@ -156,6 +157,18 @@ export function ClientJourneyPage({
   // Section collapse states for Step 1
   const [showIdentity, setShowIdentity] = useState(true);
   const [showCredentials, setShowCredentials] = useState(false);
+  const [isCreatingCase, setIsCreatingCase] = useState(false);
+
+  const handleCreateCase = async () => {
+    setIsCreatingCase(true);
+    const res = await createFilingCaseAction(clientId, selectedAyId);
+    setIsCreatingCase(false);
+    if (res.success) {
+      handleRefresh(selectedAyId).then(() => goToStep("client_status"));
+    } else {
+      alert(res.error || "Failed to create case.");
+    }
+  };
 
 
 
@@ -517,14 +530,21 @@ export function ClientJourneyPage({
                             </div>
                           ) : (
                             <div className="w-full">
-                              <CreateCaseStep
-                                clientId={clientId}
-                                selectedAyId={selectedAyId}
-                                assessmentYears={ayOptions}
-                                onComplete={() => {
-                                  handleRefresh().then(() => goToStep("client_status"));
-                                }}
-                              />
+                              <div className="flex flex-col items-center justify-center p-8 rounded-xl border border-white/5 bg-white/[0.02]">
+                                <p className="text-white/60 text-sm mb-6 text-center max-w-sm">
+                                  No case exists for Assessment Year {ayOptions.find(o => o.id === selectedAyId)?.label}. Create one to start the filing process.
+                                </p>
+                                <motion.button
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={handleCreateCase}
+                                  disabled={isCreatingCase}
+                                  className="py-3 px-8 bg-amber-500 text-black font-semibold rounded-xl tracking-wide disabled:opacity-50 flex items-center gap-2"
+                                >
+                                  {isCreatingCase ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                                  Create Case
+                                </motion.button>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -568,12 +588,11 @@ export function ClientJourneyPage({
                         {/* Filing form if not yet filed */}
                         {!itrvStepData ? (
                           <div className="w-full max-w-xl mx-auto">
-                            <CreateCaseStep
+                            <ClientStatusStep
                               clientId={clientId}
                               selectedAyId={selectedAyId}
-                              assessmentYears={ayOptions}
                               onComplete={() => {
-                                handleRefresh().then(() => goToStep("invoice"));
+                                handleRefresh(selectedAyId).then(() => goToStep("invoice"));
                               }}
                             />
                           </div>

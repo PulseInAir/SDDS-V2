@@ -244,6 +244,88 @@ export async function createCaseAndFilingAction(data: {
 }
 
 /**
+ * Step 2 action: Save simple client status (ITR No, Filing Date, Refund Amount)
+ */
+export async function recordClientStatusAction(data: {
+  clientId: string;
+  assessmentYearId: string;
+  returnCategory: string;
+  filingDate: string;
+  refundAmount: number | null;
+}) {
+  try {
+    const session = await getAuthenticatedWorkspaceSession();
+    const supabase = await createSupabaseServerClient();
+
+    // 1. Get current filing case
+    let { data: filingCase } = await supabase
+      .from("filing_cases")
+      .select("id, case_status")
+      .eq("workspace_id", session.workspace.id)
+      .eq("client_id", data.clientId)
+      .eq("assessment_year_id", data.assessmentYearId)
+      .maybeSingle();
+
+    if (!filingCase) {
+      throw new Error("Case must be created before recording status.");
+    }
+
+    // 2. Update filing case with ITR No and Refund Amount
+    await supabase
+      .from("filing_cases")
+      .update({
+        return_category: data.returnCategory,
+        refund_claimed_amount: data.refundAmount,
+        case_status: "Filed",
+        next_action: "Upload ITR-V PDF to extract charges",
+      })
+      .eq("id", filingCase.id);
+
+    // 3. Upsert filing record to save filing date
+    const { data: existingRecords } = await supabase
+      .from("filing_records")
+      .select("id")
+      .eq("case_id", filingCase.id)
+      .limit(1);
+
+    if (existingRecords && existingRecords.length > 0) {
+      await supabase
+        .from("filing_records")
+        .update({
+          filing_date: data.filingDate,
+        })
+        .eq("id", existingRecords[0].id);
+    } else {
+      await supabase.from("filing_records").insert({
+        case_id: filingCase.id,
+        workspace_id: session.workspace.id,
+        filing_kind: "Original", // Defaulting as user doesn't want this field
+        filing_date: data.filingDate,
+        acknowledgement_number: "TBD", // Defaulting as user doesn't want this field
+        verification_status: "Pending",
+        processing_status: "Submitted",
+      });
+    }
+
+    // Update case history if transitioning to Filed
+    if (filingCase.case_status !== "Filed") {
+      await supabase.from("case_status_history").insert({
+        case_id: filingCase.id,
+        from_status: filingCase.case_status as CaseStatus,
+        to_status: "Filed" as CaseStatus,
+        reason: "Client filing status recorded.",
+        changed_by: session.user.id,
+      });
+    }
+
+    revalidatePath(`/clients/${data.clientId}/journey`);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to record status." };
+  }
+}
+
+/**
  * Step 3 action: Save the computed charges.
  */
 export async function saveCaseChargesAction(data: {
