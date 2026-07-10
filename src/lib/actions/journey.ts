@@ -251,7 +251,7 @@ export async function recordClientStatusAction(data: {
   assessmentYearId: string;
   status: string;
   returnCategory: string;
-  filingDate: string;
+  filingDate?: string | null;
   refundAmount: number | null;
   expectedCompletionDate?: string | null;
   dueDate?: string | null;
@@ -265,7 +265,7 @@ export async function recordClientStatusAction(data: {
     const supabase = await createSupabaseServerClient();
 
     // 1. Get current filing case
-    let { data: filingCase } = await supabase
+    const { data: filingCase } = await supabase
       .from("filing_cases")
       .select("id, case_status")
       .eq("workspace_id", session.workspace.id)
@@ -293,30 +293,32 @@ export async function recordClientStatusAction(data: {
       })
       .eq("id", filingCase.id);
 
-    // 3. Upsert filing record to save filing date
-    const { data: existingRecords } = await supabase
-      .from("filing_records")
-      .select("id")
-      .eq("case_id", filingCase.id)
-      .limit(1);
-
-    if (existingRecords && existingRecords.length > 0) {
-      await supabase
+    // 3. Upsert filing record ONLY if filing date is provided
+    if (data.filingDate) {
+      const { data: existingRecords } = await supabase
         .from("filing_records")
-        .update({
+        .select("id")
+        .eq("case_id", filingCase.id)
+        .limit(1);
+
+      if (existingRecords && existingRecords.length > 0) {
+        await supabase
+          .from("filing_records")
+          .update({
+            filing_date: data.filingDate,
+          })
+          .eq("id", existingRecords[0].id);
+      } else {
+        await supabase.from("filing_records").insert({
+          case_id: filingCase.id,
+          workspace_id: session.workspace.id,
+          filing_kind: "Original",
           filing_date: data.filingDate,
-        })
-        .eq("id", existingRecords[0].id);
-    } else {
-      await supabase.from("filing_records").insert({
-        case_id: filingCase.id,
-        workspace_id: session.workspace.id,
-        filing_kind: "Original", // Defaulting as user doesn't want this field
-        filing_date: data.filingDate,
-        acknowledgement_number: "TBD", // Defaulting as user doesn't want this field
-        verification_status: "Pending",
-        processing_status: "Submitted",
-      });
+          acknowledgement_number: "TBD",
+          verification_status: "Pending",
+          processing_status: "Submitted",
+        });
+      }
     }
 
     // Update case history if transitioning status

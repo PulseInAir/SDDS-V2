@@ -297,11 +297,11 @@ export function ClientJourneyPage({
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-light tracking-wide text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <div className="flex flex-col gap-1">
+                <h1 className="text-3xl font-light tracking-wide text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   {client.full_name}
                 </h1>
-                <span className="text-[10px] font-medium font-mono px-3 py-1 rounded-full bg-amber-950/30 text-amber-400 border border-amber-500/20 uppercase tracking-widest shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                <span className="text-xs font-medium font-mono px-3 py-1 rounded-full bg-amber-950/30 text-amber-400 border border-amber-500/20 uppercase tracking-widest shadow-[0_0_10px_rgba(245,158,11,0.1)] w-fit">
                   PAN: <MaskedValue value={client.pan_uppercase} isPrivacyMode={isPrivacyMode} />
                 </span>
               </div>
@@ -554,19 +554,19 @@ export function ClientJourneyPage({
                     {/* ════════════════════════════════════════════════════════════════
                         STEP 2 — CLIENT STATUS
                         Subsumes: Filings
-                        Shows: ITR No., Filing Date, Refund Amount only
+                        Status toggle: Filing Queue (stays) or Filed (shifts to Step 3)
                     ════════════════════════════════════════════════════════════════ */}
                     {selectedStepId === "client_status" && (
                       <div className="space-y-6">
                         <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
-                          Record the filing status for this assessment year. Select the current status and filing details.
+                          Select the filing status for this assessment year.
                         </p>
 
                         {/* Filing details display */}
                         {filingCase?.case_status === "Filed" && itrvStepData && (
                           <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] max-w-md mx-auto">
-                            <span className="text-[10px] font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Filing Details</span>
-                            <div className="space-y-3 text-sm">
+                            <span className="text-xs font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Filing Details</span>
+                            <div className="space-y-3 text-base">
                               <div className="flex justify-between items-center">
                                 <span className="text-white/40">ITR No.</span>
                                 <span className="font-semibold text-white/80 font-mono">{filingCase.return_category || "—"}</span>
