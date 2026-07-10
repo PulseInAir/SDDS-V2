@@ -83,6 +83,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-JOURNEY-02 | DONE | Redesign client detail page to 5-step unified guided journey | CLIENT-JOURNEY-01 | Strip 10-tab layout, implement new 5-step model with horizontal step header, subsume identity/credentials into Step 1, countdown timer in Step 5. Build passes. | `3c61584` |
 | DEPLOYMENT-FIX-01 | DONE | Resolve ESLint errors causing Vercel build failures | CLIENT-JOURNEY-02 | Fixed set-state-in-effect and unescaped entities, disabled no-explicit-any. Build and lint passes. | `22e7c56` |
 | DEPLOYMENT-FIX-02 | DONE | Remove missing lenis import causing Vercel build failure | DEPLOYMENT-FIX-01 | Removed unused Lenis import and initialization from ClientJourneyPage.tsx. | `3fc731b` |
+| CLIENT-JOURNEY-03 | DONE | Redesign Step 1 and 2 to match prompt spec | DEPLOYMENT-FIX-02 | Replaced Step 1 form with simple Create Case button. Replaced Step 2 form with basic ITR No., Filing Date, Refund Amount input. | `4bd0521` |
 ## Task update protocol
 
 When starting:

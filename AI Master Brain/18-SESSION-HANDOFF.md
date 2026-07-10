@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `DEPLOYMENT-FIX-02`
+- Active task: `CLIENT-JOURNEY-03`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `3fc731b`
+- HEAD: `4bd0521`
 
 ## Client Journey Redesign (2026-07-10)
 
