@@ -250,11 +250,27 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["New Client", "Filing Queue", "Filed"].map((status) => {
-              const group = data.workflowDistribution.find((g) => g.status === status);
-              const count = group?.count ?? 0;
-              const dest = group?.destination ?? `/filing-queue?status=${encodeURIComponent(status)}`;
-              const isCompleted = status === "Filed";
+            {[
+              { 
+                label: "New Client", 
+                count: data.workflowDistribution.find((g) => g.status === "New Client")?.count ?? 0, 
+                dest: data.workflowDistribution.find((g) => g.status === "New Client")?.destination ?? "/clients?status=New+Client",
+                isCompleted: false
+              },
+              { 
+                label: "Action Required", 
+                count: metricMap.get("attention_cases")?.value ?? 0, 
+                dest: metricMap.get("attention_cases")?.destination ?? "/clients?scope=attention",
+                isCompleted: false
+              },
+              { 
+                label: "Filed", 
+                count: data.workflowDistribution.find((g) => g.status === "Filed")?.count ?? 0, 
+                dest: data.workflowDistribution.find((g) => g.status === "Filed")?.destination ?? "/clients?status=Filed",
+                isCompleted: true
+              }
+            ].map((statItem) => {
+              const { label: status, count, dest, isCompleted } = statItem;
               const isActive = count > 0;
 
               return (

@@ -20,7 +20,6 @@ export type NavigationItem = {
 export const primaryNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Clients", href: "/clients", icon: Users },
-  { name: "Filing Queue", href: "/filing-queue", icon: Inbox },
   { name: "Documents", href: "/documents", icon: FileText },
   { name: "Invoices", href: "/invoices", icon: Receipt },
   { name: "Refunds", href: "/refunds", icon: IndianRupee },

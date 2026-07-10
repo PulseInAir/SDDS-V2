@@ -77,25 +77,25 @@ export const DASHBOARD_METRIC_DEFINITIONS: readonly DashboardMetricDefinition[] 
     id: "active_clients",
     label: "Active clients",
     description: "All active filing cases in the selected assessment year.",
-    destination: "/filing-queue",
+    destination: "/clients",
   },
   {
     id: "new_yet_to_start",
     label: "New / Yet to start",
     description: "Cases still at New Client.",
-    destination: "/filing-queue?status=New+Client",
+    destination: "/clients?status=New+Client",
   },
   {
     id: "filed",
     label: "Filed",
     description: "Cases successfully filed.",
-    destination: "/filing-queue?status=Filed",
+    destination: "/clients?status=Filed",
   },
   {
     id: "attention_cases",
     label: "Attention cases",
     description: "Blocked or overdue filing cases.",
-    destination: "/filing-queue?scope=attention",
+    destination: "/clients?scope=attention",
   },
   {
     id: "refunds_pending",
@@ -149,7 +149,7 @@ export function getDashboardWorkflowDistribution(cases: DashboardCaseSnapshot[])
   return CASE_STATUSES.map((status) => ({
     status,
     count: cases.filter((filingCase) => filingCase.case_status === status).length,
-    destination: `/filing-queue?status=${encodeURIComponent(status)}`,
+    destination: `/clients?status=${encodeURIComponent(status)}`,
   }));
 }
 

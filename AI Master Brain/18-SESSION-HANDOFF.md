@@ -8,7 +8,17 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `964828a`
+- HEAD: Pending
+
+## Remove Filing Queue Sidebar and Replace Dashboard Tile (2026-07-10)
+
+**Status: DONE — Removed Filing Queue from sidebar and replaced its dashboard linking.**
+
+### Changes completed:
+1. **navigation.ts**: Removed the `Filing Queue` entry from the `primaryNavigation` array to remove it from the sidebar.
+2. **contracts.ts**: Updated all `getDashboardWorkflowDistribution` and metric definitions that linked to `/filing-queue` to link to `/clients` instead, leveraging the existing client page filter cards.
+3. **OperationalDashboard.tsx**: Replaced the "Filing Queue" stat tile in the Filing Reactor Core with a new "Action Required" tile pulling from the `attention_cases` metric.
+4. **Verification**: `npm run build` compiled successfully without errors.
 
 ## Dashboard & Journey Scroll and Data Fix (2026-07-10)
 
