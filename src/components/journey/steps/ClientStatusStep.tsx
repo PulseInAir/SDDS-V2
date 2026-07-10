@@ -7,7 +7,10 @@ import { Loader2 } from "lucide-react";
 interface ClientStatusStepProps {
   clientId: string;
   selectedAyId: string;
-  filingCase?: Record<string, unknown>;
+  filingCase?: {
+    case_status?: string;
+    return_category?: string;
+  };
   onComplete: (status: string) => void;
 }
 
