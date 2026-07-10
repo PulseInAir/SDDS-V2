@@ -249,9 +249,16 @@ export async function createCaseAndFilingAction(data: {
 export async function recordClientStatusAction(data: {
   clientId: string;
   assessmentYearId: string;
+  status: string;
   returnCategory: string;
   filingDate: string;
   refundAmount: number | null;
+  expectedCompletionDate?: string | null;
+  dueDate?: string | null;
+  nextAction?: string | null;
+  blockerCode?: string | null;
+  blockerNote?: string | null;
+  followUpExcluded?: boolean;
 }) {
   try {
     const session = await getAuthenticatedWorkspaceSession();
@@ -270,14 +277,19 @@ export async function recordClientStatusAction(data: {
       throw new Error("Case must be created before recording status.");
     }
 
-    // 2. Update filing case with ITR No and Refund Amount
+    // 2. Update filing case with all details and selected status
     await supabase
       .from("filing_cases")
       .update({
+        case_status: data.status,
         return_category: data.returnCategory,
         refund_claimed_amount: data.refundAmount,
-        case_status: "Filed",
-        next_action: "Upload ITR-V PDF to extract charges",
+        expected_completion_date: data.expectedCompletionDate || null,
+        due_date: data.dueDate || null,
+        next_action: data.status === "Filed" ? "Upload ITR-V PDF to extract charges" : data.nextAction || null,
+        blocker_code: data.blockerCode || null,
+        blocker_note: data.blockerNote || null,
+        follow_up_excluded: data.followUpExcluded || false,
       })
       .eq("id", filingCase.id);
 
@@ -307,12 +319,12 @@ export async function recordClientStatusAction(data: {
       });
     }
 
-    // Update case history if transitioning to Filed
-    if (filingCase.case_status !== "Filed") {
+    // Update case history if transitioning status
+    if (filingCase.case_status !== data.status) {
       await supabase.from("case_status_history").insert({
         case_id: filingCase.id,
         from_status: filingCase.case_status as CaseStatus,
-        to_status: "Filed" as CaseStatus,
+        to_status: data.status as CaseStatus,
         reason: "Client filing status recorded.",
         changed_by: session.user.id,
       });

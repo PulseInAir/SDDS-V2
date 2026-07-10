@@ -60,8 +60,8 @@ function resolveGuidedSteps(state: any, filingCase: any): GuidedStep[] {
   // Step 1: New Client — done when case exists
   const step1Done = caseStep?.status === "done";
 
-  // Step 2: Client Status — done when filing is recorded (filed step done)
-  const step2Done = filedStep?.status === "done";
+  // Step 2: Client Status — done when status is "Filed"
+  const step2Done = filingCase?.case_status === "Filed";
 
   // Step 3: Invoice — done when invoice is created
   const invoiceDone = invoiceStep?.status === "done";
@@ -563,7 +563,7 @@ export function ClientJourneyPage({
                         </p>
 
                         {/* Filing details display */}
-                        {filingCase && itrvStepData && (
+                        {filingCase?.case_status === "Filed" && itrvStepData && (
                           <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] max-w-md mx-auto">
                             <span className="text-[10px] font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Filing Details</span>
                             <div className="space-y-3 text-sm">
@@ -586,13 +586,18 @@ export function ClientJourneyPage({
                         )}
 
                         {/* Filing form if not yet filed */}
-                        {!itrvStepData ? (
-                          <div className="w-full max-w-xl mx-auto">
+                        {filingCase?.case_status !== "Filed" ? (
+                          <div className="w-full max-w-2xl mx-auto">
                             <ClientStatusStep
                               clientId={clientId}
                               selectedAyId={selectedAyId}
-                              onComplete={() => {
-                                handleRefresh(selectedAyId).then(() => goToStep("invoice"));
+                              filingCase={filingCase}
+                              onComplete={(status) => {
+                                handleRefresh(selectedAyId).then(() => {
+                                  if (status === "Filed") {
+                                    goToStep("invoice");
+                                  }
+                                });
                               }}
                             />
                           </div>
