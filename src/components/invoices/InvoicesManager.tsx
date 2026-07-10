@@ -2,18 +2,36 @@
 
 import { useState } from "react";
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
+import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
 import { InvoicePageContent } from "@/components/invoices/InvoicePageContent";
+import { ChargesTable } from "@/components/charges/ChargesTable";
 
 type InvoicesModuleData = Awaited<ReturnType<typeof getInvoicesModuleData>>;
 
+type ClientOption = {
+  id: string;
+  full_name: string;
+  pan_uppercase: string;
+};
+
+type AssessmentYearOption = {
+  id: string;
+  label: string;
+  is_current: boolean | null;
+};
+
 export function InvoicesManager({
   data,
+  charges = [],
   basePath,
   showClientFilter,
+  defaultClientId,
 }: {
   data: InvoicesModuleData;
+  charges?: any[];
   basePath: string;
   showClientFilter: boolean;
+  defaultClientId?: string;
 }) {
   const [editingInvoice, setEditingInvoice] = useState<InvoicesModuleData["paginatedInvoices"][number] | null>(null);
 
@@ -26,8 +44,22 @@ export function InvoicesManager({
     setEditingInvoice(null);
   };
 
+  const clients = data.clients as ClientOption[];
+  const assessmentYears = data.assessmentYears as AssessmentYearOption[];
+
   return (
     <div className="space-y-6">
+      <InvoiceCreateForm
+        key={editingInvoice?.id || "create"}
+        clients={clients}
+        assessmentYears={assessmentYears}
+        defaultClientId={defaultClientId}
+        invoiceSettings={data.invoiceSettings}
+        editingInvoice={editingInvoice || undefined}
+        onCancelEdit={handleCancelEdit}
+        revalidateTarget={basePath}
+      />
+      <ChargesTable chargesData={charges} />
       <InvoicePageContent
         data={data}
         basePath={basePath}

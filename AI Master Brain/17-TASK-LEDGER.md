@@ -75,6 +75,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | GUIDED-WORKFLOW-01 | DONE | Implement Guided Workflow Engine and simplify operational statuses | DASHBOARD-EXCEPTIONS-01 | Client journey dashboard, 8-step pipeline rail, status cleanup to 3 states, embedded charges table | `f499ba2` |
 | UI-CINEMATIC-WORKFLOW-01 | DONE | Implement cinematic gamified wizard workflow | GUIDED-WORKFLOW-01 | One-screen-at-a-time immersive workflow with smooth scrolling, Framer Motion transitions, and minimal HUD | `76e005c` |
 | GLOBAL-FONT-01 | DONE | Reduce global font scale and align row text sizing | UI-CINEMATIC-WORKFLOW-01 | Root font-size set to 100%, body set to 14px, rows fit without wrapping, build passes | `061dc4110ec916181b26b3d98ff0ead023f2e64d` |
+| INVOICE-RESTORE-01 | DONE | Restore invoice generation section (Create Form, Charges Register, filters, summary cards) | GLOBAL-FONT-01 | InvoiceCreateForm, ChargesTable, Invoices & Revenue header with filters/summary cards restored, build passes | `5f635ae0d2081069fee08eb67002aa7b006d47eb` |
 ## Task update protocol
 
 When starting:

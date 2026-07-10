@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, Receipt, Edit } from "lucide-react";
 
 import type { getInvoicesModuleData } from "@/lib/actions/invoices";
-import { formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
+import { buildInvoiceQueryHref, formatInvoiceStatus, getInvoiceStatusVariant } from "@/lib/utils/invoices";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyValue } from "@/components/ui/MoneyValue";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -74,8 +74,133 @@ export function InvoicePageContent({
     };
   }, [data.paginatedInvoices]);
 
+  const activeFilters = data.filters;
+
   return (
     <div className="space-y-6">
+      <section className="space-y-4 rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel p-4 sm:p-5 shadow-sm">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Invoices & Revenue</h1>
+            <p className="mt-1 text-sm text-text-muted">
+              Track billed, received, outstanding, and overdue values from the same invoice and payment records.
+            </p>
+          </div>
+          <Link href={basePath} className="text-sm font-medium text-brand-700 hover:text-brand-800">
+            Reset filters
+          </Link>
+        </div>
+
+        <form className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <label className="space-y-1 text-sm text-text-secondary xl:col-span-2">
+            <span className="font-medium text-text-primary">Search</span>
+            <input
+              type="text"
+              name="search"
+              defaultValue={activeFilters.search ?? ""}
+              placeholder="Client, PAN, or invoice number"
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            />
+          </label>
+
+          {showClientFilter ? (
+            <label className="space-y-1 text-sm text-text-secondary">
+              <span className="font-medium text-text-primary">Client</span>
+              <select
+                name="clientId"
+                defaultValue={activeFilters.clientId ?? ""}
+                className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+              >
+                <option value="">All clients</option>
+                {data.clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.full_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          <label className="space-y-1 text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">Assessment year</span>
+            <select
+              name="assessmentYearId"
+              defaultValue={activeFilters.assessmentYearId ?? ""}
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            >
+              <option value="">All years</option>
+              {data.assessmentYears.map((assessmentYear) => (
+                <option key={assessmentYear.id} value={assessmentYear.id}>
+                  {assessmentYear.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">Status</span>
+            <select
+              name="status"
+              defaultValue={activeFilters.status ?? ""}
+              className="h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white px-3 text-sm text-text-primary shadow-sm outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            >
+              <option value="">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="issued">Issued</option>
+              <option value="partially_paid">Partially Paid</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+
+          <label className="flex items-end gap-2 rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted px-3 py-2 text-sm text-text-secondary">
+            <input type="checkbox" name="overdueOnly" value="true" defaultChecked={activeFilters.overdueOnly === true} className="h-4 w-4 rounded border-border-subtle text-brand-600 focus:ring-brand-600" />
+            <span>Only overdue</span>
+          </label>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center rounded-[var(--radius-input)] bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+            >
+              Apply filters
+            </button>
+          </div>
+        </form>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <p className="text-xs uppercase tracking-wide text-text-muted">Billed</p>
+            <p className="mt-2 text-2xl font-semibold text-text-primary">
+              <MoneyValue value={data.summary.billedAmount} />
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">Issued invoice totals only.</p>
+          </div>
+          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <p className="text-xs uppercase tracking-wide text-text-muted">Received</p>
+            <p className="mt-2 text-2xl font-semibold text-text-primary">
+              <MoneyValue value={data.summary.receivedAmount} />
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">Valid non-reversed payments.</p>
+          </div>
+          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <p className="text-xs uppercase tracking-wide text-text-muted">Outstanding</p>
+            <p className="mt-2 text-2xl font-semibold text-text-primary">
+              <MoneyValue value={data.summary.outstandingAmount} />
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">{data.summary.partialCount} invoices are partially paid.</p>
+          </div>
+          <div className="rounded-[var(--radius-input)] border border-border-subtle bg-surface-muted p-4">
+            <p className="text-xs uppercase tracking-wide text-text-muted">Overdue</p>
+            <p className="mt-2 text-2xl font-semibold text-text-primary">
+              <MoneyValue value={data.summary.overdueAmount} />
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">{data.summary.overdueCount} invoices need follow-up.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-sm">
         <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3 sm:px-5 sm:py-4">
           <div>
@@ -225,7 +350,14 @@ export function InvoicePageContent({
             </span>
             <div className="flex gap-2">
               <Link
-                href={`${basePath}?page=${data.page > 1 ? data.page - 1 : 1}`}
+                href={buildInvoiceQueryHref(basePath, {
+                  search: activeFilters.search,
+                  clientId: activeFilters.clientId,
+                  assessmentYearId: activeFilters.assessmentYearId,
+                  status: activeFilters.status,
+                  overdueOnly: activeFilters.overdueOnly ? "true" : undefined,
+                  page: data.page > 1 ? String(data.page - 1) : undefined,
+                })}
                 aria-disabled={data.page <= 1}
                 className={`rounded-[var(--radius-input)] border px-3 py-1.5 ${
                   data.page <= 1
@@ -236,7 +368,14 @@ export function InvoicePageContent({
                 Previous
               </Link>
               <Link
-                href={`${basePath}?page=${data.page < data.totalPages ? data.page + 1 : data.totalPages}`}
+                href={buildInvoiceQueryHref(basePath, {
+                  search: activeFilters.search,
+                  clientId: activeFilters.clientId,
+                  assessmentYearId: activeFilters.assessmentYearId,
+                  status: activeFilters.status,
+                  overdueOnly: activeFilters.overdueOnly ? "true" : undefined,
+                  page: data.page < data.totalPages ? String(data.page + 1) : undefined,
+                })}
                 aria-disabled={data.page >= data.totalPages}
                 className={`rounded-[var(--radius-input)] border px-3 py-1.5 ${
                   data.page >= data.totalPages

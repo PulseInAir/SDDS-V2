@@ -4,13 +4,23 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: GLOBAL-FONT-01
+- Active task: INVOICE-RESTORE-01
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `061dc4110ec916181b26b3d98ff0ead023f2e64d`
+- HEAD: `5f635ae0d2081069fee08eb67002aa7b006d47eb`
 
-## Global Font Scale and Row Text Alignment (2026-07-10)
+## Invoice Generation Section Restoration (2026-07-10)
+
+**Status: DONE — Restored Invoice Create Form, Charges Register Table, and Invoices & Revenue header section with filters and summary cards.**
+
+### Restoration steps completed:
+1. **InvoicesManager.tsx**: Re-added `InvoiceCreateForm` and `ChargesTable` imports and rendering, restored `charges` and `defaultClientId` props.
+2. **InvoicePageContent.tsx**: Re-added "Invoices & Revenue" header section with filter form (search, client, assessment year, status, overdue only) and summary cards (Billed, Received, Outstanding, Overdue). Restored `buildInvoiceQueryHref` for filter-aware pagination.
+3. **Page Files**: Restored `getChargesRegisterData` calls and props passing in both `/invoices` and `/clients/[clientId]/invoices` pages.
+4. **Build Verified**: Successfully compiled with `npm run build` after clearing `.next`.
+
+### Global Font Scale and Row Text Alignment (2026-07-10)
 
 **Status: IN_PROGRESS — Lower root and body font sizes so dense table rows no longer wrap and stay aligned with the rest of the UI.**
 
