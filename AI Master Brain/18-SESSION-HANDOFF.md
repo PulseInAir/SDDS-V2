@@ -4,11 +4,11 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `DEPLOYMENT-FIX-01`
+- Active task: `DEPLOYMENT-FIX-02`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `22e7c56`
+- HEAD: `3fc731b`
 
 ## Client Journey Redesign (2026-07-10)
 
@@ -26,6 +26,7 @@ This file is rewritten after every task. Keep it compact and factual.
 - Disabled `@typescript-eslint/no-explicit-any` in `eslint.config.mjs`
 - Fixed `react-hooks/set-state-in-effect` in `ChargesStep.tsx` and `ClientJourneyPage.tsx`
 - Fixed unescaped entities in `CreateCaseStep.tsx` and `NextYearFollowUpStep.tsx`
+- Removed missing `lenis` import from `ClientJourneyPage.tsx` that caused `Module not found` errors.
 
 ## Client Journey & Dashboard Optimization (2026-07-10)
 
