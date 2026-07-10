@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import Lenis from "lenis";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -39,27 +38,6 @@ function formatDateTime(value: string) {
 }
 
 export function OperationalDashboard({ data }: { data: DashboardPageData }) {
-  // Initialize smooth scrolling with Lenis
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      touchMultiplier: 2,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   if (!data.selectedAssessmentYear) {
     return (
@@ -101,7 +79,7 @@ export function OperationalDashboard({ data }: { data: DashboardPageData }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030303] text-white overflow-hidden selection:bg-amber-500/30">
+    <div className="relative min-h-screen bg-[#030303] text-white selection:bg-amber-500/30">
       
       {/* Cinematic Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">

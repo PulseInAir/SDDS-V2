@@ -13,7 +13,6 @@ import { PaymentFollowUpStep } from "./steps/PaymentFollowUpStep";
 import { NextYearFollowUpStep } from "./steps/NextYearFollowUpStep";
 import { getClientJourneyState } from "@/lib/actions/journey";
 import { motion, AnimatePresence } from "framer-motion";
-import Lenis from "lenis";
 
 import { 
   ArrowLeft, 
@@ -52,27 +51,7 @@ export function ClientJourneyPage({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
 
-  // Initialize smooth scrolling with Lenis
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      touchMultiplier: 2,
-    });
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // Re-fetch journey state whenever AY changes
   useEffect(() => {
@@ -163,7 +142,7 @@ export function ClientJourneyPage({
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-[#030303] text-white overflow-x-hidden selection:bg-amber-500/30">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-[#030303] text-white selection:bg-amber-500/30">
       
       {/* Cinematic Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
