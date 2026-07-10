@@ -13,7 +13,7 @@ interface JourneyPipelineProps {
 
 export function JourneyPipeline({ steps, currentStepId, onStepClick }: JourneyPipelineProps) {
   return (
-    <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4 hidden lg:flex">
+    <div className="sticky top-1/3 z-50 flex-col items-center gap-4 hidden lg:flex float-right mr-4 mt-8 mb-8">
       {steps.map((step, idx) => {
         const isCurrent = step.id === currentStepId;
         const isDone = step.status === "done";

@@ -1,6 +1,7 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { JourneyPipeline } from "./JourneyPipeline";
 import { CreateCaseStep } from "./steps/CreateCaseStep";
@@ -142,21 +143,22 @@ export function ClientJourneyPage({
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-[#030303] text-white selection:bg-amber-500/30">
+    <div className="relative bg-[#030303] text-white selection:bg-amber-500/30 min-h-full">
       
       {/* Cinematic Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      {/* Ambient Background — absolute, not fixed */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[10%] left-[20%] w-[40rem] h-[40rem] bg-amber-600/5 rounded-full blur-[120px] animate-[pulse_8s_ease-in-out_infinite_alternate]" />
         <div className="absolute bottom-[10%] right-[10%] w-[50rem] h-[50rem] bg-orange-600/5 rounded-full blur-[150px] animate-[pulse_12s_ease-in-out_infinite_alternate]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* Cinematic Header */}
+      {/* Sticky header — stays within scroll container */}
       <motion.div 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-[#030303]/60 backdrop-blur-xl px-8 py-5 flex items-center justify-between"
+        className="sticky top-0 z-40 border-b border-white/5 bg-[#030303]/90 backdrop-blur-xl px-8 py-5 flex items-center justify-between"
       >
         <div className="flex items-center gap-6">
           <Link 
@@ -203,7 +205,7 @@ export function ClientJourneyPage({
       />
 
       {/* Main Cinematic Viewport */}
-      <main className="relative z-10 w-full min-h-screen pt-32 pb-24 px-8 flex flex-col items-center justify-center">
+      <main className="relative z-10 w-full pb-24 px-8 pt-8 flex flex-col items-center">
         
         {isExtracting ? (
           <motion.div 
