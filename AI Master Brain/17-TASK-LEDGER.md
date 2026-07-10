@@ -74,7 +74,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DASHBOARD-EXCEPTIONS-01 | DONE | Remove Filing Exceptions section from the dashboard pipeline map | DASHBOARD-HUD-01 | Removed the exceptions column, allowing the core pipeline to fill the gap naturally | `b4bf243303c6f81e57d57a1d36f67ef068b06daf` |
 | GUIDED-WORKFLOW-01 | DONE | Implement Guided Workflow Engine and simplify operational statuses | DASHBOARD-EXCEPTIONS-01 | Client journey dashboard, 8-step pipeline rail, status cleanup to 3 states, embedded charges table | `f499ba2` |
 | UI-CINEMATIC-WORKFLOW-01 | DONE | Implement cinematic gamified wizard workflow | GUIDED-WORKFLOW-01 | One-screen-at-a-time immersive workflow with smooth scrolling, Framer Motion transitions, and minimal HUD | `76e005c` |
-| GLOBAL-FONT-01 | DONE | Reduce global font scale and align row text sizing | UI-CINEMATIC-WORKFLOW-01 | Root font-size set to 100%, body set to 14px, rows fit without wrapping, build passes |  |
+| GLOBAL-FONT-01 | DONE | Reduce global font scale and align row text sizing | UI-CINEMATIC-WORKFLOW-01 | Root font-size set to 100%, body set to 14px, rows fit without wrapping, build passes | `061dc4110ec916181b26b3d98ff0ead023f2e64d` |
 ## Task update protocol
 
 When starting:
