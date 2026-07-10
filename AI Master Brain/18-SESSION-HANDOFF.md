@@ -4,11 +4,22 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `CLIENT-JOURNEY-03`
+- Active task: `CLIENT-JOURNEY-04`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `4bd0521`
+- HEAD: `b3b202b`
+
+## Client Status Subsume (2026-07-10)
+
+**Status: DONE — Subsumed the "Filing Details" panel into Step 2 and implemented dynamic step shifting.**
+
+### Changes completed:
+1. **ClientStatusStep.tsx**: Replaced minimal status form with full case details form (Status, Return Category, Filing Date, Refund Amount, Expected Completion, Due Date, Next Action, Blocker Code, Blocker Note, Follow-up Exclusion).
+2. **Dynamic Redirection**: If user selects "Filing Queue" and saves, UI remains on Step 2. If user selects "Filed" and saves, UI dynamically shifts to Step 3 (Invoice).
+3. **journey.ts**: `recordClientStatusAction` updated to record the selected `status` and all extra case metadata into the `filing_cases` database table.
+4. **ClientJourneyPage.tsx**: Passed `filingCase` to `ClientStatusStep` and ensured the static summary display is only shown when `case_status` is "Filed".
+5. **Verification**: `npm run build` compiled successfully without errors.
 
 ## Client Journey Redesign (2026-07-10)
 

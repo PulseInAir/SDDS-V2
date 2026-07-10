@@ -84,6 +84,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | DEPLOYMENT-FIX-01 | DONE | Resolve ESLint errors causing Vercel build failures | CLIENT-JOURNEY-02 | Fixed set-state-in-effect and unescaped entities, disabled no-explicit-any. Build and lint passes. | `22e7c56` |
 | DEPLOYMENT-FIX-02 | DONE | Remove missing lenis import causing Vercel build failure | DEPLOYMENT-FIX-01 | Removed unused Lenis import and initialization from ClientJourneyPage.tsx. | `3fc731b` |
 | CLIENT-JOURNEY-03 | DONE | Redesign Step 1 and 2 to match prompt spec | DEPLOYMENT-FIX-02 | Replaced Step 1 form with simple Create Case button. Replaced Step 2 form with basic ITR No., Filing Date, Refund Amount input. | `4bd0521` |
+| CLIENT-JOURNEY-04 | DONE | Subsume filings details into Step 2 and implement dynamic step shifting | CLIENT-JOURNEY-03 | ClientStatusStep has full filings form. Status selects Filing Queue (stays) or Filed (shifts to Step 3). UI static summary only shows when case is Filed. | `b3b202b` |
 ## Task update protocol
 
 When starting:
