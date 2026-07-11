@@ -8,7 +8,18 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None — owner must give next prompt
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `cc67d76`
+- HEAD: `f860b2b`
+
+## Step 3 Window B Concurrency Fix (2026-07-11)
+
+**Status: DONE — Refined Step 3 Window B to display the Invoice, Refund, and Upload forms concurrently without an intermediate explicit charges confirmation step.**
+
+### Changes shipped
+1. **Removed `ChargesStep`**: Dropped the isolated Charges confirmation panel from `ClientJourneyPage.tsx`. The workflow now moves instantly to Window B where all forms are visible.
+2. **Auto-Populate Charges directly in Invoice form**: `InvoiceCreateForm.tsx` now receives `initialRefundClaimedAmount` as a prop directly from `filingCase`, populating its built-in Refund Claim Charges Calculator on load.
+3. **`journey-resolver.ts` Update**: Redefined the `charges` step completion condition from checking `itr_filing_charges` to simply checking if `return_category` is populated (i.e. ITR-V data was extracted).
+4. **Verification**: Checked and verified using `npm run typecheck` and `npm run build` which passed.
+5. **Commit**: `f860b2b` pushed to `origin/master`.
 
 ## Step 3 Upload, Extract, and Invoice Flow Correction (2026-07-11)
 
