@@ -57,6 +57,9 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
     setSuccess(null);
 
     const formData = new FormData(e.currentTarget);
+    if (selectedFile) {
+      formData.set("file", selectedFile);
+    }
 
     startTransition(async () => {
       const res = await uploadDocumentAction({}, formData);
