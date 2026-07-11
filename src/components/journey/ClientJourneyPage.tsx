@@ -153,10 +153,10 @@ export function ClientJourneyPage({
     resolveCurrentGuidedStep(guidedSteps)
   );
 
-  // Section collapse states for Step 1
   const [showIdentity, setShowIdentity] = useState(true);
   const [showCredentials, setShowCredentials] = useState(false);
   const [isCreatingCase, setIsCreatingCase] = useState(false);
+  const [itrvDocument, setItrvDocument] = useState<any>(null);
 
   const handleCreateCase = async () => {
     setIsCreatingCase(true);
@@ -214,9 +214,23 @@ export function ClientJourneyPage({
     }
   }
 
+  async function fetchItrvDocument(ayId: string = selectedAyId) {
+    try {
+      const docsRes = await fetch(`/api/documents?clientId=${clientId}&assessmentYearId=${ayId}`);
+      if (docsRes.ok) {
+        const docs = await docsRes.json();
+        const itrvDoc = (docs.data || []).find((d: any) => d.document_type === "ITR-V" && !d.archived_at);
+        setItrvDocument(itrvDoc || null);
+      }
+    } catch (e) {
+      console.error("Failed to fetch documents", e);
+    }
+  }
+
   async function handleRefresh(ayId: string = selectedAyId) {
     setIsRefreshing(true);
     const res = await getClientJourneyState(clientId, ayId);
+    await fetchItrvDocument(ayId);
     setIsRefreshing(false);
     
     if (res.success && res.state) {
@@ -256,7 +270,7 @@ export function ClientJourneyPage({
   const { client, filingCase, state } = journeyData;
 
   // Old step data accessors (still used by substep components)
-  const itrvStepData = state.steps.find((s: any) => s.id === "filed")?.data;
+  const filedStepData = state.steps.find((s: any) => s.id === "filed")?.data;
   const activeInvoice = state.steps.find((s: any) => s.id === "invoice")?.data;
   const activeRefund = state.steps.find((s: any) => s.id === "refund")?.data;
   const activeFollowup = state.steps.find((s: any) => s.id === "next_ay_followup")?.data;
@@ -563,7 +577,7 @@ export function ClientJourneyPage({
                         </p>
 
                         {/* Filing details display */}
-                        {filingCase?.case_status === "Filed" && itrvStepData && (
+                        {filingCase?.case_status === "Filed" && filedStepData && (
                           <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] max-w-md mx-auto">
                             <span className="text-xs font-mono text-amber-500/60 uppercase tracking-widest mb-3 block">Filing Details</span>
                             <div className="space-y-3 text-base">
@@ -573,7 +587,7 @@ export function ClientJourneyPage({
                               </div>
                               <div className="flex justify-between items-center">
                                 <span className="text-white/40">Filing Date</span>
-                                <span className="font-medium text-white/80">{itrvStepData.filingDate ? new Date(itrvStepData.filingDate).toLocaleDateString('en-GB') : "—"}</span>
+                                <span className="font-medium text-white/80">{filedStepData.filingDate ? new Date(filedStepData.filingDate).toLocaleDateString('en-GB') : "—"}</span>
                               </div>
                               <div className="flex justify-between items-center">
                                 <span className="text-white/40">Refund Amount</span>
@@ -625,8 +639,8 @@ export function ClientJourneyPage({
                     ════════════════════════════════════════════════════════════════ */}
                     {selectedStepId === "invoice" && (
                       <div className="space-y-8">
-                        {/* Window A: Upload ITR-V (only when no filing exists yet) */}
-                        {!itrvStepData && (
+                        {/* Window A: Upload ITR-V (only when no ITR-V document exists) */}
+                        {!itrvDocument && (
                           <div className="w-full max-w-xl mx-auto space-y-4">
                             <UploadITRVStep
                               clientId={clientId}
@@ -642,7 +656,7 @@ export function ClientJourneyPage({
                             (return_category = ITR No., refund_claimed_amount = Refund Amount).
                             User can re-upload ITR-V, edit charges/invoice, and create
                             a draft or final invoice. Either action advances to Step 4. */}
-                        {itrvStepData && (
+                        {itrvDocument && (
                           <div className="w-full max-w-4xl mx-auto space-y-8">
 
                             {/* Compact upload-control row: indicates current file + re-upload action */}
@@ -656,7 +670,7 @@ export function ClientJourneyPage({
                               <UploadITRVStep
                                 clientId={clientId}
                                 selectedAyId={selectedAyId}
-                                existingItrvDoc={null}
+                                existingItrvDoc={itrvDocument}
                                 onComplete={() => handleRefresh()}
                                 compact
                               />
