@@ -19,12 +19,12 @@
   --color-text-secondary: #E2E8F0;
   --color-text-muted: #94A3B8;
 
-  --color-border-subtle: #1E293B;
-  --color-surface-app: #070B14;
-  --color-surface-panel: #0E1626;
-  --color-surface-muted: #0F1A30;
-  --color-surface-hover: #19253F;
-  --color-surface-selected: #1E2E4A;
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-surface-app: #050505;
+  --color-surface-panel: #0A0A0A;
+  --color-surface-muted: rgba(255, 255, 255, 0.02);
+  --color-surface-hover: rgba(255, 255, 255, 0.05);
+  --color-surface-selected: rgba(255, 255, 255, 0.08);
 
   --radius-input: 8px;
   --radius-panel: 12px;
@@ -57,11 +57,10 @@ body {
   margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: #070B14;
-  background-image: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 45%),
-    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 45%),
-
-    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 60%);
+  background-color: #050505;
+  background-image: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.02) 0%, transparent 60%);
   background-size: 200% 200%;
   animation: auroraMotion 30s ease infinite;
   color: var(--foreground);

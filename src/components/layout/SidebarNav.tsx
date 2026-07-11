@@ -9,9 +9,9 @@ export function SidebarNav({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <div className={classNames("hidden md:flex flex-shrink-0 h-full w-[280px] flex-col border-r border-border-subtle bg-surface-panel", className)}>
-      <div className="flex h-[60px] items-center px-7 border-b border-border-subtle bg-surface-muted/30">
-        <span className="text-lg font-extrabold tracking-wider text-brand-700 uppercase">SDDS Suite</span>
+    <div className={classNames("hidden md:flex flex-shrink-0 h-full w-[280px] flex-col border-r border-white/5 bg-[#050505]", className)}>
+      <div className="flex h-[60px] items-center px-7 border-b border-white/5 bg-white/[0.02]">
+        <span className="text-[11px] font-mono tracking-[0.25em] text-white/80 uppercase glow-brand">SDDS SUITE</span>
       </div>
 
       <nav className="flex-1 space-y-1.5 overflow-y-auto px-4 py-6">
@@ -25,8 +25,8 @@ export function SidebarNav({ className }: { className?: string }) {
               className={classNames(
                 "group flex items-center rounded-[var(--radius-input)] pl-3 pr-4 py-2.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
                 isActive
-                  ? "bg-brand-50/80 text-brand-700 shadow-xs border-l-[3px] border-brand-600 rounded-l-none"
-                  : "text-text-secondary hover:bg-surface-hover hover:text-text-primary border-l-[3px] border-transparent"
+                  ? "bg-white/[0.05] text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border-l-[3px] border-white/30 rounded-l-none"
+                  : "text-white/40 hover:bg-white/[0.02] hover:text-white/80 border-l-[3px] border-transparent"
               )}
               aria-current={isActive ? "page" : undefined}
             >
@@ -34,8 +34,8 @@ export function SidebarNav({ className }: { className?: string }) {
                 className={classNames(
                   "mr-3 h-[18px] w-[18px] flex-shrink-0 transition-colors",
                   isActive
-                    ? "text-brand-700"
-                    : "text-text-muted group-hover:text-text-secondary"
+                    ? "text-white"
+                    : "text-white/30 group-hover:text-white/60"
                 )}
                 aria-hidden="true"
               />
@@ -45,14 +45,14 @@ export function SidebarNav({ className }: { className?: string }) {
         })}
       </nav>
 
-      <div className="border-t border-border-subtle p-4 space-y-1.5">
+      <div className="border-t border-white/5 p-4 space-y-1.5">
         <Link
           href={settingsNavigationItem.href}
           className={classNames(
             "group flex items-center rounded-[var(--radius-input)] pl-3 pr-4 py-2.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
             isNavigationItemActive(pathname, settingsNavigationItem.href)
-              ? "bg-brand-50/80 text-brand-700 shadow-xs border-l-[3px] border-brand-600 rounded-l-none"
-              : "text-text-secondary hover:bg-surface-hover hover:text-text-primary border-l-[3px] border-transparent"
+              ? "bg-white/[0.05] text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border-l-[3px] border-white/30 rounded-l-none"
+              : "text-white/40 hover:bg-white/[0.02] hover:text-white/80 border-l-[3px] border-transparent"
           )}
           aria-current={isNavigationItemActive(pathname, settingsNavigationItem.href) ? "page" : undefined}
         >
@@ -60,8 +60,8 @@ export function SidebarNav({ className }: { className?: string }) {
             className={classNames(
               "mr-3 h-[18px] w-[18px] flex-shrink-0 transition-colors",
               isNavigationItemActive(pathname, settingsNavigationItem.href)
-                ? "text-brand-700"
-                : "text-text-muted group-hover:text-text-secondary"
+                ? "text-white"
+                : "text-white/30 group-hover:text-white/60"
             )}
             aria-hidden="true"
           />

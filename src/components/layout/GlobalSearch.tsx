@@ -140,7 +140,7 @@ export function GlobalSearch() {
       </label>
       <div className="relative">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
+          <Search className="h-4 w-4 text-white/30" aria-hidden="true" />
         </div>
         <input
           id="global-search"
@@ -182,7 +182,7 @@ export function GlobalSearch() {
             setIsOpen(true);
           }}
           placeholder="Search clients, PAN, invoices, or acknowledgement numbers"
-          className="block h-10 w-full rounded-[var(--radius-input)] border border-border-subtle bg-white py-2 pl-10 pr-10 text-sm text-text-primary shadow-sm outline-none placeholder:text-text-muted focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+          className="block h-10 w-full rounded-[var(--radius-input)] border border-white/5 bg-white/[0.02] py-2 pl-10 pr-10 text-sm text-white/80 shadow-sm outline-none placeholder:text-white/30 focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all"
           autoComplete="off"
         />
         {query ? (
@@ -194,7 +194,7 @@ export function GlobalSearch() {
               setActiveIndex(-1);
               setResponse((current) => ({ ...current, query: "", results: [] }));
             }}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-text-muted transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-white/30 transition-colors hover:text-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             aria-label="Clear search"
           >
             <XCircle className="h-4 w-4" aria-hidden="true" />
@@ -206,20 +206,20 @@ export function GlobalSearch() {
         <div
           id={resultsListId}
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 overflow-hidden rounded-[var(--radius-panel)] border border-border-subtle bg-surface-panel shadow-lg"
+          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 overflow-hidden rounded-[var(--radius-panel)] border border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
         >
-          <div className="border-b border-border-subtle bg-surface-muted px-4 py-3 text-xs text-text-secondary">
+          <div className="border-b border-white/5 bg-white/[0.02] px-4 py-3 text-xs text-white/40 font-mono uppercase tracking-wider">
             Search scope: {response.supportedFields.join(", ")}.
           </div>
 
           {deferredQuery.length < MIN_SEARCH_LENGTH ? (
-            <div className="px-4 py-5 text-sm text-text-secondary">
+            <div className="px-4 py-5 text-sm text-white/40">
               Type at least {MIN_SEARCH_LENGTH} characters to search approved indexed fields only.
             </div>
           ) : null}
 
           {deferredQuery.length >= MIN_SEARCH_LENGTH && isLoading ? (
-            <div className="px-4 py-5 text-sm text-text-secondary" aria-live="polite">
+            <div className="px-4 py-5 text-sm text-white/40" aria-live="polite">
               Searching across workspace records...
             </div>
           ) : null}
@@ -235,8 +235,8 @@ export function GlobalSearch() {
               <div className="max-h-[420px] overflow-y-auto">
                 {(["client", "invoice", "filing_record"] as const).map((groupKey) =>
                   groupedResults[groupKey].length > 0 ? (
-                    <div key={groupKey} className="border-t border-border-subtle first:border-t-0">
-                      <div className="px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted">
+                    <div key={groupKey} className="border-t border-white/5 first:border-t-0">
+                      <div className="px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/30">
                         {getResultTypeLabel(groupKey)}
                       </div>
                       <div className="pb-2">
@@ -257,23 +257,23 @@ export function GlobalSearch() {
                                 setActiveIndex(-1);
                               }}
                               className={`mx-2 flex items-start gap-3 rounded-[var(--radius-input)] px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 ${
-                                isActive ? "bg-brand-50" : "hover:bg-surface-hover"
+                                isActive ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
                               }`}
                             >
-                              <div className="mt-0.5 rounded-full bg-surface-muted p-2 text-text-secondary">
+                              <div className="mt-0.5 rounded-full bg-white/[0.03] border border-white/5 p-2 text-white/50">
                                 {getResultIcon(result.type)}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center justify-between gap-3">
-                                  <p className="truncate text-sm font-semibold text-text-primary">{result.title}</p>
-                                  <span className="rounded-full bg-surface-muted px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+                                  <p className="truncate text-sm font-semibold text-white/90">{result.title}</p>
+                                  <span className="rounded-full bg-white/[0.03] border border-white/5 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-white/50">
                                     {getResultTypeLabel(result.type)}
                                   </span>
                                 </div>
-                                <p className="mt-1 text-xs font-medium text-text-secondary">{result.identifier}</p>
-                                <p className="mt-1 text-xs text-text-muted">{result.context}</p>
+                                <p className="mt-1 text-xs font-medium text-white/60">{result.identifier}</p>
+                                <p className="mt-1 text-xs text-white/40">{result.context}</p>
                               </div>
-                              <ArrowUpRight className="mt-1 h-4 w-4 flex-shrink-0 text-text-muted" aria-hidden="true" />
+                              <ArrowUpRight className="mt-1 h-4 w-4 flex-shrink-0 text-white/20" aria-hidden="true" />
                             </Link>
                           );
                         })}
@@ -283,7 +283,7 @@ export function GlobalSearch() {
                 )}
               </div>
             ) : (
-              <div className="px-4 py-5 text-sm text-text-secondary" aria-live="polite">
+              <div className="px-4 py-5 text-sm text-white/40" aria-live="polite">
                 No results found in the supported search fields for &quot;{response.query}&quot;.
               </div>
             )

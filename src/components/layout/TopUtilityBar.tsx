@@ -107,7 +107,7 @@ export function TopUtilityBar({
 
   return (
     <>
-      <header className={classNames("flex min-h-[60px] flex-shrink-0 items-center justify-between gap-3 border-b border-border-subtle bg-surface-panel px-4 py-3 sm:px-6", className)}>
+      <header className={classNames("flex min-h-[60px] flex-shrink-0 items-center justify-between gap-3 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md px-4 py-3 sm:px-6", className)}>
         <div className="flex min-w-0 flex-1 items-center gap-x-4">
           <div className="md:hidden">
             <IconButton
@@ -130,16 +130,16 @@ export function TopUtilityBar({
         <div className="flex items-center gap-x-3 sm:gap-x-4">
           <Link
             href="/clients/new"
-            className="inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-input)] bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 border border-transparent p-2 sm:px-4 sm:py-2 text-xs sm:text-sm"
+            className="inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-input)] bg-white/[0.03] text-white/80 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30 border border-white/10 p-2 sm:px-4 sm:py-2 text-xs sm:text-sm shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]"
           >
             <Plus className="h-4 w-4 flex-shrink-0 sm:mr-1.5" />
             <span className="hidden sm:inline">Add Client</span>
           </Link>
-          <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
+          <div className="hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
           <AssessmentYearSelect />
-          <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
+          <div className="hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
           <PrivacyToggle />
-          <div className="hidden h-6 w-px bg-border-subtle sm:block" aria-hidden="true" />
+          <div className="hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
 
           <div
             className="relative"
@@ -165,30 +165,30 @@ export function TopUtilityBar({
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-[var(--radius-input)] bg-surface-panel shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 border border-border-subtle">
+              <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-[var(--radius-input)] bg-[#0A0A0A]/90 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] ring-1 ring-white/10 focus:outline-none z-50 border border-white/10">
                 <div className="py-1">
-                  <div className="px-4 py-2 border-b border-border-subtle">
-                    <p className="text-sm font-semibold text-text-primary truncate">
+                  <div className="px-4 py-2 border-b border-white/5">
+                    <p className="text-sm font-semibold text-white/90 truncate">
                       {user.fullName || "User"}
                     </p>
-                    <p className="text-xs text-text-muted truncate">
+                    <p className="text-xs text-white/40 truncate">
                       {user.email}
                     </p>
                   </div>
                   <Link
                     href="/settings/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="flex w-full items-center px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+                    className="flex w-full items-center px-4 py-2 text-sm text-white/60 hover:bg-white/[0.05] hover:text-white"
                   >
-                    <UserCircle className="mr-3 h-4 w-4 text-text-muted" />
+                    <UserCircle className="mr-3 h-4 w-4 text-white/40" />
                     Admin Profile
                   </Link>
                   <form action={signOut}>
                     <button
                       type="submit"
-                      className="flex w-full items-center px-4 py-2 text-sm text-text-secondary hover:bg-surface-hover hover:text-text-primary text-left"
+                      className="flex w-full items-center px-4 py-2 text-sm text-white/60 hover:bg-white/[0.05] hover:text-white text-left"
                     >
-                      <LogOut className="mr-3 h-4 w-4 text-text-muted" />
+                      <LogOut className="mr-3 h-4 w-4 text-white/40" />
                       Log Out
                     </button>
                   </form>
@@ -211,12 +211,12 @@ export function TopUtilityBar({
           <div
             id="mobile-navigation"
             ref={mobileNavRef}
-            className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,calc(100vw-2rem))] flex-col border-r border-border-subtle bg-surface-panel shadow-xl"
+            className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,calc(100vw-2rem))] flex-col border-r border-white/5 bg-[#050505] shadow-xl"
           >
-            <div className="flex h-[60px] items-center justify-between border-b border-border-subtle px-4">
+            <div className="flex h-[60px] items-center justify-between border-b border-white/5 px-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">SDDS</p>
-                <h2 id="mobile-navigation-title" className="text-sm font-semibold text-text-primary">
+                <p className="text-[11px] font-mono font-semibold uppercase tracking-[0.25em] text-white/80 glow-brand">SDDS</p>
+                <h2 id="mobile-navigation-title" className="text-sm font-semibold text-white/90">
                   Navigation
                 </h2>
               </div>
@@ -241,17 +241,17 @@ export function TopUtilityBar({
                     href={item.href}
                     onClick={() => setIsMobileNavOpen(false)}
                     className={classNames(
-                      "group flex items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+                      "group flex items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
                       isActive
-                        ? "bg-surface-selected text-brand-700"
-                        : "text-text-secondary hover:bg-surface-hover hover:text-text-primary",
+                        ? "bg-white/[0.05] text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border-l-[3px] border-white/30 rounded-l-none"
+                        : "text-white/40 hover:bg-white/[0.02] hover:text-white/80 border-l-[3px] border-transparent",
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
                     <item.icon
                       className={classNames(
                         "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-                        isActive ? "text-brand-700" : "text-text-muted group-hover:text-text-secondary",
+                        isActive ? "text-white" : "text-white/30 group-hover:text-white/60",
                       )}
                       aria-hidden="true"
                     />
@@ -261,15 +261,15 @@ export function TopUtilityBar({
               })}
             </nav>
 
-            <div className="space-y-1 border-t border-border-subtle p-3">
+            <div className="space-y-1 border-t border-white/5 p-3">
               <Link
                 href={settingsNavigationItem.href}
                 onClick={() => setIsMobileNavOpen(false)}
                 className={classNames(
-                  "group flex items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+                  "group flex items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
                   isNavigationItemActive(pathname, settingsNavigationItem.href)
-                    ? "bg-surface-selected text-brand-700"
-                    : "text-text-secondary hover:bg-surface-hover hover:text-text-primary",
+                    ? "bg-white/[0.05] text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border-l-[3px] border-white/30 rounded-l-none"
+                    : "text-white/40 hover:bg-white/[0.02] hover:text-white/80 border-l-[3px] border-transparent",
                 )}
                 aria-current={isNavigationItemActive(pathname, settingsNavigationItem.href) ? "page" : undefined}
               >
@@ -277,8 +277,8 @@ export function TopUtilityBar({
                   className={classNames(
                     "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
                     isNavigationItemActive(pathname, settingsNavigationItem.href)
-                      ? "text-brand-700"
-                      : "text-text-muted group-hover:text-text-secondary",
+                      ? "text-white"
+                      : "text-white/30 group-hover:text-white/60",
                   )}
                   aria-hidden="true"
                 />
@@ -288,10 +288,10 @@ export function TopUtilityBar({
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                  className="group flex w-full items-center rounded-[var(--radius-input)] px-3 py-3 text-sm font-medium text-white/40 transition-colors hover:bg-white/[0.02] hover:text-white/80 border-l-[3px] border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
                   <LogOut
-                    className="mr-3 h-5 w-5 flex-shrink-0 text-text-muted group-hover:text-text-secondary"
+                    className="mr-3 h-5 w-5 flex-shrink-0 text-white/30 group-hover:text-white/60"
                     aria-hidden="true"
                   />
                   Sign out
