@@ -4,24 +4,28 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `CLIENT-JOURNEY-05`
-- Next READY task: None
+- Active task: None (all READY tasks DONE)
+- Next READY task: None — owner must give next prompt
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `0012d0e`
+- HEAD: `1dbd7c3`
 
 ## Step 3 (Invoice) Subsume & Upload Fix (2026-07-11)
 
-**Status: IN_PROGRESS — Fix Step 3 to subsume Documents + Invoices & Payments + Refunds as 2-window structure; upload ITR-V auto-extract must populate case fields.**
+**Status: DONE — Step 3 explicitly subsumes Documents + Invoices & Payments + Refunds via 2-window structure, and Upload & Auto-Extract now persists case fields.**
 
-### Reported bug
-1. **Upload button does nothing.** After attaching a PDF and clicking "Upload & Auto-Extract", the form does not save `ITR No.` (return_category) or `Refund Amount` (refund_claimed_amount) to `filing_cases`, so the charges panel never auto-populates and the second window never opens.
-2. **Step 3 fails to subsume 3 header menus.** Per spec, Step 3 must absorb Documents, Invoices & Payments, and Refunds into a 2-window flow. Current Step 3 shows only the "Upload ITR-V" text and then sits idle.
-
-### Plan
-1. PDF extract endpoint: after extraction, if a filing case exists for the same `client_id` + `assessment_year_id`, persist `return_category` (ITR No.) and `refund_claimed_amount` into `filing_cases` (also stamp filing record if filings table is empty).
-2. Rewrite Step 3 (`ClientJourneyPage`) with explicit Window A (upload container only — `UploadITRVStep` alone, no surrounding copy) and Window B (after upload: re-upload control + ChargesStep + RefundTrackingStep + invoice draft/final buttons).
-3. Replace `InvoiceStep` with a stepped sub-flow that has Draft Invoice and Final Invoice buttons. Both advance to Step 4.
+### Changes shipped
+1. **Auto-extract persistence** (`api/documents/[id]/extract/route.ts`): after extraction, when a filing case exists for the same `client_id` + `assessment_year_id`, persist `return_category` (ITR No.) and `refund_claimed_amount` into `filing_cases`, with `tax_payable` mirrored as 0 refund when applicable. Inserts/updates a `filing_records` row when ack number or filing date is missing so the resolver treats the case as Filed.
+2. **UploadITRVStep** now fires `/api/documents/[id]/extract` immediately after upload so case fields populate before the journey refresh. Added a `compact` prop to render an inline "Re-upload ITR-V" pill + small file picker for use inside Window B.
+3. **Step 3 two-window flow** in `ClientJourneyPage`:
+   - Window A: `<UploadITRVStep existingItrvDoc={null} />` only — no extra copy text and no surrounding chrome beyond the component's own heading.
+   - Window B activates once `itrvStepData` is populated (filings.acknowledgement_number + filing_date exist): a compact "ITR-V Received" re-upload strip, ChargesStep, RefundTrackingStep, and InvoiceStep stacked top-to-bottom.
+4. **InvoiceStep** rewrites:
+   - No invoice: shows side-by-side "Create Draft Invoice" + "Create Final Invoice" buttons, both open the draft form (per spec, both end at Step 4 eventually).
+   - Existing draft: shows "Edit Details" link + "Issue Final Invoice →" amber button that calls `issueInvoiceAction` with today's issue date and +15 day due date, then advances via `onComplete` → Step 4 (Payment).
+   - Existing issued: shows the existing summary card with "Edit Details" + "Record Payment →" path.
+5. **Verification**: `npm run typecheck` clean, `npm run lint` clean (0 errors), `npm run build` compiled successfully.
+6. **Commit**: `1dbd7c3` pushed to `origin/master`.
 
 ## Step 2 Simplification & Header Typography (2026-07-10)
 
