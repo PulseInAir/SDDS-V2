@@ -56,6 +56,7 @@ export function InvoiceCreateForm({
   defaultClientId,
   invoiceSettings,
   editingInvoice,
+  initialRefundClaimedAmount,
   onCancelEdit,
   onSuccess,
 }: {
@@ -72,6 +73,7 @@ export function InvoiceCreateForm({
     };
   };
   editingInvoice?: InvoicesModuleData["paginatedInvoices"][number];
+  initialRefundClaimedAmount?: number;
   onCancelEdit?: () => void;
   revalidateTarget?: string;
   onSuccess?: (invoiceId: string) => void;
@@ -138,7 +140,7 @@ export function InvoiceCreateForm({
         }
       }
     }
-    return "";
+    return initialRefundClaimedAmount ? String(initialRefundClaimedAmount) : "";
   });
 
   const [refundPercentage, setRefundPercentage] = useState(
@@ -207,8 +209,10 @@ export function InvoiceCreateForm({
 
     getReceivedRefundAmount(selectedClientId, selectedAyId)
       .then((amt) => {
-        if (amt !== null) {
+        if (amt !== null && amt > 0) {
           setRefundableAmount(String(amt));
+        } else if (initialRefundClaimedAmount !== undefined && initialRefundClaimedAmount > 0) {
+          setRefundableAmount(String(initialRefundClaimedAmount));
         } else {
           setRefundableAmount("");
         }
@@ -216,7 +220,7 @@ export function InvoiceCreateForm({
       .catch((err) => {
         console.error("Failed to fetch received refund amount:", err);
       });
-  }, [selectedClientId, selectedAyId, editingInvoice]);
+  }, [selectedClientId, selectedAyId, editingInvoice, initialRefundClaimedAmount]);
 
   // Validate calculator inputs on the fly (derived render variable to avoid setState inside useMemo warning)
   const calcErrors = useMemo(() => {

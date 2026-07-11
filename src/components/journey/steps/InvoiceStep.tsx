@@ -21,6 +21,7 @@ interface InvoiceStepProps {
     total_amount: number;
     balance_amount: number;
   } | null;
+  initialRefundClaimedAmount?: number;
   onComplete: () => void;
 }
 
@@ -30,6 +31,7 @@ export function InvoiceStep({
   ayOptions,
   invoiceSettings,
   existingInvoice,
+  initialRefundClaimedAmount,
   onComplete,
 }: InvoiceStepProps) {
   const [issuing, startIssueTransition] = useTransition();
@@ -58,6 +60,7 @@ export function InvoiceStep({
             assessmentYears={ayOptions}
             defaultClientId={clientId}
             invoiceSettings={invoiceSettings}
+            initialRefundClaimedAmount={initialRefundClaimedAmount}
             revalidateTarget={`/clients/${clientId}/journey`}
             onSuccess={() => onComplete()}
           />

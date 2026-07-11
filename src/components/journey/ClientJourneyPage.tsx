@@ -6,7 +6,6 @@ import { JourneyPipeline } from "./JourneyPipeline";
 import { JourneyStepHeader } from "./JourneyStepHeader";
 import { ClientStatusStep } from "./steps/ClientStatusStep";
 import { UploadITRVStep } from "./steps/UploadITRVStep";
-import { ChargesStep } from "./steps/ChargesStep";
 import { RefundTrackingStep } from "./steps/RefundTrackingStep";
 import { InvoiceStep } from "./steps/InvoiceStep";
 import { PaymentStep } from "./steps/PaymentStep";
@@ -663,23 +662,8 @@ export function ClientJourneyPage({
                               />
                             </div>
 
-                            {/* Charges panel — auto-populated, editable via the Modify action */}
-                            <ChargesStep
-                              key={`${filingCase?.id}_${filingCase?.return_category}_${filingCase?.refund_claimed_amount}_${filingCase?.itr_filing_charges}_${filingCase?.refund_claim_charges}`}
-                              caseId={filingCase?.id || ""}
-                              clientId={clientId}
-                              rateCard={invoiceSettings?.rate_card || {}}
-                              refundChargePercentage={invoiceSettings?.refund_charge_percentage || 10}
-                              defaultItrForm={filingCase?.return_category || "ITR-1"}
-                              initialRefundClaimed={filingCase?.refund_claimed_amount || 0}
-                              initialItrCharges={filingCase?.itr_filing_charges || undefined}
-                              initialRefundCharges={filingCase?.refund_claim_charges || undefined}
-                              onComplete={() => handleRefresh()}
-                            />
-
-                            {/* Refund tracking — appears after charges are confirmed and only if refund was claimed */}
-                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" &&
-                             state.steps.find((s: any) => s.id === "refund")?.status !== "skipped" && (
+                            {/* Refund tracking — appears only if refund was claimed (auto-detected from ITR-V) */}
+                            {state.steps.find((s: any) => s.id === "refund")?.status !== "skipped" && (
                               <RefundTrackingStep
                                 caseId={filingCase?.id || ""}
                                 clientId={clientId}
@@ -692,25 +676,24 @@ export function ClientJourneyPage({
                             )}
 
                             {/* Invoice creation / edit — Draft & Final buttons, both forward to Step 4 */}
-                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" && (
-                              <InvoiceStep
-                                clientId={clientId}
-                                selectedAyId={selectedAyId}
-                                clientsOptions={clientsOptions}
-                                ayOptions={ayOptions}
-                                invoiceSettings={invoiceSettings}
-                                existingInvoice={activeInvoice ? {
-                                  id: activeInvoice.invoiceId,
-                                  invoice_number: activeInvoice.invoiceNumber,
-                                  status: activeInvoice.status,
-                                  total_amount: activeInvoice.totalAmount,
-                                  balance_amount: activeInvoice.balanceAmount,
-                                } : null}
-                                onComplete={() => {
-                                  handleRefresh().then(() => goToStep("payment"));
-                                }}
-                              />
-                            )}
+                            <InvoiceStep
+                              clientId={clientId}
+                              selectedAyId={selectedAyId}
+                              clientsOptions={clientsOptions}
+                              ayOptions={ayOptions}
+                              invoiceSettings={invoiceSettings}
+                              existingInvoice={activeInvoice ? {
+                                id: activeInvoice.invoiceId,
+                                invoice_number: activeInvoice.invoiceNumber,
+                                status: activeInvoice.status,
+                                total_amount: activeInvoice.totalAmount,
+                                balance_amount: activeInvoice.balanceAmount,
+                              } : null}
+                              initialRefundClaimedAmount={filingCase?.refund_claimed_amount || 0}
+                              onComplete={() => {
+                                handleRefresh().then(() => goToStep("payment"));
+                              }}
+                            />
                           </div>
                         )}
                       </div>

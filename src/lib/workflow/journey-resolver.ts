@@ -92,8 +92,8 @@ export function resolveJourneyState({
   });
 
   // ── Step 3: Charges Calculated ────────────────────────────────────────────
-  // Done if charges are recorded
-  const hasCharges = filingCase?.itr_filing_charges !== null && filingCase?.itr_filing_charges !== undefined;
+  // Done if charges are auto-populated from ITR-V extraction
+  const hasCharges = !!filingCase?.return_category;
   const step3Done = step1Done && hasCharges;
   steps.push({
     id: "charges",
