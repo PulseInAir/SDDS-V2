@@ -8,7 +8,17 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None — owner must give next prompt
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `319909a`
+- HEAD: `d2c22d5`
+
+## Window B Uploaded Document Register (2026-07-11)
+
+**Status: DONE — Inserted an uploaded document register per client in the Invoice step (Window B) with a delete option.**
+
+### Changes shipped
+1. **API**: Added `archiveDocumentAction` in `documents.ts` to support hard archiving of documents and recording `activity_events` upon deletion.
+2. **State Updates**: Updated `getClientJourneyState` in `journey.ts` to return an array of all active documents (`documents: documentList`) instead of just the isolated `itrvDocument`.
+3. **UI Component**: Created a sleek, dark-themed `DocumentRegister.tsx` table to display files, types, upload dates, sizes, and actions (Download / Delete). Delete triggers `startTransition` to call `archiveDocumentAction`, followed by a `handleRefresh()` which automatically hides Window B if the ITR-V itself is deleted.
+4. **Commit**: `d2c22d5` pushed to `origin/master`.
 
 ## ITR-V Upload Window Refresh Fix (2026-07-11)
 

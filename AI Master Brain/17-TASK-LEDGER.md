@@ -91,6 +91,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-JOURNEY-05-R2 | DONE | Refinement: Decouple Window B transition from "filed" step data and base it strictly on ITR-V document existence | CLIENT-JOURNEY-05-R1 | `ClientJourneyPage` now fetches the `ITR-V` document explicitly during refresh and stores it in `itrvDocument`. Window B only triggers if the document actually exists, eliminating the bug where users were stuck in Window A if the filing date wasn't previously provided. | `47dab13` |
 | GLOBAL-LAYOUT-01 | DONE | Unify global layout design (Sidebar, Topbar) with the deep cinematic aesthetic of the Guided Journey | CLIENT-JOURNEY-05-R2 | Refactored `globals.css` core surface tokens to deep dark (`#050505`). Converted `SidebarNav.tsx`, `TopUtilityBar.tsx`, and `GlobalSearch.tsx` to use translucent glassmorphism (`white/[0.02]`, `white/5`), removing corporate blue defaults. | `e2ccce6` |
 | CLIENT-JOURNEY-BUG-01 | DONE | Fix Window A reverting on page refresh by initializing ITR-V state from server | CLIENT-JOURNEY-05-R2 | itrvDocument fetched by server action and initialized on mount to prevent UI flicker. | `319909a` |
+| CLIENT-JOURNEY-05-R3 | DONE | Insert uploaded document register per client in Window B with delete option | CLIENT-JOURNEY-BUG-01 | Added DocumentRegister.tsx component. Updated journey.ts to fetch all documents. Added archiveDocumentAction to documents.ts. | `d2c22d5` |
 ## Task update protocol
 
 When starting:
