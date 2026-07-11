@@ -8,7 +8,17 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None — owner must give next prompt
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `f860b2b`
+- HEAD: `319909a`
+
+## ITR-V Upload Window Refresh Fix (2026-07-11)
+
+**Status: DONE — Fixed the UI bug where refreshing the Client Journey page in Window B incorrectly reverted to the Window A upload drop box.**
+
+### Changes shipped
+1. **Server-Side Initialization**: Updated `getClientJourneyState` in `journey.ts` to actively fetch the ITR-V document via a robust Supabase query alongside other case data, returning it as `itrvDocument` in the initial load payload.
+2. **Preventing Flicker**: Updated `ClientJourneyPage.tsx` to directly initialize its internal `itrvDocument` state with `initialJourneyData?.itrvDocument`, completely bypassing the intermediate `null` state and avoiding any brief UI flicker of the upload box.
+3. **Optimized Refresh Strategy**: Removed the redundant client-side `fetchItrvDocument` call inside the `handleRefresh` hook. The refresh action now flawlessly picks up the document straight from the refreshed journey state.
+4. **Commit**: `319909a` pushed to `origin/master`.
 
 ## Window A -> Window B Transition Logic Fix (2026-07-11)
 
