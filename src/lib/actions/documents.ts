@@ -482,3 +482,45 @@ export async function getSignedDownloadUrl(documentId: string) {
 
   return signedUrlData.signedUrl;
 }
+
+export async function archiveDocumentAction(documentId: string, revalidateTarget = "/documents") {
+  const session = await getAuthenticatedWorkspaceSession();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: document, error: fetchError } = await supabase
+    .from("documents")
+    .select("client_id, original_filename")
+    .eq("workspace_id", session.workspace.id)
+    .eq("id", documentId)
+    .single();
+
+  if (fetchError || !document) {
+    return { success: false, error: "Document not found." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("documents")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", documentId);
+
+  if (updateError) {
+    return { success: false, error: updateError.message };
+  }
+
+  await supabase.from("activity_events").insert({
+    workspace_id: session.workspace.id,
+    actor_id: session.user.id,
+    client_id: document.client_id,
+    entity_type: "document",
+    entity_id: documentId,
+    action: "document_deleted",
+    message: `Document "${document.original_filename}" was deleted.`,
+  });
+
+  revalidatePath("/documents");
+  revalidatePath(`/clients/${document.client_id}`);
+  revalidatePath(`/clients/${document.client_id}/documents`);
+  revalidatePath(revalidateTarget);
+
+  return { success: true };
+}

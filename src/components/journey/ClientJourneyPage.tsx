@@ -9,6 +9,7 @@ import { UploadITRVStep } from "./steps/UploadITRVStep";
 import { RefundTrackingStep } from "./steps/RefundTrackingStep";
 import { InvoiceStep } from "./steps/InvoiceStep";
 import { PaymentStep } from "./steps/PaymentStep";
+import { DocumentRegister } from "./DocumentRegister";
 import { PaymentFollowUpStep } from "./steps/PaymentFollowUpStep";
 import { NextYearFollowUpStep } from "./steps/NextYearFollowUpStep";
 import { ClientForm } from "@/components/clients/ClientForm";
@@ -662,6 +663,12 @@ export function ClientJourneyPage({
                                 compact
                               />
                             </div>
+
+                            {/* Document Register for all uploaded documents */}
+                            <DocumentRegister
+                              documents={journeyData?.documents || []}
+                              onRefresh={() => handleRefresh()}
+                            />
 
                             {/* Refund tracking — appears only if refund was claimed (auto-detected from ITR-V) */}
                             {state.steps.find((s: any) => s.id === "refund")?.status !== "skipped" && (
