@@ -185,7 +185,8 @@ export function ClientJourneyPage({
     const filings = journeyData.state?.steps?.find((s: any) => s.id === "filed")?.data;
     const chargesSet = journeyData.state?.steps?.find((s: any) => s.id === "charges")?.status === "done";
     
-    if (caseRecord && filings && !chargesSet && !isExtracting) {
+    // Auto extract only if case exists, has filings, charges are not set, and return_category is not yet extracted/saved
+    if (caseRecord && filings && !chargesSet && !caseRecord.return_category && !isExtracting) {
       fetchClientItrvAndExtract(caseRecord.id);
     }
   }, [journeyData]);
@@ -664,6 +665,7 @@ export function ClientJourneyPage({
 
                             {/* Charges panel — auto-populated, editable via the Modify action */}
                             <ChargesStep
+                              key={`${filingCase?.id}_${filingCase?.return_category}_${filingCase?.refund_claimed_amount}_${filingCase?.itr_filing_charges}_${filingCase?.refund_claim_charges}`}
                               caseId={filingCase?.id || ""}
                               clientId={clientId}
                               rateCard={invoiceSettings?.rate_card || {}}

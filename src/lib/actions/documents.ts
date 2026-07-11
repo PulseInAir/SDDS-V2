@@ -30,6 +30,7 @@ type DocumentFilters = {
 export type DocumentActionState = {
   error?: string;
   success?: string;
+  documentId?: string;
 };
 
 type PendingCaseWithoutDocuments = {
@@ -391,6 +392,7 @@ export async function uploadDocumentAction(
     success: replacesDocumentId
       ? `Uploaded replacement version ${version} for ${documentType}.`
       : `Uploaded ${documentType}.`,
+    documentId,
   };
 }
 

@@ -57,6 +57,7 @@ export function InvoiceCreateForm({
   invoiceSettings,
   editingInvoice,
   onCancelEdit,
+  onSuccess,
 }: {
   clients: ClientOption[];
   assessmentYears: AssessmentYearOption[];
@@ -73,6 +74,7 @@ export function InvoiceCreateForm({
   editingInvoice?: InvoicesModuleData["paginatedInvoices"][number];
   onCancelEdit?: () => void;
   revalidateTarget?: string;
+  onSuccess?: (invoiceId: string) => void;
 }) {
   const boundAction = editingInvoice
     ? updateInvoiceAction.bind(null, editingInvoice.id)
@@ -287,9 +289,12 @@ export function InvoiceCreateForm({
           setRefundableAmount("");
           setItems([createEmptyItem()]);
         });
+        if (onSuccess && state.invoiceId) {
+          onSuccess(state.invoiceId);
+        }
       }
     }
-  }, [state.success, editingInvoice, onCancelEdit]);
+  }, [state.success, state.invoiceId, editingInvoice, onCancelEdit, onSuccess]);
 
   const handleExtract = async (docId: string) => {
     if (!docId) return;
@@ -718,16 +723,43 @@ export function InvoiceCreateForm({
         </p>
       ) : null}
 
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2.5">
         {editingInvoice && onCancelEdit && (
           <Button type="button" variant="secondary" onClick={onCancelEdit} disabled={isPending}>
             Cancel
           </Button>
         )}
-        <Button type="submit" variant="primary" disabled={isPending}>
-          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-          {editingInvoice ? "Save update" : "Create draft"}
-        </Button>
+        {editingInvoice ? (
+          <Button type="submit" variant="primary" disabled={isPending}>
+            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+            Save update
+          </Button>
+        ) : (
+          <>
+            <Button
+              type="submit"
+              name="status"
+              value="draft"
+              variant="secondary"
+              disabled={isPending}
+              className="active:scale-95 transition-transform"
+            >
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+              Create Draft Invoice
+            </Button>
+            <Button
+              type="submit"
+              name="status"
+              value="issued"
+              variant="primary"
+              disabled={isPending}
+              className="active:scale-95 transition-transform bg-amber-500 hover:bg-amber-400 text-black font-semibold shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+            >
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+              Create Final Invoice
+            </Button>
+          </>
+        )}
       </div>
     </form>
   );

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useTransition } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { uploadDocumentAction } from "@/lib/actions/documents";
 import { Button } from "@/components/ui/Button";
 import { Loader2, Upload, FileText, CheckCircle, RefreshCw } from "lucide-react";
+import { classNames } from "@/lib/utils/styles";
 
 interface UploadITRVStepProps {
   clientId: string;
@@ -21,6 +23,23 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
   const [success, setSuccess] = useState<string | null>(null);
 
   const [isReuploading, setIsReuploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+      setError(null);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const handleClearFile = () => {
+    setSelectedFile(null);
+    const fileInput = document.getElementById("itrv-file-input") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,27 +57,17 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
 
       setSuccess(res.success || "Document uploaded successfully!");
 
-      // Find the uploaded document id from the documents table so we can
-      // immediately run extraction against it. Re-fires refresh so that the
-      // charges auto-populate from filing_cases.return_category +
-      // filing_cases.refund_claimed_amount.
-      try {
-        const docsRes = await fetch(`/api/documents?clientId=${clientId}&assessmentYearId=${selectedAyId}`);
-        if (docsRes.ok) {
-          const docs = await docsRes.json();
-          const itrvDocs = (docs.data || []).filter((d: any) => d.document_type === "ITR-V" && !d.archived_at);
-          itrvDocs.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-          const latest = itrvDocs[0];
-          if (latest?.id) {
-            await fetch(`/api/documents/${latest.id}/extract`, { method: "POST" });
-          }
+      if (res.documentId) {
+        try {
+          await fetch(`/api/documents/${res.documentId}/extract`, { method: "POST" });
+        } catch (err) {
+          console.error("[Extract] Direct trigger failed:", err);
         }
-      } catch {
-        // Non-fatal — the parent refresh + ClientJourneyPage effect will retry.
       }
 
       setTimeout(() => {
-        onComplete();
+        onComplete(res.documentId);
+        setSelectedFile(null);
         if (compact) setIsReuploading(false);
       }, 600);
     });
@@ -116,26 +125,28 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-text-primary">Upload ITR-V Acknowledgement</h3>
+        <h3 className="text-xl font-light text-white tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          Upload ITR-V
+        </h3>
       </div>
 
       {existingItrvDoc && !isReuploading ? (
-        <div className="p-4 rounded-[var(--radius-panel)] border border-emerald-500/30 bg-emerald-950/20 max-w-md">
+        <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 max-w-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-950/60 border border-emerald-500 flex items-center justify-center text-emerald-400">
+            <div className="w-10 h-10 rounded-full bg-emerald-950/60 border border-emerald-500 flex items-center justify-center text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
               <FileText className="h-5 w-5" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wide">Document Uploaded</p>
-              <p className="text-sm text-text-primary font-medium truncate mt-0.5">{existingItrvDoc.original_filename}</p>
+              <p className="text-sm text-white/80 font-medium truncate mt-0.5">{existingItrvDoc.original_filename}</p>
             </div>
             <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
           </div>
 
-          <div className="mt-4 flex justify-end gap-3">
-            <Button size="sm" variant="ghost" className="text-text-muted hover:text-white" onClick={() => setIsReuploading(true)}>
+          <div className="mt-5 flex justify-end gap-3 border-t border-emerald-500/10 pt-4">
+            <Button size="sm" variant="ghost" className="text-white/60 hover:text-white" onClick={() => setIsReuploading(true)}>
               Re-upload ITR-V
             </Button>
             <Button size="sm" variant="secondary" onClick={() => onComplete()}>
@@ -146,13 +157,13 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
           {error && (
-            <div className="p-3 text-xs bg-red-950/20 border border-red-500/30 text-red-400 rounded-[var(--radius-input)]">
+            <div className="p-3 text-xs bg-red-950/20 border border-red-500/30 text-red-400 rounded-xl">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="p-3 text-xs bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 rounded-[var(--radius-input)]">
+            <div className="p-3 text-xs bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 rounded-xl">
               {success}
             </div>
           )}
@@ -164,38 +175,114 @@ export function UploadITRVStep({ clientId, selectedAyId, onComplete, existingItr
           <input type="hidden" name="checklistStatus" value="received" />
           <input type="hidden" name="revalidateTarget" value={`/clients/${clientId}/journey`} />
 
-          <div className="flex flex-col gap-4">
-            <div className="relative group border border-dashed border-neutral-800 hover:border-brand-500/50 rounded-[var(--radius-panel)] p-6 bg-neutral-950/20 transition-all duration-300 text-center">
-              <input
-                type="file"
-                name="file"
-                accept="application/pdf"
-                required
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              <div className="flex flex-col items-center justify-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-neutral-900/60 border border-neutral-800 flex items-center justify-center text-text-muted group-hover:text-brand-400 group-hover:border-brand-500/30 transition-all">
-                  <Upload className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="block text-sm font-medium text-text-primary">Click to select PDF or drag and drop</span>
-                  <span className="block text-[10px] text-text-muted mt-1 font-mono">Accepts only Indian ITR-V (PDF)</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-col gap-5">
+            <AnimatePresence mode="wait">
+              {selectedFile ? (
+                <motion.div
+                  key="file-attached"
+                  initial={{ opacity: 0, scale: 0.96, y: 5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96, y: -5 }}
+                  className="relative p-5 rounded-2xl border border-emerald-500/20 bg-emerald-950/5 flex items-center justify-between shadow-[0_0_20px_rgba(16,185,129,0.03)] border-solid"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white/90 truncate max-w-[200px] sm:max-w-xs">{selectedFile.name}</p>
+                      <p className="text-[11px] text-emerald-400/80 font-mono mt-0.5">{(selectedFile.size / 1024).toFixed(1)} KB • Ready for extraction</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearFile}
+                    className="px-3 py-1 rounded-full border border-white/5 hover:border-red-500/30 bg-white/[0.02] hover:bg-red-500/10 text-[9px] uppercase tracking-wider font-bold text-white/50 hover:text-red-400 transition-all duration-300"
+                  >
+                    Clear File
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="drag-drop"
+                  animate={{
+                    scale: isDragOver ? 1.01 : 1,
+                    borderColor: isDragOver ? "rgba(245, 158, 11, 0.5)" : "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: isDragOver ? "rgba(245, 158, 11, 0.04)" : "rgba(255, 255, 255, 0.01)",
+                    boxShadow: isDragOver ? "0 0 25px rgba(245, 158, 11, 0.1)" : "none",
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="relative group border border-dashed rounded-2xl p-8 text-center flex flex-col items-center justify-center hover:border-white/10 transition-colors"
+                >
+                  <input
+                    type="file"
+                    id="itrv-file-input"
+                    name="file"
+                    accept="application/pdf"
+                    required
+                    onChange={handleFileChange}
+                    onDragEnter={() => setIsDragOver(true)}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={() => setIsDragOver(false)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <motion.div
+                      animate={isDragOver ? { y: [-3, 3, -3] } : {}}
+                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      className="w-12 h-12 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-white/40 group-hover:text-amber-400 group-hover:border-amber-500/30 transition-all"
+                    >
+                      <Upload className="h-5 w-5" />
+                    </motion.div>
+                    <div>
+                      <span className="block text-xs font-semibold text-white/70 uppercase tracking-wider">
+                        {isDragOver ? "Drop ITR-V PDF here" : "Select ITR-V PDF file"}
+                      </span>
+                      <span className="block text-[10px] text-white/30 mt-1.5 font-mono">Accepts only Indian ITR-V (PDF)</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isPending} className="active:scale-95 transition-transform">
-                {isPending ? (
-                  <span className="flex items-center gap-1.5">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Uploading & Extracting...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    Upload & Auto-Extract
-                  </span>
+            <div className="flex justify-end pt-2">
+              <motion.button
+                type="submit"
+                disabled={isPending || !selectedFile}
+                whileHover={!isPending && selectedFile ? { scale: 1.02, boxShadow: "0 0 25px rgba(245, 158, 11, 0.35)" } : {}}
+                whileTap={!isPending && selectedFile ? { scale: 0.97 } : {}}
+                className={classNames(
+                  "relative h-12 px-8 rounded-xl font-bold text-[10px] uppercase tracking-widest overflow-hidden transition-all duration-500",
+                  isPending
+                    ? "bg-amber-950/30 text-amber-500/40 border border-amber-500/10 cursor-not-allowed w-full sm:w-auto"
+                    : !selectedFile
+                    ? "bg-white/[0.02] text-white/20 border border-white/5 cursor-not-allowed w-full sm:w-auto"
+                    : "bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 bg-[size:200%_auto] hover:bg-[right_center] text-black shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-[background-position] duration-700 w-full sm:w-auto"
                 )}
-              </Button>
+              >
+                {/* Scanner sweep line */}
+                {isPending && (
+                  <motion.div
+                    className="absolute inset-x-0 h-[2px] bg-amber-400 shadow-[0_0_10px_#f59e0b] z-20"
+                    animate={{ top: ["0%", "100%", "0%"] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                )}
+
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
+                      <span>Extracting ITR-V...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      <span>Upload & Auto-Extract</span>
+                    </>
+                  )}
+                </span>
+              </motion.button>
             </div>
           </div>
         </form>

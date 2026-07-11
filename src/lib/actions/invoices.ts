@@ -449,6 +449,42 @@ export async function createInvoiceAction(
     }
   }
 
+  const targetStatus = String(formData.get("status") ?? "draft").trim();
+  const isFinal = targetStatus === "issued";
+
+  if (isFinal) {
+    const today = new Date().toISOString().slice(0, 10);
+    const due = new Date();
+    due.setDate(due.getDate() + 15);
+    const dueDate = due.toISOString().slice(0, 10);
+
+    const { error: issueError } = await supabase
+      .from("invoices")
+      .update({
+        status: "issued",
+        issue_date: today,
+        due_date: dueDate,
+      })
+      .eq("workspace_id", session.workspace.id)
+      .eq("id", invoice.id);
+
+    if (issueError) {
+      return { error: `Invoice draft was created, but failed to issue: ${issueError.message}` };
+    }
+
+    await supabase.from("activity_events").insert({
+      workspace_id: session.workspace.id,
+      actor_id: session.user.id,
+      client_id: clientId,
+      case_id: filingCase?.id ?? null,
+      entity_type: "invoice",
+      entity_id: invoice.id,
+      action: "invoice_issued",
+      message: `Invoice ${invoice.invoice_number} was issued.`,
+      metadata: { issueDate: today, dueDate },
+    });
+  }
+
   const settingsPct = formData.get("refundClaimSettingsPercentage");
   const appliedPct = formData.get("refundClaimAppliedPercentage");
 
@@ -460,7 +496,9 @@ export async function createInvoiceAction(
     entity_type: "invoice",
     entity_id: invoice.id,
     action: "invoice_created",
-    message: `Draft invoice ${invoice.invoice_number} was created.`,
+    message: isFinal
+      ? `Invoice ${invoice.invoice_number} was created and finalized.`
+      : `Draft invoice ${invoice.invoice_number} was created.`,
     metadata: settingsPct && appliedPct ? {
       refund_claim_settings_percentage: parseFloat(String(settingsPct)),
       refund_claim_applied_percentage: parseFloat(String(appliedPct))
@@ -473,7 +511,9 @@ export async function createInvoiceAction(
   revalidatePath(`/clients/${clientId}/invoices`);
 
   return {
-    success: `Created draft invoice ${invoice.invoice_number}.`,
+    success: isFinal
+      ? `Created and issued invoice ${invoice.invoice_number}.`
+      : `Created draft invoice ${invoice.invoice_number}.`,
     invoiceId: invoice.id,
   };
 }

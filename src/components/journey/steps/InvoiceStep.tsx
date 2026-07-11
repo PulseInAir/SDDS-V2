@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import { InvoiceCreateForm } from "@/components/invoices/InvoiceCreateForm";
 import { Button } from "@/components/ui/Button";
-import { FilePlus, FileText, Edit3, Send, Loader2 } from "lucide-react";
+import { FileText, Edit3, Send, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { issueInvoiceAction } from "@/lib/actions/invoices";
 import { formatInvoiceStatus } from "@/lib/utils/invoices";
@@ -32,18 +32,17 @@ export function InvoiceStep({
   existingInvoice,
   onComplete,
 }: InvoiceStepProps) {
-  const [showForm, setShowForm] = useState(false);
   const [issuing, startIssueTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // ── No invoice yet — Draft / Final Invoice actions ────────────────────────
+  // ── No invoice yet — Render creation form directly ────────────────────────
   if (!existingInvoice) {
     return (
-      <div className="space-y-4 max-w-3xl">
+      <div className="space-y-4 max-w-4xl">
         <div>
           <h3 className="text-lg font-semibold text-text-primary">Generate Invoice</h3>
           <p className="text-sm text-text-muted mt-0.5">
-            Charges have been auto-populated from the ITR-V extraction. Create a draft to edit, or finalise it directly.
+            Charges have been auto-populated from the ITR-V extraction. Edit details and create a draft or final invoice.
           </p>
         </div>
 
@@ -53,55 +52,16 @@ export function InvoiceStep({
           </div>
         )}
 
-        {!showForm ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl">
-            <Button
-              onClick={() => setShowForm(true)}
-              variant="secondary"
-              className="activate:scale-95 transition-transform h-12 justify-start px-4"
-            >
-              <FilePlus className="h-4 w-4 mr-2" />
-              <div className="flex flex-col items-start">
-                <span className="text-sm font-semibold">Create Draft Invoice</span>
-                <span className="text-[10px] font-normal opacity-70">Edit details → Step 4 to finalise</span>
-              </div>
-            </Button>
-
-            <Button
-              onClick={() => setShowForm(true)}
-              className="active:scale-95 transition-transform h-12 justify-start px-4 bg-amber-500 hover:bg-amber-400"
-            >
-              <Send className="h-4 w-4 mr-2" />
-              <div className="flex flex-col items-start">
-                <span className="text-sm font-semibold">Create Final Invoice</span>
-                <span className="text-[10px] font-normal opacity-70">Issue & forward to Payment</span>
-              </div>
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-base font-semibold text-text-primary">New Invoice Draft</h3>
-              <button
-                onClick={() => setShowForm(false)}
-                className="text-xs text-text-secondary hover:text-text-primary font-medium transition-colors"
-              >
-                Hide Form
-              </button>
-            </div>
-
-            <div className="border border-border-subtle rounded-[var(--radius-panel)] p-1 bg-neutral-950/10">
-              <InvoiceCreateForm
-                clients={clientsOptions}
-                assessmentYears={ayOptions}
-                defaultClientId={clientId}
-                invoiceSettings={invoiceSettings}
-                revalidateTarget={`/clients/${clientId}/journey`}
-                onCancelEdit={() => setShowForm(false)}
-              />
-            </div>
-          </div>
-        )}
+        <div className="border border-border-subtle rounded-[var(--radius-panel)] p-1 bg-neutral-950/10">
+          <InvoiceCreateForm
+            clients={clientsOptions}
+            assessmentYears={ayOptions}
+            defaultClientId={clientId}
+            invoiceSettings={invoiceSettings}
+            revalidateTarget={`/clients/${clientId}/journey`}
+            onSuccess={() => onComplete()}
+          />
+        </div>
       </div>
     );
   }

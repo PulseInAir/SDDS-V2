@@ -8,7 +8,19 @@ This file is rewritten after every task. Keep it compact and factual.
 - Next READY task: None — owner must give next prompt
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `1dbd7c3`
+- HEAD: `cc67d76`
+
+## Step 3 Upload, Extract, and Invoice Flow Correction (2026-07-11)
+
+**Status: DONE — Fixed ITR-V upload copy, implemented missing GET /api/documents endpoint, added highly interactive file-upload drag-and-drop feedback, scanner-swept auto-extract buttons, and immediate transition to Step 4 (Payment) for both Draft and Final Invoices.**
+
+### Changes shipped
+1. **Simplified Copy**: Changed heading to exactly `"Upload ITR-V"` and removed descriptive paragraph clutter.
+2. **GET `/api/documents` API**: Added the missing endpoint in `route.ts` to query client documents.
+3. **Interactive Upload Container**: Added Framer Motion drag-over active glowing border/background styles (`border-amber-500/80 bg-amber-500/[0.05] shadow-[0_0_30px_rgba(245,158,11,0.15)]`), mouse spotlight scaling, upload icon bounce, and a green-lit file preview card.
+4. **Vibrant Scanner Button**: Refactored the upload button to support a golden shifting gradient shimmer on hover, spring scaling clicks, and an animated green/amber scanner beam sweeping across the button while auto-extraction is active.
+5. **Immediate Issue & Routing**: Updated `createInvoiceAction` to allow immediate issuing if the form requests status `"issued"`. Refactored `InvoiceStep.tsx` and `InvoiceCreateForm.tsx` to directly show the billing details with side-by-side Draft / Final submit buttons, immediately calling `onComplete()` to advance to Step 4 (Payment) on successful creation.
+6. **Verification**: Checked and verified using `npm run typecheck` (clean), `npm run lint` (clean), and `npm run build` (compiled successfully with Next.js production build).
 
 ## Step 3 (Invoice) Subsume & Upload Fix (2026-07-11)
 
