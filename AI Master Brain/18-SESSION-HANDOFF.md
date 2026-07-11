@@ -10,6 +10,27 @@ This file is rewritten after every task. Keep it compact and factual.
 - Branch: `master`
 - HEAD: `f860b2b`
 
+## Window A -> Window B Transition Logic Fix (2026-07-11)
+
+**Status: DONE — Completely decoupled the Window B rendering from the "filed" step logic. Window B now strictly evaluates the existence of the ITR-V document via the `/api/documents` API.**
+
+### Changes shipped
+1. **Removed `itrvStepData` dependency**: The previous implementation mistakenly linked Window B's display to whether the ITR was marked as "filed" in Step 2. If a user skipped assigning a filing date, they were perpetually stuck in Window A.
+2. **True Document Detection**: Implemented `fetchItrvDocument()` in `ClientJourneyPage.tsx` which directly fetches and detects if an ITR-V document has been uploaded for the current client and Assessment Year.
+3. **Instant UI Reaction**: After uploading via `UploadITRVStep` in Window A, `onComplete()` triggers `handleRefresh()`, automatically fetching the new document state and instantly transitioning the UI directly to Window B without requiring the case to be "filed".
+4. **Commit**: `47dab13` pushed to `origin/master`.
+
+## Global Layout Cinematic Unification (2026-07-11)
+
+**Status: DONE — Unified the global layout (Sidebar, Topbar, Global Search) with the deep cinematic glassmorphic aesthetic of the Guided Journey.**
+
+### Changes shipped
+1. **Core Surface Tokens**: Updated `globals.css` to use deep dark `#050505` backgrounds instead of standard corporate navy blues.
+2. **Sidebar Navigation**: Removed solid backgrounds and blue active states from `SidebarNav.tsx`. Replaced with translucent glassmorphic panels, glowing text for the header, and subtle `white/5` borders.
+3. **Top Utility Bar**: Updated `TopUtilityBar.tsx` to use `backdrop-blur-md` on `#050505`, replaced the solid primary "Add Client" button with an interactive glassmorphic amber-glowing button, and updated the User Dropdown to match.
+4. **Global Search**: Modified the search input and results dropdown in `GlobalSearch.tsx` to use `white/[0.02]` backgrounds and delicate focus states, integrating seamlessly into the dark theme.
+5. **Commit**: `e2ccce6` pushed to `origin/master`.
+
 ## Step 3 Window B Concurrency Fix (2026-07-11)
 
 **Status: DONE — Refined Step 3 Window B to display the Invoice, Refund, and Upload forms concurrently without an intermediate explicit charges confirmation step.**

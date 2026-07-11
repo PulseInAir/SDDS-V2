@@ -60,6 +60,7 @@ export async function getClientJourneyState(clientId: string, assessmentYearId?:
     let refunds: any[] = [];
     let followUps: any[] = [];
     let nextAyLabel: string | null = null;
+    let itrvDoc: any = null;
 
     if (filingCase) {
       // 4. Fetch related data
@@ -67,7 +68,8 @@ export async function getClientJourneyState(clientId: string, assessmentYearId?:
         { data: filingRecs },
         { data: invoiceRecs },
         { data: refundRecs },
-        { data: followUpRecs }
+        { data: followUpRecs },
+        { data: documentRecs }
       ] = await Promise.all([
         supabase
           .from("filing_records")
@@ -88,13 +90,24 @@ export async function getClientJourneyState(clientId: string, assessmentYearId?:
           .from("follow_ups")
           .select("*")
           .eq("case_id", filingCase.id)
+          .is("archived_at", null),
+        supabase
+          .from("documents")
+          .select("*")
+          .eq("workspace_id", session.workspace.id)
+          .eq("client_id", clientId)
+          .eq("assessment_year_id", selectedAyId)
+          .eq("document_type", "ITR-V")
           .is("archived_at", null)
+          .order("created_at", { ascending: false })
+          .limit(1)
       ]);
 
       filings = filingRecs || [];
       invoices = invoiceRecs || [];
       refunds = refundRecs || [];
       followUps = followUpRecs || [];
+      itrvDoc = documentRecs && documentRecs.length > 0 ? documentRecs[0] : null;
 
       // 5. Get Next AY Label for automated scheduling
       const { data: ay } = await supabase
@@ -130,6 +143,7 @@ export async function getClientJourneyState(clientId: string, assessmentYearId?:
       filingCase,
       selectedAyId,
       state,
+      itrvDocument: itrvDoc,
     };
   } catch (error: any) {
     return {

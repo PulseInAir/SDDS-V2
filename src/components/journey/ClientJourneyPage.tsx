@@ -156,7 +156,7 @@ export function ClientJourneyPage({
   const [showIdentity, setShowIdentity] = useState(true);
   const [showCredentials, setShowCredentials] = useState(false);
   const [isCreatingCase, setIsCreatingCase] = useState(false);
-  const [itrvDocument, setItrvDocument] = useState<any>(null);
+  const [itrvDocument, setItrvDocument] = useState<any>(initialJourneyData?.itrvDocument || null);
 
   const handleCreateCase = async () => {
     setIsCreatingCase(true);
@@ -214,27 +214,14 @@ export function ClientJourneyPage({
     }
   }
 
-  async function fetchItrvDocument(ayId: string = selectedAyId) {
-    try {
-      const docsRes = await fetch(`/api/documents?clientId=${clientId}&assessmentYearId=${ayId}`);
-      if (docsRes.ok) {
-        const docs = await docsRes.json();
-        const itrvDoc = (docs.data || []).find((d: any) => d.document_type === "ITR-V" && !d.archived_at);
-        setItrvDocument(itrvDoc || null);
-      }
-    } catch (e) {
-      console.error("Failed to fetch documents", e);
-    }
-  }
-
   async function handleRefresh(ayId: string = selectedAyId) {
     setIsRefreshing(true);
     const res = await getClientJourneyState(clientId, ayId);
-    await fetchItrvDocument(ayId);
     setIsRefreshing(false);
     
     if (res.success && res.state) {
       setJourneyData(res);
+      setItrvDocument(res.itrvDocument || null);
       // Update current step after refresh
       const newGuidedSteps = resolveGuidedSteps(res.state, res.filingCase);
       const newCurrent = resolveCurrentGuidedStep(newGuidedSteps);
