@@ -86,6 +86,7 @@ Statuses: `PENDING`, `READY`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `REJECTED`.
 | CLIENT-JOURNEY-03 | DONE | Redesign Step 1 and 2 to match prompt spec | DEPLOYMENT-FIX-02 | Replaced Step 1 form with simple Create Case button. Replaced Step 2 form with basic ITR No., Filing Date, Refund Amount input. | `4bd0521` |
 | CLIENT-JOURNEY-04 | DONE | Subsume filings details into Step 2 and implement dynamic step shifting | CLIENT-JOURNEY-03 | ClientStatusStep has full filings form. Status selects Filing Queue (stays) or Filed (shifts to Step 3). UI static summary only shows when case is Filed. | `b3b202b` |
 | CLIENT-JOURNEY-04-R1 | DONE | Refinement: simplify Step 2 to 2-button status toggle, stack client name/PAN header, enlarge typography | CLIENT-JOURNEY-04 | Step 2 reduced to Filing Queue/Filed toggle + Save only (fields moved to Step 3 via ITR-V extraction). Header stacked vertically. Filed summary card and step typography bumped. | `d6066fc` |
+| CLIENT-JOURNEY-05 | IN_PROGRESS | Fix Step 3 (Invoice) to subsume Documents + Invoices & Payments + Refunds with explicit 2-window structure; persist ITR-V extraction to filing_cases | CLIENT-JOURNEY-04-R1 | (a) ITR-V upload auto-extract now writes ITR No. (return_category) and Refund Amount (refund_claimed_amount) into filing_cases so ChargesStep auto-populates (b) Step 3 first window shows only upload container, second window shows charges+refund+invoice with re-upload, edit invoice, and Draft/Final Invoice buttons (c) build/typecheck/lint pass | — |
 ## Task update protocol
 
 When starting:

@@ -619,18 +619,15 @@ export function ClientJourneyPage({
                     {/* ════════════════════════════════════════════════════════════════
                         STEP 3 — INVOICE
                         Subsumes: Documents + Invoices & Payments + Refunds
-                        Sub-window A: Upload ITR-V
-                        Sub-window B: Charges + Invoice + Refund
+                        Window A: Upload ITR-V (only upload container)
+                        Window B: Charges auto-populated + Re-upload + Edit invoice
+                                  + Draft Invoice / Final Invoice buttons
                     ════════════════════════════════════════════════════════════════ */}
                     {selectedStepId === "invoice" && (
                       <div className="space-y-8">
-                        <p className="text-base text-white/60 font-light leading-relaxed max-w-lg mx-auto text-center">
-                          Upload the ITR-V acknowledgement, review charges, track refunds, and generate the invoice.
-                        </p>
-
-                        {/* Sub-window A: Upload ITR-V (if not yet uploaded) */}
+                        {/* Window A: Upload ITR-V (only when no filing exists yet) */}
                         {!itrvStepData && (
-                          <div className="w-full max-w-xl mx-auto">
+                          <div className="w-full max-w-xl mx-auto space-y-4">
                             <UploadITRVStep
                               clientId={clientId}
                               selectedAyId={selectedAyId}
@@ -640,36 +637,46 @@ export function ClientJourneyPage({
                           </div>
                         )}
 
-                        {/* Sub-window B: After upload — Charges + Refund + Invoice */}
+                        {/* Window B: After upload — Charges + Refund + Invoice
+                            Charges are auto-populated from filing_cases
+                            (return_category = ITR No., refund_claimed_amount = Refund Amount).
+                            User can re-upload ITR-V, edit charges/invoice, and create
+                            a draft or final invoice. Either action advances to Step 4. */}
                         {itrvStepData && (
-                          <div className="space-y-8">
-                            {/* Re-upload option */}
-                            <div className="flex justify-end">
+                          <div className="w-full max-w-4xl mx-auto space-y-8">
+
+                            {/* Compact upload-control row: indicates current file + re-upload action */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-3 rounded-xl border border-white/5 bg-white/[0.02]">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                                  <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                </div>
+                                <span className="text-xs uppercase tracking-widest font-mono text-emerald-400">ITR-V Received</span>
+                              </div>
                               <UploadITRVStep
                                 clientId={clientId}
                                 selectedAyId={selectedAyId}
-                                existingItrvDoc={{ id: "", original_filename: itrvStepData.ackNumber }}
+                                existingItrvDoc={null}
                                 onComplete={() => handleRefresh()}
+                                compact
                               />
                             </div>
 
-                            {/* Charges section */}
-                            {state.steps.find((s: any) => s.id === "charges")?.status !== "done" && (
-                              <ChargesStep
-                                caseId={filingCase?.id || ""}
-                                clientId={clientId}
-                                rateCard={invoiceSettings?.rate_card || {}}
-                                refundChargePercentage={invoiceSettings?.refund_charge_percentage || 10}
-                                defaultItrForm={filingCase?.return_category || "ITR-1"}
-                                initialRefundClaimed={filingCase?.refund_claimed_amount || 0}
-                                initialItrCharges={filingCase?.itr_filing_charges || undefined}
-                                initialRefundCharges={filingCase?.refund_claim_charges || undefined}
-                                onComplete={() => handleRefresh()}
-                              />
-                            )}
+                            {/* Charges panel — auto-populated, editable via the Modify action */}
+                            <ChargesStep
+                              caseId={filingCase?.id || ""}
+                              clientId={clientId}
+                              rateCard={invoiceSettings?.rate_card || {}}
+                              refundChargePercentage={invoiceSettings?.refund_charge_percentage || 10}
+                              defaultItrForm={filingCase?.return_category || "ITR-1"}
+                              initialRefundClaimed={filingCase?.refund_claimed_amount || 0}
+                              initialItrCharges={filingCase?.itr_filing_charges || undefined}
+                              initialRefundCharges={filingCase?.refund_claim_charges || undefined}
+                              onComplete={() => handleRefresh()}
+                            />
 
-                            {/* Refund tracking (if applicable) */}
-                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" && 
+                            {/* Refund tracking — appears after charges are confirmed and only if refund was claimed */}
+                            {state.steps.find((s: any) => s.id === "charges")?.status === "done" &&
                              state.steps.find((s: any) => s.id === "refund")?.status !== "skipped" && (
                               <RefundTrackingStep
                                 caseId={filingCase?.id || ""}
@@ -682,7 +689,7 @@ export function ClientJourneyPage({
                               />
                             )}
 
-                            {/* Invoice generation */}
+                            {/* Invoice creation / edit — Draft & Final buttons, both forward to Step 4 */}
                             {state.steps.find((s: any) => s.id === "charges")?.status === "done" && (
                               <InvoiceStep
                                 clientId={clientId}

@@ -208,6 +208,87 @@ export async function POST(
       parsedData = regexResult;
     }
 
+    // ── Persist extracted values to the filing case so ChargesStep auto-populates ──
+    // Behaviour:
+    //  • When a filing case exists for this client + AY, write ITR No. and Refund
+    //    Amount into filing_cases so the 2nd window of Step 3 can show them.
+    //  • If no filing_records row exists yet, insert one with the extracted
+    //    acknowledgement number and filing date. This activates the "filed"
+    //    journey step and lets ChargesStep + RefundTrackingStep render.
+    if (document.client_id && document.assessment_year_id) {
+      const { data: filingCase } = await supabase
+        .from("filing_cases")
+        .select("id, itr_filing_charges, refund_charge_percentage, case_status")
+        .eq("workspace_id", session.workspace.id)
+        .eq("client_id", document.client_id)
+        .eq("assessment_year_id", document.assessment_year_id)
+        .is("archived_at", null)
+        .maybeSingle();
+
+      if (filingCase) {
+        const caseUpdate: Record<string, unknown> = {};
+        if (parsedData.itrForm && typeof parsedData.itrForm === "string") {
+          caseUpdate.return_category = parsedData.itrForm.toUpperCase();
+        }
+        if (parsedData.refundAmount && parsedData.refundAmount > 0) {
+          caseUpdate.refund_claimed_amount = parsedData.refundAmount;
+        }
+        if (parsedData.taxPayable && parsedData.taxPayable > 0) {
+          // Mirror as 0 refund — tax payable does NOT generate a refund.
+          caseUpdate.refund_claimed_amount = 0;
+        }
+        if (Object.keys(caseUpdate).length > 0) {
+          // Only refresh next_action after charges are saved; never overwrite computed fees.
+          caseUpdate.next_action = "Review charges and finalise invoice";
+          await supabase
+            .from("filing_cases")
+            .update(caseUpdate)
+            .eq("id", filingCase.id);
+        }
+
+        // Keep filing_records consistent so resovler treats case as "filed".
+        const { data: existingRecords } = await supabase
+          .from("filing_records")
+          .select("id, acknowledgement_number, filing_date")
+          .eq("case_id", filingCase.id)
+          .is("archived_at", null)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        const ackFromFilename =
+          document.original_filename?.match(/\d{10,}/)?.[0] ?? null;
+        const today = new Date().toISOString().slice(0, 10);
+
+        if (existingRecords && existingRecords.length > 0) {
+          const record = existingRecords[0];
+          const recordUpdate: Record<string, unknown> = {};
+          if (!record.acknowledgement_number && ackFromFilename) {
+            recordUpdate.acknowledgement_number = ackFromFilename;
+          }
+          if (!record.filing_date) {
+            recordUpdate.filing_date = today;
+            recordUpdate.processing_status = "Submitted";
+          }
+          if (Object.keys(recordUpdate).length > 0) {
+            await supabase
+              .from("filing_records")
+              .update(recordUpdate)
+              .eq("id", record.id);
+          }
+        } else {
+          await supabase.from("filing_records").insert({
+            case_id: filingCase.id,
+            workspace_id: session.workspace.id,
+            filing_kind: "Original",
+            filing_date: today,
+            acknowledgement_number: ackFromFilename || `ITRV-${Date.now()}`,
+            verification_status: "Pending",
+            processing_status: "Submitted",
+          });
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {

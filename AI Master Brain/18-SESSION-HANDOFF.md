@@ -4,11 +4,24 @@ This file is rewritten after every task. Keep it compact and factual.
 
 ## Current state
 
-- Active task: `CLIENT-JOURNEY-04`
+- Active task: `CLIENT-JOURNEY-05`
 - Next READY task: None
 - Repository: `PulseInAir/SDDS-V2`
 - Branch: `master`
-- HEAD: `d6066fc`
+- HEAD: `0012d0e`
+
+## Step 3 (Invoice) Subsume & Upload Fix (2026-07-11)
+
+**Status: IN_PROGRESS — Fix Step 3 to subsume Documents + Invoices & Payments + Refunds as 2-window structure; upload ITR-V auto-extract must populate case fields.**
+
+### Reported bug
+1. **Upload button does nothing.** After attaching a PDF and clicking "Upload & Auto-Extract", the form does not save `ITR No.` (return_category) or `Refund Amount` (refund_claimed_amount) to `filing_cases`, so the charges panel never auto-populates and the second window never opens.
+2. **Step 3 fails to subsume 3 header menus.** Per spec, Step 3 must absorb Documents, Invoices & Payments, and Refunds into a 2-window flow. Current Step 3 shows only the "Upload ITR-V" text and then sits idle.
+
+### Plan
+1. PDF extract endpoint: after extraction, if a filing case exists for the same `client_id` + `assessment_year_id`, persist `return_category` (ITR No.) and `refund_claimed_amount` into `filing_cases` (also stamp filing record if filings table is empty).
+2. Rewrite Step 3 (`ClientJourneyPage`) with explicit Window A (upload container only — `UploadITRVStep` alone, no surrounding copy) and Window B (after upload: re-upload control + ChargesStep + RefundTrackingStep + invoice draft/final buttons).
+3. Replace `InvoiceStep` with a stepped sub-flow that has Draft Invoice and Final Invoice buttons. Both advance to Step 4.
 
 ## Step 2 Simplification & Header Typography (2026-07-10)
 
